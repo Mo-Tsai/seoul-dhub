@@ -220,6 +220,31 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .pfab{position:fixed;bottom:24px;right:24px;background:var(--ink);color:var(--bg);border:none;border-radius:50px;padding:12px 22px;cursor:pointer;font-family:var(--serif);font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.18);display:flex;align-items:center;gap:7px;z-index:50;transition:transform .15s}
 .pfab:hover{transform:translateY(-2px)}
 
+/* ── LOGIN OVERLAY ── */
+.login-overlay{position:fixed;inset:0;background:var(--ink);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .3s}
+.login-overlay.hidden{opacity:0;pointer-events:none}
+.login-logo{font-size:48px;line-height:1}
+.login-title{color:var(--bg);font-size:26px;font-weight:700;letter-spacing:.02em}
+.login-sub{color:rgba(255,255,255,.45);font-size:12px;font-family:var(--mono);margin-top:-16px}
+.login-prompt{color:rgba(255,255,255,.7);font-size:14px;font-family:var(--serif)}
+.login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(90vw,320px)}
+.login-btn{padding:22px 16px;border:none;border-radius:10px;cursor:pointer;font-family:var(--serif);font-size:17px;font-weight:700;transition:transform .12s,box-shadow .12s;display:flex;align-items:center;justify-content:center;gap:8px}
+.login-btn:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.login-btn:active{transform:translateY(0)}
+.lbtn-mo   {background:#e8e5e0;color:#3a3630}
+.lbtn-kelly{background:#fde8f2;color:#8a2f5a}
+.lbtn-mia  {background:#ede8f9;color:#5e45a0}
+.lbtn-rui  {background:#e5f0fb;color:#2d5f9b}
+
+/* user chip in header */
+.user-chip{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:5px;border:1px solid rgba(255,255,255,.22);cursor:pointer;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.9);background:rgba(255,255,255,.1);transition:background .15s;white-space:nowrap}
+.user-chip:hover{background:rgba(255,255,255,.2)}
+.chip-mo   {border-color:#7a7068!important;background:rgba(122,112,104,.35)!important}
+.chip-kelly{border-color:#d48aaa!important;background:rgba(212,138,170,.25)!important}
+.chip-mia  {border-color:#9985cc!important;background:rgba(153,133,204,.25)!important}
+.chip-rui  {border-color:#6a9fd4!important;background:rgba(106,159,212,.25)!important}
+.chip-switch{opacity:.45;font-size:9px;margin-left:2px}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:72px;right:24px;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:12px;font-family:var(--mono);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:300}
 .toast.show{opacity:1;transform:translateY(0)}
@@ -263,6 +288,20 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 </head>
 <body>
 
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-logo">🇰🇷</div>
+  <div class="login-title">Seoul D-Hub</div>
+  <div class="login-sub">2025 / 7/1–7/5 · 家族行程</div>
+  <div class="login-prompt">你是誰？</div>
+  <div class="login-grid">
+    <button class="login-btn lbtn-mo"    onclick="selectAndEnter('Mo')">Mo</button>
+    <button class="login-btn lbtn-kelly" onclick="selectAndEnter('Kelly')">Kelly</button>
+    <button class="login-btn lbtn-mia"   onclick="selectAndEnter('Mia')">Mia ✨</button>
+    <button class="login-btn lbtn-rui"   onclick="selectAndEnter('Rui')">Rui 🐉</button>
+  </div>
+</div>
+
 <header class="hdr">
   <div>
     <div class="hdr-title">🇰🇷 Seoul D-Hub</div>
@@ -270,20 +309,17 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
   </div>
   <div class="hdr-right">
     <span id="connDot" class="conn-dot offline" title="連線狀態"></span>
-    <select id="userSelect" class="user-sel" onchange="setCurrentUser(this.value)">
-      <option value="">你是誰？</option>
-      <option value="Mo">Mo</option>
-      <option value="Kelly">Kelly</option>
-      <option value="Mia">Mia</option>
-      <option value="Rui">Rui</option>
-    </select>
+    <div class="user-chip" id="userChip" onclick="showLoginOverlay()" title="切換身份">
+      <span id="userChipName">—</span>
+      <span class="chip-switch">切換</span>
+    </div>
     <button class="hbtn" onclick="togglePanel('panelFlight')">✈ 機票</button>
     <button class="hbtn" onclick="togglePanel('panelHotel')">🏨 住宿</button>
     <button class="hbtn" onclick="togglePanel('panelEmergency')">🆘 緊急</button>
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn" onclick="window.print()">⎙ 列印</button>
-    <span class="ver">v1.3</span>
+    <span class="ver">v1.4</span>
   </div>
 </header>
 
@@ -725,17 +761,37 @@ function voteStr(votes) {
 function setCurrentUser(name) {
   currentUser = name;
   localStorage.setItem('seoul_current_user', name);
-  const sel = document.getElementById('userSelect');
-  if (sel) {
-    sel.value = name;
-    const cls = name ? 'selected-'+name.toLowerCase() : '';
-    sel.className = 'user-sel' + (cls?' '+cls:'');
+  const chip = document.getElementById('userChip');
+  const chipName = document.getElementById('userChipName');
+  if (chip && chipName) {
+    chipName.textContent = name || '—';
+    chip.className = 'user-chip' + (name ? ' chip-'+name.toLowerCase() : '');
   }
   setSyncInfo(name ? `Hi ${name}，已連線` : '已連線，即時同步中');
 }
 
-// Restore user on load
-if (currentUser) setCurrentUser(currentUser);
+function selectAndEnter(name) {
+  setCurrentUser(name);
+  const ol = document.getElementById('loginOverlay');
+  ol.classList.add('hidden');
+  setTimeout(() => { ol.style.display = 'none'; }, 300);
+  showToast('歡迎，' + name + ' 👋');
+  render();
+}
+
+function showLoginOverlay() {
+  const ol = document.getElementById('loginOverlay');
+  ol.style.display = 'flex';
+  requestAnimationFrame(() => ol.classList.remove('hidden'));
+}
+
+// Restore user on load or show login screen
+if (currentUser) {
+  setCurrentUser(currentUser);
+  document.getElementById('loginOverlay').style.display = 'none';
+} else {
+  // will show overlay until user picks identity
+}
 
 // ═══════════════════════════════════════════
 //  RENDER
@@ -793,7 +849,10 @@ function renderDay() {
               }).join('')}
             </div>
             <div class="card-footer">
-              <div class="card-who">${(item.who||[]).map(w=>`<span class="who-tag ${whoClass(w)}">${esc(w)}</span>`).join('')}</div>
+              <div class="card-who">${currentUser
+                ? `<span class="who-tag ${whoClass(currentUser)}">${esc(currentUser)}</span>`
+                : (item.addedBy&&item.addedBy!=='—'?`<span class="who-tag who-other">${esc(item.addedBy)}</span>`:'')}
+              ${item.addedBy&&item.addedBy!=='—'&&item.addedBy!==currentUser?`<span class="who-tag who-other" style="opacity:.55">by ${esc(item.addedBy)}</span>`:''}</div>
               <div class="card-btns">
                 ${item.address?`<a class="cbtn maps" href="${mapsUrl(item.address)}" target="_blank" rel="noopener">🗺 地圖</a>`:''}
                 ${isH
