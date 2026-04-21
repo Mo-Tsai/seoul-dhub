@@ -267,6 +267,31 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .chip-rui  {border-color:#1030C0!important;background:rgba(26,76,232,.15)!important;color:#6090FF!important}
 .chip-switch{opacity:.35;font-size:9px;margin-left:2px}
 
+/* ── DAY SUGGEST (modal) ── */
+.day-suggest{background:var(--blue-bg);border:1px solid #b8ceff;border-radius:7px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.day-suggest.hidden{display:none}
+.day-suggest-text{font-size:11px;font-family:var(--mono);color:var(--blue);flex:1}
+.day-suggest-text strong{font-weight:700}
+.day-suggest-apply{background:var(--blue);color:#fff;border:none;border-radius:4px;padding:4px 11px;font-size:10px;font-family:var(--mono);cursor:pointer;white-space:nowrap}
+.day-suggest-apply:hover{opacity:.85}
+
+/* ── MOVE SHEET ── */
+.move-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:210;display:none;align-items:flex-end;justify-content:center}
+.move-modal.open{display:flex}
+.move-sheet{background:var(--card);border-radius:16px 16px 0 0;padding:20px 20px 36px;width:100%;max-width:500px}
+.move-sheet-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.move-sheet-name{font-size:11px;font-family:var(--mono);color:var(--muted);margin-bottom:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.move-day-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
+.move-day-btn{padding:10px 4px;border-radius:8px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--muted);text-align:center;line-height:1.5;transition:all .12s}
+.move-day-btn span{display:block;font-size:9px;font-weight:400;opacity:.6}
+.move-day-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.move-day-btn.suggested{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.move-day-btn.current{opacity:.3;cursor:default;pointer-events:none;border-style:dashed}
+.move-suggest-label{font-size:10px;font-family:var(--mono);color:var(--blue);margin-bottom:10px}
+.move-suggest-label.hidden{display:none}
+.move-cancel{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-family:var(--serif);font-size:13px;color:var(--muted)}
+.move-cancel:hover{background:var(--border)}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:72px;right:24px;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:12px;font-family:var(--mono);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:300}
 .toast.show{opacity:1;transform:translateY(0)}
@@ -380,7 +405,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn" onclick="window.print()">⎙ 列印</button>
-    <span class="ver">v1.6</span>
+    <span class="ver">v1.7</span>
   </div>
 </header>
 
@@ -453,7 +478,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
   <div class="modal">
     <div class="modal-title">＋ 新增地點</div>
-    <div class="fg"><label>地點名稱 *</label><input id="m_name" type="text" placeholder="如：益善洞咖啡、弘大逛街"></div>
+    <div class="fg"><label>地點名稱 *</label><input id="m_name" type="text" placeholder="如：益善洞咖啡、弘大逛街" oninput="updateDaySuggest()"></div>
     <div class="fg"><label>地點韓文（選填）</label><input id="m_nameko" type="text" placeholder="如：익선동"></div>
     <div class="fg-row">
       <div class="fg">
@@ -466,6 +491,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
         </select>
       </div>
       <div class="fg">
+        <div class="day-suggest hidden" id="daySuggestBanner">
+          <span class="day-suggest-text" id="daySuggestText"></span>
+          <button class="day-suggest-apply" onclick="applySuggest()">採用</button>
+        </div>
         <label>加入哪一天</label>
         <select id="m_day">
           <option value="1">Day 1（7/1）</option>
@@ -480,7 +509,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
       <div class="fg"><label>開始時間</label><input id="m_time" type="time"></div>
       <div class="fg"><label>結束時間</label><input id="m_endtime" type="time"></div>
     </div>
-    <div class="fg"><label>地址／搜尋（Google Maps 用）</label><input id="m_address" type="text" placeholder="如：익선동 서울"></div>
+    <div class="fg"><label>地址／搜尋（Google Maps 用）</label><input id="m_address" type="text" placeholder="如：익선동 서울" oninput="updateDaySuggest()"></div>
     <div class="fg-row">
       <div class="fg"><label>門票費用</label><input id="m_admission" type="text" placeholder="免費 / ₩15,000"></div>
       <div class="fg"><label>預算估算</label><input id="m_budget" type="text" placeholder="₩30,000 / NT$700"></div>
@@ -503,6 +532,17 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
       <button class="btn-cancel" onclick="closeModal()">取消</button>
       <button class="btn-submit" onclick="submitAdd()">加入行程</button>
     </div>
+  </div>
+</div>
+
+<!-- MOVE MODAL -->
+<div class="move-modal" id="moveModal" onclick="handleMoveOverlay(event)">
+  <div class="move-sheet">
+    <div class="move-sheet-title">移到哪一天？</div>
+    <div class="move-sheet-name" id="moveItemName"></div>
+    <div class="move-suggest-label hidden" id="moveSuggestLabel"></div>
+    <div class="move-day-grid" id="moveDayGrid"></div>
+    <button class="move-cancel" onclick="closeMoveModal()">取消</button>
   </div>
 </div>
 
@@ -933,6 +973,7 @@ function renderDay() {
               ${item.addedBy&&item.addedBy!=='—'&&item.addedBy!==currentUser?`<span class="who-tag who-other" style="opacity:.55">by ${esc(item.addedBy)}</span>`:''}</div>
               <div class="card-btns">
                 ${item.address?`<a class="cbtn maps" href="${mapsUrl(item.address)}" target="_blank" rel="noopener">🗺 地圖</a>`:''}
+                <button class="cbtn" onclick="openMoveModal('${item.id}',${currentDay})">📅 移到…</button>
                 ${isH
                   ?`<button class="cbtn restore" onclick="toggleHide('${item.id}',${currentDay})">↩ 恢復</button>`
                   :`<button class="cbtn hide"    onclick="toggleHide('${item.id}',${currentDay})">🙈 隱藏</button>`}
@@ -1119,6 +1160,7 @@ function openModal(day) {
   ['m_name','m_nameko','m_address','m_admission','m_budget','m_hours','m_transport','m_desc']
     .forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('m_type').value='other';
+  suggestedDay=null; document.getElementById('daySuggestBanner').classList.add('hidden');
   MEMBERS.forEach(m=>{
     document.getElementById('w_'+m.low).checked=false;
     document.getElementById('opt_'+m.low).classList.remove(m.optCls);
@@ -1155,6 +1197,109 @@ function submitAdd() {
   saveState(); currentDay=dayNum; closeModal(); render();
   showToast('✅ 已加入 Day '+dayNum);
 }
+
+// ═══════════════════════════════════════════
+//  SMART DAY SUGGESTION
+// ═══════════════════════════════════════════
+
+const DAY_KEYWORDS = {
+  1: ['삼청','경복','북촌','인사동','안국','창덕','가회','소격','팔판','삼청동'],
+  2: ['광화문','세종대로','청계천','을지로','명동','시청','남대문','중구','덕수궁','일민','세종'],
+  3: ['동대문','ddp','동대문디자인','성수','왕십리','동묘','신당','을지로3가','을지로4가'],
+  4: ['용산','한남','이태원','압구정','강남','신사','청담','도산','한강진','리움','소서울','한남동'],
+  5: ['이촌','국립중앙박물관','서빙고','노량진','용산역'],
+};
+
+let suggestedDay = null;
+
+function suggestBestDay(name, address) {
+  const txt = ((name||'') + ' ' + (address||'')).toLowerCase();
+  const scores = {};
+  for (let d = 1; d <= 5; d++) {
+    scores[d] = (DAY_KEYWORDS[d]||[]).reduce((s,kw) => txt.includes(kw) ? s+3 : s, 0);
+    const cnt = (state.items[d]||[]).filter(i=>!i.hidden).length;
+    if (cnt < 3) scores[d] += 1;
+  }
+  const best = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
+  return parseInt(best[1]) >= 3 ? {day:parseInt(best[0]), score:parseInt(best[1])} : null;
+}
+
+function updateDaySuggest() {
+  const name = document.getElementById('m_name').value;
+  const addr = document.getElementById('m_address').value;
+  const result = suggestBestDay(name, addr);
+  const banner = document.getElementById('daySuggestBanner');
+  const text   = document.getElementById('daySuggestText');
+  if (result) {
+    suggestedDay = result.day;
+    const meta = DAYS_META[result.day-1];
+    text.innerHTML = `📍 建議 <strong>Day ${result.day} — ${meta.area}</strong>（依地理位置）`;
+    banner.classList.remove('hidden');
+  } else {
+    suggestedDay = null;
+    banner.classList.add('hidden');
+  }
+}
+
+function applySuggest() {
+  if (!suggestedDay) return;
+  document.getElementById('m_day').value = String(suggestedDay);
+  document.getElementById('daySuggestBanner').classList.add('hidden');
+  showToast(`✓ 已設為 Day ${suggestedDay}`);
+}
+
+// ═══════════════════════════════════════════
+//  MOVE ITEM
+// ═══════════════════════════════════════════
+
+let moveItemId = null, moveFromDay = null;
+
+function openMoveModal(id, fromDay) {
+  const item = (state.items[fromDay]||[]).find(i=>i.id===id);
+  if (!item) return;
+  moveItemId = id; moveFromDay = fromDay;
+  document.getElementById('moveItemName').textContent = item.name;
+  const suggest = suggestBestDay(item.name, item.address||'');
+  const sugLabel = document.getElementById('moveSuggestLabel');
+  if (suggest && suggest.day !== fromDay) {
+    const meta = DAYS_META[suggest.day-1];
+    sugLabel.textContent = `📍 智能推薦：Day ${suggest.day} — ${meta.area}`;
+    sugLabel.classList.remove('hidden');
+  } else {
+    sugLabel.classList.add('hidden');
+  }
+  const grid = document.getElementById('moveDayGrid');
+  grid.innerHTML = DAYS_META.map(m => {
+    const isCurrent  = m.day === fromDay;
+    const isSuggested = suggest && suggest.day === m.day && m.day !== fromDay;
+    return `<button class="move-day-btn${isCurrent?' current':''}${isSuggested?' suggested':''}"
+      onclick="doMoveItem(${m.day})">
+      Day ${m.day}<span>${m.area}</span>
+    </button>`;
+  }).join('');
+  document.getElementById('moveModal').classList.add('open');
+}
+
+function doMoveItem(toDay) {
+  if (!moveItemId || !moveFromDay || toDay === moveFromDay) { closeMoveModal(); return; }
+  const items = state.items[moveFromDay]||[];
+  const idx = items.findIndex(i=>i.id===moveItemId);
+  if (idx < 0) { closeMoveModal(); return; }
+  const [item] = items.splice(idx, 1);
+  if (!state.items[toDay]) state.items[toDay] = [];
+  state.items[toDay].push(item);
+  saveState(); closeMoveModal();
+  const meta = DAYS_META[toDay-1];
+  showToast(`✓ 已移到 Day ${toDay} — ${meta.area}`);
+  render();
+}
+
+function closeMoveModal() {
+  document.getElementById('moveModal').classList.remove('open');
+  moveItemId = null; moveFromDay = null;
+}
+
+function handleMoveOverlay(e) { if (e.target===e.currentTarget) closeMoveModal(); }
 
 // ═══════════════════════════════════════════
 //  EXPORT
