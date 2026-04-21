@@ -14,28 +14,30 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
 :root {
-  --bg:#F5F2EC; --card:#FDFAF6; --ink:#1C1A17; --muted:#6B665E; --border:#DDD9D2;
-  --accent:#C8432A; --accent-bg:#FDF0ED;
-  --blue:#3A6E9A; --blue-bg:#EBF3FA;
-  --green:#3A7A55; --green-bg:#EAF4EF;
-  --red:#C8432A; --red-bg:#FDF0ED;
-  --purple:#6B5FA5; --purple-bg:#F0EEF9;
+  --bg:#F5F3FF; --card:#FFFFFF; --ink:#0E0C26; --muted:#6B5C9A; --border:#DDD8FF;
+  --accent:#D4196A; --accent-bg:#FDE8F2;
+  --blue:#2E4FD4; --blue-bg:#EEF1FF;
+  --green:#00996A; --green-bg:#E6FFF6;
+  --red:#D4196A; --red-bg:#FDE8F2;
+  --purple:#7A28C8; --purple-bg:#F2EAFF;
   --serif:'Noto Serif TC',Georgia,serif;
   --mono:'DM Mono',Consolas,monospace;
-  --r:8px;
+  --r:10px;
+  --hdr-grad:linear-gradient(135deg,#0E0C26 0%,#1C186A 60%,#2D1060 100%);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:100vh;font-size:14px;line-height:1.6}
 
 /* ── HEADER ── */
-.hdr{position:sticky;top:0;z-index:100;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px}
-.hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em}
-.hdr-sub{font-size:10px;font-family:var(--mono);opacity:.5;margin-top:1px}
+.hdr{position:sticky;top:0;z-index:100;background:var(--hdr-grad);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.hdr::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0 1px,transparent 1px 40px);pointer-events:none}
+.hdr-title{font-size:15px;font-weight:700;letter-spacing:.06em;background:linear-gradient(90deg,#fff 0%,#C8B4FF 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hdr-sub{font-size:10px;font-family:var(--mono);opacity:.45;margin-top:1px}
 .hdr-right{display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
-.hbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.9);padding:5px 11px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--mono);transition:background .15s;white-space:nowrap}
-.hbtn:hover{background:rgba(255,255,255,.2)}
-.ver{font-family:var(--mono);font-size:10px;opacity:.3;margin-left:4px}
+.hbtn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.85);padding:5px 11px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--mono);transition:all .15s;white-space:nowrap}
+.hbtn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3)}
+.ver{font-family:var(--mono);font-size:10px;opacity:.25;margin-left:4px}
 
 /* user selector */
 .user-sel{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.95);padding:5px 9px;border-radius:5px;font-family:var(--mono);font-size:11px;cursor:pointer;outline:none}
@@ -74,12 +76,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .weather-dismiss:hover{opacity:1}
 
 /* ── DAY TABS ── */
-.day-tabs{background:var(--card);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;padding:0 20px;scrollbar-width:none}
+.day-tabs{background:var(--ink);border-bottom:2px solid rgba(255,255,255,.08);display:flex;overflow-x:auto;padding:0 16px;scrollbar-width:none}
 .day-tabs::-webkit-scrollbar{display:none}
-.tab{padding:11px 16px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--serif);transition:all .15s}
-.tab:hover{color:var(--ink)}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.tab-date{display:block;font-size:9px;font-family:var(--mono);opacity:.55;font-weight:400;margin-top:1px}
+.tab{padding:10px 15px;cursor:pointer;font-size:12px;font-weight:600;color:rgba(255,255,255,.45);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--serif);transition:all .15s;letter-spacing:.02em}
+.tab:hover{color:rgba(255,255,255,.8)}
+.tab.active{color:#fff;border-bottom-color:#C8A8FF;text-shadow:0 0 12px rgba(200,168,255,.6)}
+.tab-date{display:block;font-size:9px;font-family:var(--mono);opacity:.5;font-weight:400;margin-top:1px}
 
 /* ── LAYOUT ── */
 .layout{display:flex;min-height:calc(100vh - 92px)}
@@ -103,8 +105,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .tl-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 0 1.5px var(--border)}
 
 /* ── ITEM CARD ── */
-.item-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:box-shadow .15s,opacity .2s}
-.item-card:hover{box-shadow:0 2px 14px rgba(0,0,0,.08)}
+.item-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:box-shadow .15s,opacity .2s;box-shadow:0 2px 8px rgba(14,12,38,.06)}
+.item-card:hover{box-shadow:0 4px 20px rgba(14,12,38,.13)}
 .item-card.hidden-item{opacity:.4}
 .card-inner{display:flex}
 .card-bar{width:4px;flex-shrink:0}
@@ -221,29 +223,50 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .pfab:hover{transform:translateY(-2px)}
 
 /* ── LOGIN OVERLAY ── */
-.login-overlay{position:fixed;inset:0;background:var(--ink);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;transition:opacity .3s}
+.login-overlay{position:fixed;inset:0;background:var(--hdr-grad);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:opacity .35s;overflow:hidden}
+.login-overlay::before{content:'서울 ★ 한국 ★ K-TRIP ★ 서울 ★ 한국 ★ K-TRIP ★ 서울 ★ 한국 ★';position:absolute;top:0;left:-10%;right:-10%;padding:8px 0;font-size:11px;font-family:var(--mono);color:rgba(255,255,255,.06);white-space:nowrap;letter-spacing:.3em;border-bottom:1px solid rgba(255,255,255,.05)}
+.login-overlay::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(122,40,200,.18) 0%,transparent 70%);pointer-events:none}
 .login-overlay.hidden{opacity:0;pointer-events:none}
-.login-logo{font-size:48px;line-height:1}
-.login-title{color:var(--bg);font-size:26px;font-weight:700;letter-spacing:.02em}
-.login-sub{color:rgba(255,255,255,.45);font-size:12px;font-family:var(--mono);margin-top:-16px}
-.login-prompt{color:rgba(255,255,255,.7);font-size:14px;font-family:var(--serif)}
-.login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(90vw,320px)}
-.login-btn{padding:22px 16px;border:none;border-radius:10px;cursor:pointer;font-family:var(--serif);font-size:17px;font-weight:700;transition:transform .12s,box-shadow .12s;display:flex;align-items:center;justify-content:center;gap:8px}
-.login-btn:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.35)}
-.login-btn:active{transform:translateY(0)}
-.lbtn-mo   {background:#e8e5e0;color:#3a3630}
-.lbtn-kelly{background:#fde8f2;color:#8a2f5a}
-.lbtn-mia  {background:#ede8f9;color:#5e45a0}
-.lbtn-rui  {background:#e5f0fb;color:#2d5f9b}
+.login-logo{font-size:52px;line-height:1;filter:drop-shadow(0 0 16px rgba(200,168,255,.5))}
+.login-title{font-size:28px;font-weight:700;letter-spacing:.06em;background:linear-gradient(90deg,#fff 0%,#C8A8FF 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.login-sub{font-size:11px;font-family:var(--mono);color:rgba(255,255,255,.4);margin-top:-14px;letter-spacing:.12em}
+.login-prompt{font-size:13px;color:rgba(255,255,255,.65);font-family:var(--serif);letter-spacing:.04em}
+.login-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(90vw,340px)}
+.login-btn{padding:20px 16px;border:1.5px solid transparent;border-radius:12px;cursor:pointer;font-family:var(--serif);font-size:16px;font-weight:700;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column;align-items:center;gap:5px}
+.login-btn .lb-emoji{font-size:26px;line-height:1}
+.login-btn .lb-role{font-size:9px;font-family:var(--mono);opacity:.6;font-weight:400;letter-spacing:.06em}
+.login-btn:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.4)}
+.login-btn:active{transform:translateY(-1px)}
+.lbtn-mo   {background:linear-gradient(135deg,#2a2318,#3d3020);border-color:#6a5a30;color:#F0D880}
+.lbtn-kelly{background:linear-gradient(135deg,#2a0f1e,#3d1430);border-color:#9e3060;color:#FFB8D8}
+.lbtn-mia  {background:linear-gradient(135deg,#1a0f30,#2a1850);border-color:#7040C0;color:#C8A0FF}
+.lbtn-rui  {background:linear-gradient(135deg,#0a1830,#0f2848);border-color:#3060C0;color:#90C8FF}
+
+/* ── PROFILE OVERLAY ── */
+.profile-overlay{position:fixed;inset:0;background:var(--hdr-grad);z-index:490;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;transition:opacity .35s;overflow:hidden}
+.profile-overlay.hidden{opacity:0;pointer-events:none}
+.profile-card{width:min(92vw,360px);border-radius:20px;padding:32px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;position:relative;overflow:hidden}
+.profile-card::before{content:'';position:absolute;inset:0;opacity:.12;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.8),transparent 70%)}
+.pc-emoji{font-size:56px;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4));margin-bottom:4px}
+.pc-name{font-size:28px;font-weight:700;letter-spacing:.04em}
+.pc-role{font-size:11px;font-family:var(--mono);opacity:.7;letter-spacing:.1em;text-transform:uppercase}
+.pc-divider{width:40px;height:2px;border-radius:2px;opacity:.4;margin:4px 0}
+.pc-quote{font-size:13px;line-height:1.7;opacity:.85;font-style:italic;padding:0 8px}
+.pc-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:4px}
+.pc-tag{font-size:11px;font-family:var(--mono);padding:4px 11px;border-radius:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);letter-spacing:.04em}
+.pc-enter-btn{margin-top:16px;padding:14px 36px;border:none;border-radius:10px;cursor:pointer;font-family:var(--serif);font-size:15px;font-weight:700;transition:transform .15s,box-shadow .15s;letter-spacing:.04em}
+.pc-enter-btn:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.pc-back{margin-top:6px;background:none;border:none;cursor:pointer;font-size:12px;font-family:var(--mono);color:rgba(255,255,255,.4);padding:6px;letter-spacing:.06em;transition:color .15s}
+.pc-back:hover{color:rgba(255,255,255,.7)}
 
 /* user chip in header */
-.user-chip{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:5px;border:1px solid rgba(255,255,255,.22);cursor:pointer;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.9);background:rgba(255,255,255,.1);transition:background .15s;white-space:nowrap}
-.user-chip:hover{background:rgba(255,255,255,.2)}
-.chip-mo   {border-color:#7a7068!important;background:rgba(122,112,104,.35)!important}
-.chip-kelly{border-color:#d48aaa!important;background:rgba(212,138,170,.25)!important}
-.chip-mia  {border-color:#9985cc!important;background:rgba(153,133,204,.25)!important}
-.chip-rui  {border-color:#6a9fd4!important;background:rgba(106,159,212,.25)!important}
-.chip-switch{opacity:.45;font-size:9px;margin-left:2px}
+.user-chip{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.2);cursor:pointer;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.9);background:rgba(255,255,255,.08);transition:all .15s;white-space:nowrap}
+.user-chip:hover{background:rgba(255,255,255,.18)}
+.chip-mo   {border-color:#6a5a30!important;background:rgba(106,90,48,.35)!important;color:#F0D880!important}
+.chip-kelly{border-color:#9e3060!important;background:rgba(158,48,96,.25)!important;color:#FFB8D8!important}
+.chip-mia  {border-color:#7040C0!important;background:rgba(112,64,192,.25)!important;color:#C8A0FF!important}
+.chip-rui  {border-color:#3060C0!important;background:rgba(48,96,192,.25)!important;color:#90C8FF!important}
+.chip-switch{opacity:.4;font-size:9px;margin-left:2px}
 
 /* ── TOAST ── */
 .toast{position:fixed;bottom:72px;right:24px;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:12px;font-family:var(--mono);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:300}
@@ -288,24 +311,46 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
+<!-- LOGIN OVERLAY (step 1) -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-logo">🇰🇷</div>
   <div class="login-title">Seoul D-Hub</div>
-  <div class="login-sub">2025 / 7/1–7/5 · 家族行程</div>
-  <div class="login-prompt">你是誰？</div>
+  <div class="login-sub">2025 · 07/01 — 07/05</div>
+  <div class="login-prompt">你是誰？選你的身份</div>
   <div class="login-grid">
-    <button class="login-btn lbtn-mo"    onclick="selectAndEnter('Mo')">Mo</button>
-    <button class="login-btn lbtn-kelly" onclick="selectAndEnter('Kelly')">Kelly</button>
-    <button class="login-btn lbtn-mia"   onclick="selectAndEnter('Mia')">Mia ✨</button>
-    <button class="login-btn lbtn-rui"   onclick="selectAndEnter('Rui')">Rui 🐉</button>
+    <button class="login-btn lbtn-mo"    onclick="showProfile('Mo')">
+      <span class="lb-emoji">🎨</span>Mo<span class="lb-role">爸爸 · 設計師</span>
+    </button>
+    <button class="login-btn lbtn-kelly" onclick="showProfile('Kelly')">
+      <span class="lb-emoji">🌸</span>Kelly<span class="lb-role">媽媽 · 美食雷達</span>
+    </button>
+    <button class="login-btn lbtn-mia"   onclick="showProfile('Mia')">
+      <span class="lb-emoji">✨</span>Mia<span class="lb-role">女兒 · 13歲</span>
+    </button>
+    <button class="login-btn lbtn-rui"   onclick="showProfile('Rui')">
+      <span class="lb-emoji">⚡</span>Rui<span class="lb-role">兒子 · 探險家</span>
+    </button>
+  </div>
+</div>
+
+<!-- PROFILE OVERLAY (step 2) -->
+<div class="profile-overlay hidden" id="profileOverlay">
+  <div class="profile-card" id="profileCard">
+    <div class="pc-emoji" id="pcEmoji"></div>
+    <div class="pc-name" id="pcName"></div>
+    <div class="pc-role" id="pcRole"></div>
+    <div class="pc-divider" id="pcDivider"></div>
+    <div class="pc-quote" id="pcQuote"></div>
+    <div class="pc-tags" id="pcTags"></div>
+    <button class="pc-enter-btn" id="pcEnterBtn" onclick="enterApp()">✈ 進入行程</button>
+    <button class="pc-back" onclick="backToLogin()">← 換一個</button>
   </div>
 </div>
 
 <header class="hdr">
   <div>
     <div class="hdr-title">🇰🇷 Seoul D-Hub</div>
-    <div class="hdr-sub">2025 / 7/1–7/5 · 3人同步中</div>
+    <div class="hdr-sub">서울 2025 · 07/01–07/05 · 4인 동기화</div>
   </div>
   <div class="hdr-right">
     <span id="connDot" class="conn-dot offline" title="連線狀態"></span>
@@ -319,7 +364,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn" onclick="window.print()">⎙ 列印</button>
-    <span class="ver">v1.4</span>
+    <span class="ver">v1.5</span>
   </div>
 </header>
 
@@ -770,19 +815,67 @@ function setCurrentUser(name) {
   setSyncInfo(name ? `Hi ${name}，已連線` : '已連線，即時同步中');
 }
 
-function selectAndEnter(name) {
+const MEMBER_PROFILES = {
+  Mo:    { emoji:'🎨', role:'爸爸 · 設計師', quote:'每間美術館都要走完，建築外觀也要拍到滿意為止。', tags:['🏛 美術館控','📐 建築迷','☕ 咖啡依存','🗺 行程策劃'], card:'linear-gradient(135deg,#2a2318,#3d3020)', name_color:'#F0D880', btn:'#E8A800', btn_text:'#1a1000', divider:'#E8A800' },
+  Kelly: { emoji:'🌸', role:'媽媽 · 美食雷達', quote:'不好吃的不要去，好吃的要排隊也值得。', tags:['🍜 美食探索','🛍 購物達人','📸 拍照記錄','🌶 辣到底'], card:'linear-gradient(135deg,#2a0f1e,#3d1430)', name_color:'#FFB8D8', btn:'#E0206A', btn_text:'#fff', divider:'#E0206A' },
+  Mia:   { emoji:'✨', role:'女兒 · 13歲', quote:'Hybe 周邊店必去，SM Town 也要去，K-pop 聖地全制霸。', tags:['🎵 K-pop 迷','💜 ARMY','🧋 甜食控','📱 Reels 達人'], card:'linear-gradient(135deg,#1a0f30,#2a1850)', name_color:'#C8A0FF', btn:'#7A28C8', btn_text:'#fff', divider:'#7A28C8' },
+  Rui:   { emoji:'⚡', role:'兒子 · 探險家', quote:'能跑能跳能吃，只要有烤肉哪裡都願意去。', tags:['🎮 遊戲達人','🍖 烤肉主義','🏃 衝刺王','🎯 挑戰接受'], card:'linear-gradient(135deg,#0a1830,#0f2848)', name_color:'#90C8FF', btn:'#2060D0', btn_text:'#fff', divider:'#2060D0' },
+};
+
+function showProfile(name) {
+  const p = MEMBER_PROFILES[name];
+  if (!p) return;
+  // populate profile card
+  document.getElementById('pcEmoji').textContent = p.emoji;
+  document.getElementById('pcName').textContent  = name;
+  document.getElementById('pcName').style.color  = p.name_color;
+  document.getElementById('pcRole').textContent  = p.role;
+  document.getElementById('pcQuote').textContent = p.quote;
+  document.getElementById('pcDivider').style.background = p.divider;
+  document.getElementById('pcTags').innerHTML = p.tags.map(t=>`<span class="pc-tag">${t}</span>`).join('');
+  const enterBtn = document.getElementById('pcEnterBtn');
+  enterBtn.style.background = p.btn;
+  enterBtn.style.color = p.btn_text;
+  const card = document.getElementById('profileCard');
+  card.style.background = p.card;
+  card.style.color = '#fff';
+  // store pending user
+  card.dataset.pending = name;
+  // transition: fade login out, fade profile in
+  const lo = document.getElementById('loginOverlay');
+  const po = document.getElementById('profileOverlay');
+  lo.classList.add('hidden');
+  po.style.display = 'flex';
+  requestAnimationFrame(() => po.classList.remove('hidden'));
+}
+
+function enterApp() {
+  const name = document.getElementById('profileCard').dataset.pending;
   setCurrentUser(name);
-  const ol = document.getElementById('loginOverlay');
-  ol.classList.add('hidden');
-  setTimeout(() => { ol.style.display = 'none'; }, 300);
+  const po = document.getElementById('profileOverlay');
+  po.classList.add('hidden');
+  setTimeout(() => { po.style.display = 'none'; }, 350);
+  const lo = document.getElementById('loginOverlay');
+  lo.style.display = 'none';
   showToast('歡迎，' + name + ' 👋');
   render();
 }
 
+function backToLogin() {
+  const po = document.getElementById('profileOverlay');
+  const lo = document.getElementById('loginOverlay');
+  po.classList.add('hidden');
+  setTimeout(() => { po.style.display = 'none'; }, 350);
+  lo.style.display = 'flex';
+  requestAnimationFrame(() => lo.classList.remove('hidden'));
+}
+
 function showLoginOverlay() {
-  const ol = document.getElementById('loginOverlay');
-  ol.style.display = 'flex';
-  requestAnimationFrame(() => ol.classList.remove('hidden'));
+  const lo = document.getElementById('loginOverlay');
+  const po = document.getElementById('profileOverlay');
+  po.classList.add('hidden'); po.style.display = 'none';
+  lo.style.display = 'flex';
+  requestAnimationFrame(() => lo.classList.remove('hidden'));
 }
 
 // Restore user on load or show login screen
