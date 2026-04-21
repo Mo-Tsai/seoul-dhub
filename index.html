@@ -9,6 +9,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Firebase compat SDK (no bundler needed) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
 :root {
   --bg:#F5F2EC; --card:#FDFAF6; --ink:#1C1A17; --muted:#6B665E; --border:#DDD9D2;
@@ -26,54 +29,68 @@ html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:100vh;font-size:14px;line-height:1.6}
 
 /* ── HEADER ── */
-.hdr{position:sticky;top:0;z-index:100;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:11px 24px;gap:16px}
+.hdr{position:sticky;top:0;z-index:100;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:11px 20px;gap:12px}
 .hdr-title{font-size:15px;font-weight:700;letter-spacing:.04em}
 .hdr-sub{font-size:10px;font-family:var(--mono);opacity:.5;margin-top:1px}
-.hdr-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.hdr-right{display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
 .hbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.9);padding:5px 11px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--mono);transition:background .15s;white-space:nowrap}
 .hbtn:hover{background:rgba(255,255,255,.2)}
 .ver{font-family:var(--mono);font-size:10px;opacity:.3;margin-left:4px}
 
+/* user selector */
+.user-sel{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.95);padding:5px 9px;border-radius:5px;font-family:var(--mono);font-size:11px;cursor:pointer;outline:none}
+.user-sel option{background:#1C1A17;color:#F5F2EC}
+.user-sel.selected-mo    {border-color:#7a7068;background:rgba(122,112,104,.35)}
+.user-sel.selected-kelly {border-color:#d48aaa;background:rgba(212,138,170,.25)}
+.user-sel.selected-mia   {border-color:#9985cc;background:rgba(153,133,204,.25)}
+.user-sel.selected-rui   {border-color:#6a9fd4;background:rgba(106,159,212,.25)}
+
+/* connection dot */
+.conn-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;transition:background .3s}
+.conn-dot.connected{background:#4CAF50;box-shadow:0 0 5px #4CAF50}
+.conn-dot.offline{background:#666}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.conn-dot.syncing{background:#FF9800;animation:blink .8s infinite}
+
 /* ── PANELS ── */
 .panel{overflow:hidden;max-height:0;transition:max-height .35s ease;border-bottom:1px solid var(--border)}
-.panel.open{max-height:240px}
+.panel.open{max-height:260px}
 .panel-flight{background:#fdf5ed}
 .panel-hotel{background:#edf5fd}
 .panel-emergency{background:#fdf0ed}
-.panel-inner{padding:16px 24px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.panel-inner{padding:16px 22px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
 .fld{display:flex;flex-direction:column;gap:4px}
 .fld label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .fld input,.fld textarea{background:white;border:1px solid var(--border);border-radius:5px;padding:6px 10px;font-family:var(--mono);font-size:12px;color:var(--ink);outline:none}
-.fld input{width:150px}
+.fld input{width:148px}
 .fld input:focus,.fld textarea:focus{border-color:var(--accent)}
 .fld textarea{width:220px;min-height:52px;resize:none;font-size:11px}
 .psave{background:var(--accent);color:white;border:none;border-radius:5px;padding:7px 16px;cursor:pointer;font-size:13px;font-family:var(--serif);align-self:flex-end}
 .psave:hover{background:#a83520}
 
-/* ── WEATHER BANNER ── */
-.weather-banner{background:#fff8e6;border-bottom:1px solid #f0d98a;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#7a5c00}
-.weather-banner span{line-height:1.6}
+/* ── WEATHER ── */
+.weather-banner{background:#fff8e6;border-bottom:1px solid #f0d98a;padding:9px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#7a5c00}
 .weather-dismiss{background:none;border:none;cursor:pointer;font-size:16px;opacity:.5;flex-shrink:0}
 .weather-dismiss:hover{opacity:1}
 
 /* ── DAY TABS ── */
 .day-tabs{background:var(--card);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;padding:0 20px;scrollbar-width:none}
 .day-tabs::-webkit-scrollbar{display:none}
-.tab{padding:11px 18px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--serif);transition:all .15s}
+.tab{padding:11px 16px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;font-family:var(--serif);transition:all .15s}
 .tab:hover{color:var(--ink)}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .tab-date{display:block;font-size:9px;font-family:var(--mono);opacity:.55;font-weight:400;margin-top:1px}
 
 /* ── LAYOUT ── */
 .layout{display:flex;min-height:calc(100vh - 92px)}
-.content{flex:1;padding:28px 28px;max-width:740px;min-width:0}
-.sidebar{width:300px;flex-shrink:0;background:var(--card);border-left:1px solid var(--border);padding:24px 18px 24px 20px;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto}
+.content{flex:1;padding:26px 26px;max-width:740px;min-width:0}
+.sidebar{width:296px;flex-shrink:0;background:var(--card);border-left:1px solid var(--border);padding:22px 17px 22px 18px;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto}
 
 /* ── DAY HEADER ── */
-.day-header{margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+.day-header{margin-bottom:22px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
 .day-header h2{font-size:21px;font-weight:700}
 .day-meta{font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:3px}
-.show-hidden-btn{font-size:11px;font-family:var(--mono);padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);transition:all .15s;white-space:nowrap;align-self:flex-start;margin-top:4px}
+.show-hidden-btn{font-size:11px;font-family:var(--mono);padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);white-space:nowrap;align-self:flex-start;margin-top:4px}
 .show-hidden-btn:hover{background:var(--border);color:var(--ink)}
 .show-hidden-btn.active{background:#fef9e5;border-color:#d4a800;color:#8a6c00}
 
@@ -98,7 +115,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .card-badges{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
 .card-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:4px;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
 .hidden-label{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:4px;background:#fef9e5;color:#8a6c00;border:1px solid #d4a800;white-space:nowrap}
-.resv-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:4px;cursor:pointer;transition:all .15s;border:1px solid transparent;white-space:nowrap}
+.resv-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:4px;cursor:pointer;border:1px solid transparent;white-space:nowrap;transition:opacity .15s}
+.resv-badge:hover{opacity:.7}
 .resv-none{background:#f0eeea;color:var(--muted);border-color:var(--border)}
 .resv-pending{background:#fff4e0;color:#8a5c00;border-color:#e8c56a}
 .resv-booked{background:#e5f5eb;color:#2a6e42;border-color:#7ec89a}
@@ -106,15 +124,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .card-meta-row{font-size:11px;color:var(--muted);display:flex;gap:5px;align-items:flex-start}
 .card-desc{font-size:12px;color:var(--muted);line-height:1.65;font-style:italic;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
 
-/* ── VOTE ROW ── */
-.vote-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-.vote-btn{font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;background:transparent;transition:all .12s;display:inline-flex;align-items:center;gap:3px;color:var(--muted)}
+/* ── VOTES ── */
+.vote-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
+.vote-btn{font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;background:transparent;display:inline-flex;align-items:center;gap:3px;color:var(--muted);transition:all .12s}
 .vote-btn:hover{border-color:var(--muted)}
+.vote-btn.me{border-style:solid;font-weight:700}
 .vote-v1{background:#e8f4ee;border-color:#7ec89a;color:#2a6e42}
 .vote-v2{background:#fde8f2;border-color:#d48aaa;color:#8a2f5a}
 .vote-v3{background:#fef9e5;border-color:#d4a800;color:#8a6c00}
 
-/* ── CARD FOOTER ── */
+/* ── FOOTER ── */
 .card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:6px}
 .card-who{display:flex;gap:4px;flex-wrap:wrap}
 .who-tag{font-size:9px;font-family:var(--mono);padding:2px 8px;border-radius:10px}
@@ -124,7 +143,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .who-rui{background:#e5f0fb;color:#2d5f9b}
 .who-other{background:rgba(0,0,0,.06);color:var(--muted)}
 .card-btns{display:flex;gap:6px;flex-wrap:wrap}
-.cbtn{font-size:10px;padding:3px 9px;border-radius:4px;border:1px solid var(--border);cursor:pointer;background:transparent;color:var(--muted);font-family:var(--mono);transition:all .12s;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.cbtn{font-size:10px;padding:3px 9px;border-radius:4px;border:1px solid var(--border);cursor:pointer;background:transparent;color:var(--muted);font-family:var(--mono);text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:all .12s}
 .cbtn:hover{background:var(--border);color:var(--ink)}
 .cbtn.maps{color:var(--blue);border-color:#c5dff0}
 .cbtn.maps:hover{background:var(--blue-bg);border-color:var(--blue)}
@@ -132,13 +151,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .cbtn.restore{color:var(--green);border-color:#a5d4b5}
 .cbtn.restore:hover{background:var(--green-bg)}
 
-/* ── TYPE COLORS ── */
-.bar-museum{background:var(--blue)} .bar-architecture{background:var(--green)} .bar-restaurant{background:var(--red)} .bar-other{background:var(--purple)}
-.badge-museum{background:var(--blue-bg);color:var(--blue)} .badge-architecture{background:var(--green-bg);color:var(--green)} .badge-restaurant{background:var(--red-bg);color:var(--red)} .badge-other{background:var(--purple-bg);color:var(--purple)}
-.dot-museum{background:var(--blue)} .dot-architecture{background:var(--green)} .dot-restaurant{background:var(--red)} .dot-other{background:var(--purple)} .dot-hidden{background:#ccc}
+/* ── TYPE ── */
+.bar-museum{background:var(--blue)}.bar-architecture{background:var(--green)}.bar-restaurant{background:var(--red)}.bar-other{background:var(--purple)}
+.badge-museum{background:var(--blue-bg);color:var(--blue)}.badge-architecture{background:var(--green-bg);color:var(--green)}.badge-restaurant{background:var(--red-bg);color:var(--red)}.badge-other{background:var(--purple-bg);color:var(--purple)}
+.dot-museum{background:var(--blue)}.dot-architecture{background:var(--green)}.dot-restaurant{background:var(--red)}.dot-other{background:var(--purple)}.dot-hidden{background:#ccc}
 
-/* ── ADD BUTTON ── */
-.add-row{padding-left:88px;margin:4px 0 28px}
+/* ── ADD ── */
+.add-row{padding-left:88px;margin:4px 0 26px}
 .add-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:transparent;border:1.5px dashed var(--border);border-radius:var(--r);cursor:pointer;color:var(--muted);font-family:var(--serif);font-size:13px;transition:all .15s}
 .add-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
 
@@ -150,56 +169,54 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 
 /* ── SIDEBAR ── */
 .sb-close-btn{display:none;position:absolute;top:14px;right:16px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted)}
-.sb-title{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:16px}
-.sb-section{background:var(--blue-bg);border:1px solid #c5dff0;border-radius:6px;padding:10px 12px;margin-bottom:16px;font-size:11px}
-.sb-section-title{font-weight:700;font-size:12px;margin-bottom:5px}
+.sb-title{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:14px}
+.sb-section{border:1px solid #c5dff0;border-radius:6px;padding:10px 12px;margin-bottom:14px;font-size:11px}
+.sb-section.hotel{background:var(--blue-bg)}
+.sb-section.emergency{background:var(--red-bg);border-color:#e8b0a0}
+.sb-section-title{font-weight:700;font-size:12px;margin-bottom:4px}
 .sb-section-meta{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.9}
-.sb-section-link{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--blue);text-decoration:none;margin-top:5px}
-.sb-emergency{background:var(--red-bg);border-color:#e8b0a0}
-.sb-emergency .sb-section-meta{color:#7a3020}
-.sb-budget-row{background:var(--green-bg);border:1px solid #a5d4b5;border-radius:6px;padding:8px 12px;margin-bottom:16px;font-size:11px;font-family:var(--mono)}
-.sb-budget-total{font-weight:700;color:var(--green);font-size:12px}
-.sb-day{margin-bottom:18px}
-.sb-day-title{font-size:11px;font-weight:700;padding-bottom:5px;border-bottom:1px solid var(--border);margin-bottom:7px;display:flex;justify-content:space-between;align-items:center}
+.sb-section.emergency .sb-section-meta{color:#7a3020}
+.sb-section-link{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--blue);text-decoration:none;margin-top:4px}
+.sb-day{margin-bottom:16px}
+.sb-day-title{font-size:11px;font-weight:700;padding-bottom:5px;border-bottom:1px solid var(--border);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
 .sb-day-date{font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400}
-.sb-item{display:flex;gap:7px;padding:4px 4px;border-radius:4px;cursor:pointer;transition:background .1s}
+.sb-item{display:flex;gap:7px;padding:4px;border-radius:4px;cursor:pointer;transition:background .1s}
 .sb-item:hover{background:rgba(0,0,0,.04)}
 .sb-item.is-hidden{opacity:.4}
 .sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
 .sb-info{flex:1;min-width:0}
 .sb-name{font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sb-meta{font-size:10px;font-family:var(--mono);color:var(--muted)}
-.sb-votes{font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:1px}
+.sb-votes{font-size:10px;font-family:var(--mono);color:var(--muted)}
 
 /* ── MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--bg);border-radius:12px;padding:28px;width:min(92vw,520px);max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .2s}
+.modal{background:var(--bg);border-radius:12px;padding:26px;width:min(92vw,520px);max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .2s}
 .modal-overlay.open .modal{transform:translateY(0)}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:20px}
-.fg{margin-bottom:13px}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:18px}
+.fg{margin-bottom:12px}
 .fg label{display:block;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
 .fg input,.fg select,.fg textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:5px;padding:8px 11px;font-family:var(--serif);font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--muted)}
-.fg textarea{min-height:60px;resize:vertical}
-.fg-row{display:flex;gap:10px}
-.fg-row .fg{flex:1}
+.fg textarea{min-height:58px;resize:vertical}
+.fg-row{display:flex;gap:10px}.fg-row .fg{flex:1}
 .member-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .member-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;user-select:none}
 .member-opt input{display:none}
 .member-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.md-mo{background:#3a3630} .md-kelly{background:#8a2f5a} .md-mia{background:#5e45a0} .md-rui{background:#2d5f9b}
+.md-mo{background:#3a3630}.md-kelly{background:#8a2f5a}.md-mia{background:#5e45a0}.md-rui{background:#2d5f9b}
 .checked-mo{border-color:#aaa298;background:#f0ede8}
 .checked-kelly{border-color:#d48aaa;background:#fde8f2}
 .checked-mia{border-color:#9985cc;background:#ede8f9}
 .checked-rui{border-color:#6a9fd4;background:#e5f0fb}
-.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
 .btn-cancel{padding:9px 18px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-family:var(--serif);font-size:13px;color:var(--muted)}
 .btn-cancel:hover{background:var(--border)}
 .btn-submit{padding:9px 22px;background:var(--accent);color:white;border:none;border-radius:5px;cursor:pointer;font-family:var(--serif);font-size:13px;font-weight:600}
 .btn-submit:hover{background:#a83520}
 
-/* ── PRINT FAB ── */
+/* ── FAB ── */
 .pfab{position:fixed;bottom:24px;right:24px;background:var(--ink);color:var(--bg);border:none;border-radius:50px;padding:12px 22px;cursor:pointer;font-family:var(--serif);font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.18);display:flex;align-items:center;gap:7px;z-index:50;transition:transform .15s}
 .pfab:hover{transform:translateY(-2px)}
 
@@ -207,7 +224,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .toast{position:fixed;bottom:72px;right:24px;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:12px;font-family:var(--mono);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:300}
 .toast.show{opacity:1;transform:translateY(0)}
 
-/* ── SIDEBAR OVERLAY ── */
+/* ── SYNC INFO ── */
+.sync-bar{background:rgba(255,255,255,.06);border-top:1px solid rgba(255,255,255,.08);padding:4px 20px;font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.45);display:flex;align-items:center;gap:6px}
+
 .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:140}
 
 /* ── RESPONSIVE ── */
@@ -217,21 +236,20 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
   .sidebar-overlay.open{display:block}
   .sb-close-btn{display:block}
 }
-@media(max-width:600px){
-  .hdr{padding:10px 14px}
+@media(max-width:640px){
+  .hdr{padding:9px 12px;flex-wrap:wrap}
   .hdr-sub{display:none}
-  .content{padding:18px 14px}
+  .content{padding:16px 14px}
   .day-tabs{padding:0 10px}
-  .tab{padding:10px 10px;font-size:11px}
+  .tab{padding:9px 9px;font-size:11px}
   .timeline::before{left:72px}
-  .tl-item{grid-template-columns:52px 14px 1fr;gap:0 10px}
+  .tl-item{grid-template-columns:52px 14px 1fr;gap:0 9px}
   .add-row{padding-left:0}
   .notes-label{margin-left:0}
 }
-
-/* ── PRINT ── */
 @media print{
-  .hdr-right,.pfab,.sidebar,.sidebar-overlay,.add-row,.card-btns,.modal-overlay,.panel,.toast,.show-hidden-btn,.weather-banner,.vote-row{display:none!important}
+  .hdr-right,.pfab,.sidebar,.sidebar-overlay,.add-row,.card-btns,
+  .modal-overlay,.panel,.toast,.show-hidden-btn,.weather-banner,.vote-row,.sync-bar{display:none!important}
   .layout{display:block}
   .content{max-width:100%;padding:20px}
   .item-card{break-inside:avoid;page-break-inside:avoid;margin-bottom:12px}
@@ -248,20 +266,34 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 <header class="hdr">
   <div>
     <div class="hdr-title">🇰🇷 Seoul D-Hub</div>
-    <div class="hdr-sub">2025 / 7/1–7/5 · Mo · Kelly · Mia · Rui</div>
+    <div class="hdr-sub">2025 / 7/1–7/5 · 3人同步中</div>
   </div>
   <div class="hdr-right">
+    <span id="connDot" class="conn-dot offline" title="連線狀態"></span>
+    <select id="userSelect" class="user-sel" onchange="setCurrentUser(this.value)">
+      <option value="">你是誰？</option>
+      <option value="Mo">Mo</option>
+      <option value="Kelly">Kelly</option>
+      <option value="Mia">Mia</option>
+      <option value="Rui">Rui</option>
+    </select>
     <button class="hbtn" onclick="togglePanel('panelFlight')">✈ 機票</button>
     <button class="hbtn" onclick="togglePanel('panelHotel')">🏨 住宿</button>
     <button class="hbtn" onclick="togglePanel('panelEmergency')">🆘 緊急</button>
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn" onclick="window.print()">⎙ 列印</button>
-    <span class="ver">v1.2</span>
+    <span class="ver">v1.3</span>
   </div>
 </header>
 
-<!-- ── FLIGHT ── -->
+<!-- sync info bar -->
+<div class="sync-bar" id="syncBar">
+  <span id="connDot2" class="conn-dot offline"></span>
+  <span id="syncInfo">連線中…</span>
+</div>
+
+<!-- FLIGHT -->
 <div id="panelFlight" class="panel panel-flight">
   <div class="panel-inner">
     <div class="fld"><label>去程 班號</label><input id="f_out_no"  type="text" placeholder="CI160"></div>
@@ -274,7 +306,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
   </div>
 </div>
 
-<!-- ── HOTEL ── -->
+<!-- HOTEL -->
 <div id="panelHotel" class="panel panel-hotel">
   <div class="panel-inner">
     <div class="fld"><label>飯店名稱</label><input id="h_name"    type="text" placeholder="明洞斯坦福飯店"></div>
@@ -288,23 +320,23 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
   </div>
 </div>
 
-<!-- ── EMERGENCY ── -->
+<!-- EMERGENCY -->
 <div id="panelEmergency" class="panel panel-emergency">
   <div class="panel-inner">
-    <div class="fld"><label>警察</label><input id="e_police"    type="text" value="112" placeholder="112"></div>
-    <div class="fld"><label>救護車/消防</label><input id="e_ambulance" type="text" value="119" placeholder="119"></div>
-    <div class="fld"><label>飯店韓文地址</label><input id="e_hotel_kr" type="text" placeholder="서울 중구 남대문로9길 24"></div>
-    <div class="fld"><label>附近醫院</label><input id="e_hospital"  type="text" placeholder="最近醫院名稱"></div>
+    <div class="fld"><label>警察</label><input id="e_police"    type="text" placeholder="112"></div>
+    <div class="fld"><label>救護車</label><input id="e_ambulance" type="text" placeholder="119"></div>
+    <div class="fld"><label>飯店韓文地址</label><input id="e_hotel_kr"  type="text" placeholder="서울 중구 남대문로9길 24"></div>
+    <div class="fld"><label>附近醫院</label><input id="e_hospital"   type="text" placeholder="最近醫院名稱"></div>
     <div class="fld"><label>旅遊保險單號</label><input id="e_insurance" type="text" placeholder="保單號碼"></div>
     <div class="fld"><label>其他聯絡</label><textarea id="e_notes" placeholder="台灣緊急聯絡人、信用卡掛失..."></textarea></div>
     <button class="psave" onclick="saveEmergency()">儲存</button>
   </div>
 </div>
 
-<!-- ── WEATHER BANNER ── -->
+<!-- WEATHER -->
 <div id="weatherBanner" class="weather-banner">
   <span>☀️ <strong>7月首爾氣候提醒</strong>：氣溫 30–34°C，濕度高，午後雷陣雨機率高。建議攜帶雨傘、防曬。DDP 夜間場次若下午大雨請備替代方案。</span>
-  <button class="weather-dismiss" onclick="dismissWeather()" title="關閉">✕</button>
+  <button class="weather-dismiss" onclick="dismissWeather()">✕</button>
 </div>
 
 <nav class="day-tabs" id="dayTabs"></nav>
@@ -320,7 +352,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<!-- ── ADD MODAL ── -->
+<!-- ADD MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
   <div class="modal">
     <div class="modal-title">＋ 新增地點</div>
@@ -339,11 +371,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
       <div class="fg">
         <label>加入哪一天</label>
         <select id="m_day">
-          <option value="1">Day 1（7/1 三清洞）</option>
-          <option value="2">Day 2（7/2 光化門）</option>
-          <option value="3">Day 3（7/3 東大門）</option>
-          <option value="4">Day 4（7/4 龍山）</option>
-          <option value="5">Day 5（7/5 收尾）</option>
+          <option value="1">Day 1（7/1）</option>
+          <option value="2">Day 2（7/2）</option>
+          <option value="3">Day 3（7/3）</option>
+          <option value="4">Day 4（7/4）</option>
+          <option value="5">Day 5（7/5）</option>
         </select>
       </div>
     </div>
@@ -351,7 +383,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
       <div class="fg"><label>開始時間</label><input id="m_time" type="time"></div>
       <div class="fg"><label>結束時間</label><input id="m_endtime" type="time"></div>
     </div>
-    <div class="fg"><label>地址／搜尋關鍵字（Google Maps 用）</label><input id="m_address" type="text" placeholder="如：익선동 서울"></div>
+    <div class="fg"><label>地址／搜尋（Google Maps 用）</label><input id="m_address" type="text" placeholder="如：익선동 서울"></div>
     <div class="fg-row">
       <div class="fg"><label>門票費用</label><input id="m_admission" type="text" placeholder="免費 / ₩15,000"></div>
       <div class="fg"><label>預算估算</label><input id="m_budget" type="text" placeholder="₩30,000 / NT$700"></div>
@@ -381,9 +413,27 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 <button class="pfab" onclick="window.print()">⎙ 列印 / 存 PDF</button>
 
 <script>
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
+//  FIREBASE CONFIG
+// ═══════════════════════════════════════════
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA0TAG5ykB_6E-vTc83lURNUliJYjj4a0E",
+  authDomain: "seoul-dhub.firebaseapp.com",
+  databaseURL: "https://seoul-dhub-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "seoul-dhub",
+  storageBucket: "seoul-dhub.firebasestorage.app",
+  messagingSenderId: "174228162580",
+  appId: "1:174228162580:web:cb38272c12a51df2a77f01"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const DB_PATH = 'trip';
+
+// ═══════════════════════════════════════════
 //  CONSTANTS
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 
 const DAYS_META = [
   {day:1,date:'2025/07/01',weekday:'二',label:'Day 1',area:'三清洞'},
@@ -394,23 +444,18 @@ const DAYS_META = [
 ];
 
 const MEMBERS = [
-  {id:'Mo',    low:'mo',    optCls:'checked-mo',    dot:'md-mo'},
-  {id:'Kelly', low:'kelly', optCls:'checked-kelly', dot:'md-kelly'},
-  {id:'Mia',   low:'mia',   optCls:'checked-mia',   dot:'md-mia'},
-  {id:'Rui',   low:'rui',   optCls:'checked-rui',   dot:'md-rui'},
+  {id:'Mo',    low:'mo',    optCls:'checked-mo'},
+  {id:'Kelly', low:'kelly', optCls:'checked-kelly'},
+  {id:'Mia',   low:'mia',  optCls:'checked-mia'},
+  {id:'Rui',   low:'rui',  optCls:'checked-rui'},
 ];
-
 const ALL4 = ['Mo','Kelly','Mia','Rui'];
 const RESV_CYCLE = ['none','pending','booked'];
 const RESV_LABEL = {none:'待確認', pending:'待預約', booked:'已預約✓'};
-
-// vote: 0=none, 1=👍want, 2=❤️love, 3=🤔unsure
 const VOTE_ICONS = ['○','👍','❤️','🤔'];
 const VOTE_CLS   = ['','vote-v1','vote-v2','vote-v3'];
-
 const TYPE_LABEL = {museum:'美術館',architecture:'建築',restaurant:'餐廳',other:'其他'};
-
-const EMPTY_VOTES = () => ({Mo:0, Kelly:0, Mia:0, Rui:0});
+const EMPTY_VOTES = () => ({Mo:0,Kelly:0,Mia:0,Rui:0});
 
 const DEFAULT_ITEMS = {
   1:[
@@ -483,7 +528,7 @@ const DEFAULT_ITEMS = {
     {id:'d4_3',type:'architecture',hidden:false,resv:'none',votes:EMPTY_VOTES(),
      name:'Amorepacific 總部',nameKo:'아모레퍼시픽 본사',
      time:'18:00',endTime:'18:45',hours:'外觀免費',admission:'外觀免費',
-     budget:'免費',transport:'地鐵1/4號線 서울역 或 KTX 용산역，步行3分',
+     budget:'免費',transport:'地鐵1/4號線 용산역，步行3分',
      desc:'David Chipperfield 2019，方形量體挖出三中庭，龍山站旁',
      address:'아모레퍼시픽 한강대로 100 용산',who:ALL4,isDefault:true},
     {id:'d4_4',type:'restaurant',hidden:false,resv:'pending',votes:EMPTY_VOTES(),
@@ -506,100 +551,195 @@ const DEFAULT_ITEMS = {
 const DEFAULT_HOTEL = {
   name:'明洞斯坦福飯店 Stanford Hotel Myeongdong',
   address:'서울 중구 남대문로9길 24 스탠포드 호텔',
-  cin:'7/1 15:00', cout:'7/5 11:00',
-  conf:'', phone:'', notes:'',
+  cin:'7/1 15:00',cout:'7/5 11:00',conf:'',phone:'',notes:'',
 };
-
 const DEFAULT_EMERGENCY = {
-  police:'112', ambulance:'119',
+  police:'112',ambulance:'119',
   hotel_kr:'서울 중구 남대문로9길 24 스탠포드 호텔',
-  hospital:'', insurance:'', notes:'',
+  hospital:'',insurance:'',notes:'',
 };
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 //  STATE
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 
-const STORAGE_KEY = 'seoul_dhub_v2';
+const LOCAL_KEY = 'seoul_dhub_v3';
 
-function loadState() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const p = JSON.parse(saved);
-      for (let d = 1; d <= 5; d++) {
-        if (!p.items[d]) p.items[d] = [];
-        if (p.notes[d] === undefined) p.notes[d] = '';
-        p.items[d].forEach(i => {
-          if (i.hidden    === undefined) i.hidden    = false;
-          if (!i.resv)                   i.resv      = 'none';
-          if (!i.votes)                  i.votes     = EMPTY_VOTES();
-          if (i.budget    === undefined) i.budget    = '';
-          if (i.transport === undefined) i.transport = '';
-        });
-      }
-      if (!p.hotel)     p.hotel     = {...DEFAULT_HOTEL};
-      if (!p.emergency) p.emergency = {...DEFAULT_EMERGENCY};
-      if (p.weatherDismissed === undefined) p.weatherDismissed = false;
-      return p;
-    }
-  } catch(e) {}
+function freshState() {
   return {
-    flight:           {out_no:'',out_dep:'',out_arr:'',ret_no:'',ret_dep:'',ret_arr:''},
-    hotel:            {...DEFAULT_HOTEL},
-    emergency:        {...DEFAULT_EMERGENCY},
-    items:            JSON.parse(JSON.stringify(DEFAULT_ITEMS)),
-    notes:            {1:'',2:'',3:'',4:'',5:''},
-    weatherDismissed: false,
+    flight:    {out_no:'',out_dep:'',out_arr:'',ret_no:'',ret_dep:'',ret_arr:''},
+    hotel:     {...DEFAULT_HOTEL},
+    emergency: {...DEFAULT_EMERGENCY},
+    items:     JSON.parse(JSON.stringify(DEFAULT_ITEMS)),
+    notes:     {1:'',2:'',3:'',4:'',5:''},
   };
 }
 
-function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function migrateItem(i) {
+  if (!i.hidden    && i.hidden    !== false) i.hidden    = false;
+  if (!i.resv)                               i.resv      = 'none';
+  if (!i.votes)                              i.votes     = EMPTY_VOTES();
+  if (i.budget    === undefined)             i.budget    = '';
+  if (i.transport === undefined)             i.transport = '';
+  return i;
+}
 
-let state      = loadState();
-let currentDay = 1;
-let showHidden = {1:false,2:false,3:false,4:false,5:false};
-let noteTimers = {};
+function migrateState(s) {
+  if (!s.hotel)     s.hotel     = {...DEFAULT_HOTEL};
+  if (!s.emergency) s.emergency = {...DEFAULT_EMERGENCY};
+  for (let d=1;d<=5;d++) {
+    if (!s.items[d])  s.items[d]  = [];
+    if (s.notes[d] === undefined) s.notes[d] = '';
+    s.items[d].forEach(migrateItem);
+  }
+  return s;
+}
 
-// ═══════════════════════════════════
+function loadLocal() {
+  try {
+    const s = localStorage.getItem(LOCAL_KEY);
+    return s ? migrateState(JSON.parse(s)) : null;
+  } catch(e) { return null; }
+}
+
+function saveLocal() {
+  localStorage.setItem(LOCAL_KEY, JSON.stringify(state));
+}
+
+// Local-only prefs (not synced)
+let weatherDismissed = localStorage.getItem('seoul_weather_dismissed') === '1';
+let currentUser      = localStorage.getItem('seoul_current_user') || '';
+
+let state       = loadLocal() || freshState();
+let currentDay  = 1;
+let showHidden  = {1:false,2:false,3:false,4:false,5:false};
+let noteTimers  = {};
+let localWriteId = null;
+let fbReady     = false;
+
+// ═══════════════════════════════════════════
+//  FIREBASE SYNC
+// ═══════════════════════════════════════════
+
+// Connection status
+db.ref('.info/connected').on('value', snap => {
+  const ok = snap.val();
+  setConnUI(ok ? 'connected' : 'offline');
+  setSyncInfo(ok ? '已連線，即時同步中' : '離線模式');
+});
+
+// Initial load from Firebase
+db.ref(DB_PATH).once('value').then(snap => {
+  const fbData = snap.val();
+  if (fbData && fbData.items) {
+    state = migrateState(fbData);
+    saveLocal();
+  } else {
+    // First time: seed Firebase with defaults
+    const seed = freshState();
+    db.ref(DB_PATH).set(seed);
+    state = seed;
+  }
+  fbReady = true;
+  render();
+}).catch(() => {
+  fbReady = true;
+  render(); // offline fallback
+});
+
+// Real-time listener
+db.ref(DB_PATH).on('value', snap => {
+  if (!fbReady) return;
+  const fbData = snap.val();
+  if (!fbData) return;
+  if (fbData._wid === localWriteId) return; // echo of own write
+  state = migrateState(fbData);
+  saveLocal();
+  render();
+  const who = fbData._by ? fbData._by + ' 更新了行程' : '行程已同步';
+  showToast('🔄 ' + who);
+});
+
+function saveState() {
+  localWriteId = uid();
+  state._wid = localWriteId;
+  state._by  = currentUser || '—';
+  state._ts  = Date.now();
+  saveLocal();
+  if (fbReady) {
+    setConnUI('syncing');
+    db.ref(DB_PATH).set(state)
+      .then(()  => setConnUI('connected'))
+      .catch(()  => { setConnUI('offline'); showToast('⚠️ 同步失敗，已存本機'); });
+  }
+}
+
+function setConnUI(status) {
+  ['connDot','connDot2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.className = 'conn-dot ' + status;
+  });
+}
+
+function setSyncInfo(msg) {
+  const el = document.getElementById('syncInfo');
+  if (el) el.textContent = msg;
+}
+
+// ═══════════════════════════════════════════
 //  UTILS
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 
-function mapsUrl(a) { return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(a); }
-function whoClass(n) { return ({Mo:'who-mo',Kelly:'who-kelly',Mia:'who-mia',Rui:'who-rui'})[n] || 'who-other'; }
+function mapsUrl(a) { return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a); }
+function whoClass(n) { return ({Mo:'who-mo',Kelly:'who-kelly',Mia:'who-mia',Rui:'who-rui'})[n]||'who-other'; }
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+function uid() { return 'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
 
-function suggestNextTime(dayNum) {
-  const vis = (state.items[dayNum]||[]).filter(i=>!i.hidden);
+function suggestNextTime(d) {
+  const vis = (state.items[d]||[]).filter(i=>!i.hidden);
   if (!vis.length) return {start:'10:00',end:'12:00'};
   const last = [...vis].sort((a,b)=>a.time.localeCompare(b.time)).pop();
   const [h,m] = (last.endTime||last.time).split(':').map(Number);
-  const s = h*60+m+30, e = s+90;
-  const p = n => String(Math.floor(n)).padStart(2,'0');
+  const s=h*60+m+30, e=s+90;
+  const p=n=>String(Math.floor(n)).padStart(2,'0');
   return {start:`${p(s/60)}:${p(s%60)}`,end:`${p(e/60)}:${p(e%60)}`};
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'), 2200);
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2400);
 }
 
-function uid() { return 'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
-
-function voteCount(votes) {
+function voteStr(votes) {
   if (!votes) return '';
-  const parts = Object.entries(votes)
-    .filter(([,v])=>v>0)
-    .map(([k,v])=>`${k}${VOTE_ICONS[v]}`);
-  return parts.join(' ');
+  return Object.entries(votes).filter(([,v])=>v>0).map(([k,v])=>`${k}${VOTE_ICONS[v]}`).join(' ');
 }
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
+//  USER
+// ═══════════════════════════════════════════
+
+function setCurrentUser(name) {
+  currentUser = name;
+  localStorage.setItem('seoul_current_user', name);
+  const sel = document.getElementById('userSelect');
+  if (sel) {
+    sel.value = name;
+    const cls = name ? 'selected-'+name.toLowerCase() : '';
+    sel.className = 'user-sel' + (cls?' '+cls:'');
+  }
+  setSyncInfo(name ? `Hi ${name}，已連線` : '已連線，即時同步中');
+}
+
+// Restore user on load
+if (currentUser) setCurrentUser(currentUser);
+
+// ═══════════════════════════════════════════
 //  RENDER
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 
 function renderTabs() {
   document.getElementById('dayTabs').innerHTML = DAYS_META.map(d=>`
@@ -610,21 +750,18 @@ function renderTabs() {
 }
 
 function renderDay() {
-  const meta = DAYS_META[currentDay-1];
-  const all  = (state.items[currentDay]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
-  const show = showHidden[currentDay];
+  const meta  = DAYS_META[currentDay-1];
+  const all   = (state.items[currentDay]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
+  const show  = showHidden[currentDay];
   const items = show ? all : all.filter(i=>!i.hidden);
-  const hiddenCount = all.filter(i=>i.hidden).length;
-  const note  = state.notes[currentDay]||'';
+  const hCount = all.filter(i=>i.hidden).length;
 
   const itemsHtml = items.map(item => {
-    const isH = item.hidden;
+    const isH   = item.hidden;
     const votes = item.votes || EMPTY_VOTES();
     return `
     <div class="tl-item">
-      <div class="tl-time">
-        ${esc(item.time)}${item.endTime?'<br><span style="opacity:.55">–'+esc(item.endTime)+'</span>':''}
-      </div>
+      <div class="tl-time">${esc(item.time)}${item.endTime?'<br><span style="opacity:.55">–'+esc(item.endTime)+'</span>':''}</div>
       <div class="tl-dot-wrap"><div class="tl-dot ${isH?'dot-hidden':'dot-'+item.type}"></div></div>
       <div class="item-card ${isH?'hidden-item':''}">
         <div class="card-inner">
@@ -638,7 +775,7 @@ function renderDay() {
               <div class="card-badges">
                 <span class="card-badge badge-${item.type}">${TYPE_LABEL[item.type]||'其他'}</span>
                 ${isH?'<span class="hidden-label">🙈 已隱藏</span>':''}
-                <span class="resv-badge resv-${item.resv||'none'}" onclick="cycleResv('${item.id}',${currentDay})">${RESV_LABEL[item.resv||'none']}</span>
+                <span class="resv-badge resv-${item.resv||'none'}" onclick="cycleResv('${item.id}',${currentDay})" title="點擊切換預約狀態">${RESV_LABEL[item.resv||'none']}</span>
               </div>
             </div>
             <div class="card-meta">
@@ -650,16 +787,13 @@ function renderDay() {
             ${item.desc?`<div class="card-desc">${esc(item.desc)}</div>`:''}
             <div class="vote-row">
               ${ALL4.map(name=>{
-                const v = votes[name]||0;
-                return `<button class="vote-btn ${VOTE_CLS[v]}" onclick="cycleVote('${item.id}',${currentDay},'${name}')" title="${name} 的意見">
-                  <span>${name}</span><span>${VOTE_ICONS[v]}</span>
-                </button>`;
+                const v=votes[name]||0;
+                const isMe=name===currentUser;
+                return `<button class="vote-btn ${VOTE_CLS[v]} ${isMe?'me':''}" onclick="cycleVote('${item.id}',${currentDay},'${name}')" title="${name}"><span>${name}</span><span>${VOTE_ICONS[v]}</span></button>`;
               }).join('')}
             </div>
             <div class="card-footer">
-              <div class="card-who">
-                ${(item.who||[]).map(w=>`<span class="who-tag ${whoClass(w)}">${esc(w)}</span>`).join('')}
-              </div>
+              <div class="card-who">${(item.who||[]).map(w=>`<span class="who-tag ${whoClass(w)}">${esc(w)}</span>`).join('')}</div>
               <div class="card-btns">
                 ${item.address?`<a class="cbtn maps" href="${mapsUrl(item.address)}" target="_blank" rel="noopener">🗺 地圖</a>`:''}
                 ${isH
@@ -677,159 +811,144 @@ function renderDay() {
     <div class="day-header">
       <div>
         <h2>${meta.label} — ${meta.area}</h2>
-        <div class="day-meta">${meta.date}（${meta.weekday}）· 明洞 Stanford Hotel</div>
+        <div class="day-meta">${meta.date}（${meta.weekday}）· 明洞 Stanford</div>
       </div>
-      ${hiddenCount?`<button class="show-hidden-btn ${show?'active':''}" onclick="toggleShowHidden(${currentDay})">
-        ${show?`👁 收起隱藏 (${hiddenCount})`:`🙈 顯示隱藏 (${hiddenCount})`}
+      ${hCount?`<button class="show-hidden-btn ${show?'active':''}" onclick="toggleShowHidden(${currentDay})">
+        ${show?`👁 收起 (${hCount})`:`🙈 隱藏 (${hCount})`}
       </button>`:''}
     </div>
     <div class="timeline">${items.length?itemsHtml:'<p style="padding:16px 0 16px 88px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>'}</div>
     <div class="add-row"><button class="add-btn" onclick="openModal(${currentDay})">＋ 新增地點</button></div>
     <div class="notes-section">
       <div class="notes-label">📝 今日備註</div>
-      <textarea class="notes-ta" id="noteTa_${currentDay}" placeholder="輸入備註，自動儲存" oninput="noteInput(${currentDay},this.value)">${esc(note)}</textarea>
+      <textarea class="notes-ta" id="noteTa_${currentDay}" placeholder="輸入備註，自動儲存" oninput="noteInput(${currentDay},this.value)">${esc(state.notes[currentDay]||'')}</textarea>
     </div>`;
 }
 
 function renderSidebar() {
-  const h = state.hotel, e = state.emergency;
-
-  // hotel card
-  const hotelHtml = h.name ? `
-    <div class="sb-section">
+  const h=state.hotel, e=state.emergency;
+  const hotelCard = h.name?`
+    <div class="sb-section hotel">
       <div class="sb-section-title">🏨 ${esc(h.name)}</div>
       <div class="sb-section-meta">
-        ${h.cin ?`入住 ${esc(h.cin)}<br>`:''}${h.cout?`退房 ${esc(h.cout)}<br>`:''}
+        ${h.cin?`入住 ${esc(h.cin)}<br>`:''}${h.cout?`退房 ${esc(h.cout)}<br>`:''}
         ${h.conf?`訂單 ${esc(h.conf)}<br>`:''}${h.phone?`📞 ${esc(h.phone)}`:''}
       </div>
       ${h.address?`<a class="sb-section-link" href="${mapsUrl(h.address)}" target="_blank" rel="noopener">🗺 飯店地圖</a>`:''}
-    </div>` : '';
-
-  // emergency card
-  const emergencyHtml = (e.police||e.ambulance) ? `
-    <div class="sb-section sb-emergency">
+    </div>`:'';
+  const emergCard = (e.police)?`
+    <div class="sb-section emergency">
       <div class="sb-section-title">🆘 緊急聯絡</div>
-      <div class="sb-section-meta">
-        警察 ${esc(e.police||'112')} · 救護 ${esc(e.ambulance||'119')}<br>
-        ${e.hospital?`醫院 ${esc(e.hospital)}<br>`:''}
-        ${e.insurance?`保險 ${esc(e.insurance)}`:''}
+      <div class="sb-section-meta">警察 ${esc(e.police)} · 救護 ${esc(e.ambulance||'119')}
+        ${e.hospital?`<br>醫院 ${esc(e.hospital)}`:''}
+        ${e.insurance?`<br>保險 ${esc(e.insurance)}`:''}
       </div>
-    </div>` : '';
+    </div>`:'';
 
-  // per-day budget totals (just count items with budget)
-  const daysHtml = DAYS_META.map(meta => {
-    const items = (state.items[meta.day]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
-    const budgets = items.filter(i=>!i.hidden&&i.budget).map(i=>i.budget);
+  const days = DAYS_META.map(meta=>{
+    const items=(state.items[meta.day]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
+    const budgets=items.filter(i=>!i.hidden&&i.budget).map(i=>i.budget);
     return `
       <div class="sb-day">
-        <div class="sb-day-title">
-          ${meta.label} ${meta.area}
-          <span class="sb-day-date">${meta.date.slice(5)}</span>
-        </div>
-        ${items.length ? items.map(item=>`
+        <div class="sb-day-title">${meta.label} ${meta.area}<span class="sb-day-date">${meta.date.slice(5)}</span></div>
+        ${items.length?items.map(item=>`
           <div class="sb-item ${item.hidden?'is-hidden':''}" onclick="switchDay(${meta.day});closeSidebar();">
             <div class="sb-dot ${item.hidden?'dot-hidden':'dot-'+item.type}"></div>
             <div class="sb-info">
               <div class="sb-name">${esc(item.name)}</div>
               <div class="sb-meta">${esc(item.time)}${item.endTime?' – '+esc(item.endTime):''}${item.budget?' · 💰'+esc(item.budget):''}</div>
-              ${voteCount(item.votes)?`<div class="sb-votes">${voteCount(item.votes)}</div>`:''}
+              ${voteStr(item.votes)?`<div class="sb-votes">${voteStr(item.votes)}</div>`:''}
             </div>
           </div>`).join('')
-        : '<div style="font-size:11px;color:var(--muted);padding:4px 0 4px 15px;">（尚無地點）</div>'}
+        :'<div style="font-size:11px;color:var(--muted);padding:4px 0 4px 15px;">（尚無地點）</div>'}
         ${budgets.length?`<div style="font-size:10px;font-family:var(--mono);color:var(--green);margin-top:4px;padding-left:15px;">💰 ${budgets.join(' · ')}</div>`:''}
       </div>`;
   }).join('');
 
-  document.getElementById('sidebarContent').innerHTML = hotelHtml + emergencyHtml + daysHtml;
+  document.getElementById('sidebarContent').innerHTML = hotelCard + emergCard + days;
 }
 
 function render() {
   renderTabs(); renderDay(); renderSidebar(); syncPanelUI();
-  document.getElementById('weatherBanner').style.display =
-    state.weatherDismissed ? 'none' : 'flex';
+  document.getElementById('weatherBanner').style.display = weatherDismissed?'none':'flex';
 }
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 //  INTERACTIONS
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 
-function switchDay(day) { currentDay = day; render(); window.scrollTo({top:0,behavior:'smooth'}); }
-function toggleShowHidden(day) { showHidden[day] = !showHidden[day]; renderDay(); }
+function switchDay(d) { currentDay=d; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function toggleShowHidden(d) { showHidden[d]=!showHidden[d]; renderDay(); }
 
-function toggleHide(id, dayNum) {
-  const item = (state.items[dayNum]||[]).find(i=>i.id===id);
-  if (!item) return;
-  item.hidden = !item.hidden;
-  saveState(); render();
-  showToast(item.hidden?'🙈 已隱藏':'↩ 已恢復顯示');
+function toggleHide(id, d) {
+  const item=(state.items[d]||[]).find(i=>i.id===id); if(!item) return;
+  item.hidden=!item.hidden; saveState(); render();
+  showToast(item.hidden?'🙈 已隱藏':'↩ 已恢復');
 }
 
-function cycleResv(id, dayNum) {
-  const item = (state.items[dayNum]||[]).find(i=>i.id===id);
-  if (!item) return;
-  item.resv = RESV_CYCLE[(RESV_CYCLE.indexOf(item.resv||'none')+1) % RESV_CYCLE.length];
-  saveState(); render();
-  showToast(`預約狀態：${RESV_LABEL[item.resv]}`);
+function cycleResv(id, d) {
+  const item=(state.items[d]||[]).find(i=>i.id===id); if(!item) return;
+  item.resv=RESV_CYCLE[(RESV_CYCLE.indexOf(item.resv||'none')+1)%3];
+  saveState(); render(); showToast('預約：'+RESV_LABEL[item.resv]);
 }
 
-function cycleVote(id, dayNum, memberName) {
-  const item = (state.items[dayNum]||[]).find(i=>i.id===id);
-  if (!item) return;
-  if (!item.votes) item.votes = EMPTY_VOTES();
-  item.votes[memberName] = (item.votes[memberName]+1) % 4;
+function cycleVote(id, d, name) {
+  const item=(state.items[d]||[]).find(i=>i.id===id); if(!item) return;
+  if(!item.votes) item.votes=EMPTY_VOTES();
+  item.votes[name]=(item.votes[name]+1)%4;
   saveState(); render();
 }
 
-function noteInput(day, val) {
-  clearTimeout(noteTimers[day]);
-  noteTimers[day] = setTimeout(()=>{ state.notes[day]=val; saveState(); showToast('備註已自動儲存'); }, 900);
+function noteInput(d, val) {
+  clearTimeout(noteTimers[d]);
+  noteTimers[d]=setTimeout(()=>{ state.notes[d]=val; saveState(); showToast('備註已儲存'); },1000);
 }
 
 function dismissWeather() {
-  state.weatherDismissed = true; saveState();
-  document.getElementById('weatherBanner').style.display = 'none';
+  weatherDismissed=true;
+  localStorage.setItem('seoul_weather_dismissed','1');
+  document.getElementById('weatherBanner').style.display='none';
 }
 
 // ── PANELS ──
 function togglePanel(id) {
-  const el = document.getElementById(id);
-  const was = el.classList.contains('open');
+  const el=document.getElementById(id), was=el.classList.contains('open');
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
-  if (!was) el.classList.add('open');
+  if(!was) el.classList.add('open');
 }
 
 function syncPanelUI() {
-  const f=state.flight, h=state.hotel, e=state.emergency;
-  const set = (id,v)=>{ const el=document.getElementById(id); if(el) el.value=v||''; };
-  set('f_out_no',f.out_no); set('f_out_dep',f.out_dep); set('f_out_arr',f.out_arr);
-  set('f_ret_no',f.ret_no); set('f_ret_dep',f.ret_dep); set('f_ret_arr',f.ret_arr);
-  set('h_name',h.name); set('h_address',h.address); set('h_cin',h.cin);
-  set('h_cout',h.cout); set('h_conf',h.conf); set('h_phone',h.phone); set('h_notes',h.notes);
-  set('e_police',e.police); set('e_ambulance',e.ambulance);
-  set('e_hotel_kr',e.hotel_kr); set('e_hospital',e.hospital);
-  set('e_insurance',e.insurance); set('e_notes',e.notes);
+  const f=state.flight||{}, h=state.hotel||{}, e=state.emergency||{};
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+  set('f_out_no',f.out_no);set('f_out_dep',f.out_dep);set('f_out_arr',f.out_arr);
+  set('f_ret_no',f.ret_no);set('f_ret_dep',f.ret_dep);set('f_ret_arr',f.ret_arr);
+  set('h_name',h.name);set('h_address',h.address);set('h_cin',h.cin);
+  set('h_cout',h.cout);set('h_conf',h.conf);set('h_phone',h.phone);set('h_notes',h.notes);
+  set('e_police',e.police);set('e_ambulance',e.ambulance);
+  set('e_hotel_kr',e.hotel_kr);set('e_hospital',e.hospital);
+  set('e_insurance',e.insurance);set('e_notes',e.notes);
 }
 
 function saveFlight() {
-  const g = id => document.getElementById(id).value.trim();
-  state.flight = {out_no:g('f_out_no'),out_dep:g('f_out_dep'),out_arr:g('f_out_arr'),
-                  ret_no:g('f_ret_no'),ret_dep:g('f_ret_dep'),ret_arr:g('f_ret_arr')};
+  const g=id=>document.getElementById(id).value.trim();
+  state.flight={out_no:g('f_out_no'),out_dep:g('f_out_dep'),out_arr:g('f_out_arr'),
+                ret_no:g('f_ret_no'),ret_dep:g('f_ret_dep'),ret_arr:g('f_ret_arr')};
   saveState(); showToast('✈ 機票已儲存');
   document.getElementById('panelFlight').classList.remove('open');
 }
 
 function saveHotel() {
-  const g = id => document.getElementById(id).value.trim();
-  state.hotel = {name:g('h_name'),address:g('h_address'),cin:g('h_cin'),
-                 cout:g('h_cout'),conf:g('h_conf'),phone:g('h_phone'),notes:g('h_notes')};
+  const g=id=>document.getElementById(id).value.trim();
+  state.hotel={name:g('h_name'),address:g('h_address'),cin:g('h_cin'),
+               cout:g('h_cout'),conf:g('h_conf'),phone:g('h_phone'),notes:g('h_notes')};
   saveState(); showToast('🏨 住宿已儲存'); render();
   document.getElementById('panelHotel').classList.remove('open');
 }
 
 function saveEmergency() {
-  const g = id => document.getElementById(id).value.trim();
-  state.emergency = {police:g('e_police'),ambulance:g('e_ambulance'),hotel_kr:g('e_hotel_kr'),
-                     hospital:g('e_hospital'),insurance:g('e_insurance'),notes:g('e_notes')};
+  const g=id=>document.getElementById(id).value.trim();
+  state.emergency={police:g('e_police'),ambulance:g('e_ambulance'),hotel_kr:g('e_hotel_kr'),
+                   hospital:g('e_hospital'),insurance:g('e_insurance'),notes:g('e_notes')};
   saveState(); showToast('🆘 緊急資訊已儲存'); render();
   document.getElementById('panelEmergency').classList.remove('open');
 }
@@ -844,89 +963,87 @@ function closeSidebar() {
   document.getElementById('sidebarOverlay').classList.remove('open');
 }
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 //  MODAL
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 
 function toggleMember(name) {
   const cb=document.getElementById('w_'+name), opt=document.getElementById('opt_'+name);
-  cb.checked = !cb.checked;
-  const m = MEMBERS.find(m=>m.low===name);
-  if(m) opt.classList.toggle(m.optCls, cb.checked);
+  cb.checked=!cb.checked;
+  const m=MEMBERS.find(m=>m.low===name);
+  if(m) opt.classList.toggle(m.optCls,cb.checked);
 }
 
 function openModal(day) {
-  document.getElementById('m_day').value = String(day);
-  const {start,end} = suggestNextTime(day);
-  document.getElementById('m_time').value    = start;
-  document.getElementById('m_endtime').value = end;
+  document.getElementById('m_day').value=String(day);
+  const {start,end}=suggestNextTime(day);
+  document.getElementById('m_time').value=start;
+  document.getElementById('m_endtime').value=end;
   ['m_name','m_nameko','m_address','m_admission','m_budget','m_hours','m_transport','m_desc']
-    .forEach(id=>{ document.getElementById(id).value=''; });
-  document.getElementById('m_type').value = 'other';
+    .forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('m_type').value='other';
   MEMBERS.forEach(m=>{
-    document.getElementById('w_'+m.low).checked = false;
+    document.getElementById('w_'+m.low).checked=false;
     document.getElementById('opt_'+m.low).classList.remove(m.optCls);
   });
+  // auto-check current user
+  if (currentUser) {
+    const m=MEMBERS.find(m=>m.id===currentUser);
+    if(m) toggleMember(m.low);
+  }
   document.getElementById('modalOverlay').classList.add('open');
-  setTimeout(()=>document.getElementById('m_name').focus(), 200);
+  setTimeout(()=>document.getElementById('m_name').focus(),200);
 }
 
 function handleOverlayClick(e) { if(e.target===e.currentTarget) closeModal(); }
 function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
 function submitAdd() {
-  const name = document.getElementById('m_name').value.trim();
-  if (!name) { document.getElementById('m_name').focus(); return; }
-  const g = id => document.getElementById(id).value.trim();
-  const dayNum = parseInt(g('m_day'), 10);
-  const who = MEMBERS.filter(m=>document.getElementById('w_'+m.low).checked).map(m=>m.id);
-  const item = {
-    id:uid(), type:g('m_type'), hidden:false, resv:'none', votes:EMPTY_VOTES(),
-    name, nameKo:g('m_nameko'),
-    time:g('m_time')||'12:00', endTime:g('m_endtime'),
-    hours:g('m_hours'), admission:g('m_admission'),
-    budget:g('m_budget'), transport:g('m_transport'),
-    desc:g('m_desc'), address:g('m_address'),
-    who, isDefault:false,
+  const name=document.getElementById('m_name').value.trim();
+  if(!name){document.getElementById('m_name').focus();return;}
+  const g=id=>document.getElementById(id).value.trim();
+  const dayNum=parseInt(g('m_day'),10);
+  const who=MEMBERS.filter(m=>document.getElementById('w_'+m.low).checked).map(m=>m.id);
+  const item={
+    id:uid(),type:g('m_type'),hidden:false,resv:'none',votes:EMPTY_VOTES(),
+    name,nameKo:g('m_nameko'),
+    time:g('m_time')||'12:00',endTime:g('m_endtime'),
+    hours:g('m_hours'),admission:g('m_admission'),
+    budget:g('m_budget'),transport:g('m_transport'),
+    desc:g('m_desc'),address:g('m_address'),
+    who,isDefault:false,addedBy:currentUser||'—',
   };
-  if (!state.items[dayNum]) state.items[dayNum] = [];
+  if(!state.items[dayNum]) state.items[dayNum]=[];
   state.items[dayNum].push(item);
   saveState(); currentDay=dayNum; closeModal(); render();
   showToast('✅ 已加入 Day '+dayNum);
 }
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 //  EXPORT
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 
 function exportBackup() {
-  const blob = new Blob([JSON.stringify({
-    exported:new Date().toISOString(), trip:'Seoul 2025 — 7/1–7/5',
-    members:ALL4, state
-  },null,2)],{type:'application/json'});
-  const a = Object.assign(document.createElement('a'),{
-    href:URL.createObjectURL(blob),
-    download:`seoul-dhub-${new Date().toISOString().slice(0,10)}.json`
-  });
-  a.click(); URL.revokeObjectURL(a.href);
-  showToast('↓ 備份已下載');
+  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),trip:'Seoul 2025',members:ALL4,state},null,2)],{type:'application/json'});
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`seoul-dhub-${new Date().toISOString().slice(0,10)}.json`});
+  a.click();URL.revokeObjectURL(a.href);showToast('↓ 備份已下載');
 }
 
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 //  KEYBOARD
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
 
-document.addEventListener('keydown', e => {
-  const tag = document.activeElement.tagName;
-  if (e.key==='Escape') closeModal();
-  if (['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
-  if (e.key==='ArrowRight' && currentDay<5) switchDay(currentDay+1);
-  if (e.key==='ArrowLeft'  && currentDay>1) switchDay(currentDay-1);
+document.addEventListener('keydown',e=>{
+  const tag=document.activeElement.tagName;
+  if(e.key==='Escape') closeModal();
+  if(['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
+  if(e.key==='ArrowRight'&&currentDay<5) switchDay(currentDay+1);
+  if(e.key==='ArrowLeft' &&currentDay>1) switchDay(currentDay-1);
 });
 
-// ═══════════════════════════════════
-//  INIT
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════
+//  INIT (show local cache first, Firebase will refresh)
+// ═══════════════════════════════════════════
 render();
 </script>
 </body>
