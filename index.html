@@ -52,25 +52,34 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 .hbtn:hover { background: rgba(255,255,255,0.2); }
 .ver { font-family: var(--mono); font-size: 10px; opacity: 0.3; margin-left: 4px; }
 
-/* ── FLIGHT BAR ── */
-.flight-bar {
+/* ── COLLAPSIBLE PANELS ── */
+.panel {
   overflow: hidden; max-height: 0; transition: max-height 0.35s ease;
-  background: var(--accent-bg); border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
-.flight-bar.open { max-height: 160px; }
-.flight-inner { padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.panel.open { max-height: 300px; }
+.panel-flight { background: #fdf5ed; }
+.panel-hotel  { background: #edf5fd; }
+.panel-inner { padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
 .fld { display: flex; flex-direction: column; gap: 4px; }
 .fld label { font-size: 9px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-.fld input {
+.fld input, .fld textarea {
   background: white; border: 1px solid var(--border); border-radius: 5px;
-  padding: 6px 10px; font-family: var(--mono); font-size: 12px; color: var(--ink); width: 140px; outline: none;
+  padding: 6px 10px; font-family: var(--mono); font-size: 12px; color: var(--ink); outline: none;
 }
-.fld input:focus { border-color: var(--accent); }
-.fsave {
+.fld input { width: 150px; }
+.fld input:focus, .fld textarea:focus { border-color: var(--accent); }
+.fld textarea { width: 220px; min-height: 48px; resize: none; font-size: 11px; }
+.psave {
   background: var(--accent); color: white; border: none; border-radius: 5px;
   padding: 7px 16px; cursor: pointer; font-size: 13px; font-family: var(--serif); align-self: flex-end;
 }
-.fsave:hover { background: #a83520; }
+.psave:hover { background: #a83520; }
+.hotel-maps {
+  align-self: flex-end; font-size: 11px; padding: 7px 12px; border-radius: 5px;
+  background: var(--blue-bg); color: var(--blue); border: 1px solid #c5dff0;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+}
 
 /* ── DAY TABS ── */
 .day-tabs {
@@ -98,9 +107,16 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 }
 
 /* ── DAY HEADER ── */
-.day-header { margin-bottom: 28px; }
+.day-header { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
 .day-header h2 { font-size: 22px; font-weight: 700; }
 .day-meta { font-size: 11px; font-family: var(--mono); color: var(--muted); margin-top: 4px; }
+.show-hidden-btn {
+  font-size: 11px; font-family: var(--mono); padding: 5px 10px; border-radius: 5px;
+  border: 1px solid var(--border); background: transparent; cursor: pointer;
+  color: var(--muted); transition: all 0.15s; white-space: nowrap; align-self: flex-start; margin-top: 4px;
+}
+.show-hidden-btn:hover { background: var(--border); color: var(--ink); }
+.show-hidden-btn.active { background: #fef9e5; border-color: #d4a800; color: #8a6c00; }
 
 /* ── TIMELINE ── */
 .timeline { position: relative; }
@@ -115,8 +131,9 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 .tl-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--bg); box-shadow: 0 0 0 1.5px var(--border); }
 
 /* ── ITEM CARD ── */
-.item-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; transition: box-shadow 0.15s; }
+.item-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; transition: box-shadow 0.15s, opacity 0.2s; }
 .item-card:hover { box-shadow: 0 2px 14px rgba(0,0,0,0.08); }
+.item-card.hidden-item { opacity: 0.45; }
 .card-inner { display: flex; }
 .card-bar { width: 4px; flex-shrink: 0; }
 .card-content { padding: 14px 16px; flex: 1; min-width: 0; }
@@ -124,12 +141,18 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 .card-name { font-size: 14px; font-weight: 700; line-height: 1.35; }
 .card-nameko { font-size: 11px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
 .card-badge { font-size: 9px; font-family: var(--mono); padding: 2px 7px; border-radius: 4px; flex-shrink: 0; white-space: nowrap; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+.hidden-label { font-size: 9px; font-family: var(--mono); padding: 2px 7px; border-radius: 4px; background: #fef9e5; color: #8a6c00; border: 1px solid #d4a800; flex-shrink: 0; margin-top: 2px; white-space: nowrap; }
 .card-meta { display: flex; flex-direction: column; gap: 3px; margin-top: 8px; }
 .card-meta-row { font-size: 11px; color: var(--muted); display: flex; gap: 5px; align-items: flex-start; }
 .card-desc { font-size: 12px; color: var(--muted); line-height: 1.65; font-style: italic; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
 .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px; }
 .card-who { display: flex; gap: 4px; flex-wrap: wrap; }
-.who-tag { font-size: 9px; font-family: var(--mono); padding: 1px 7px; border-radius: 10px; background: rgba(0,0,0,0.05); color: var(--muted); }
+.who-tag { font-size: 9px; font-family: var(--mono); padding: 2px 8px; border-radius: 10px; }
+.who-mo     { background: #e8e5e0; color: #3a3630; }
+.who-kelly  { background: #fde8f2; color: #8a2f5a; }
+.who-mia    { background: #ede8f9; color: #5e45a0; }
+.who-rui    { background: #e5f0fb; color: #2d5f9b; }
+.who-other  { background: rgba(0,0,0,0.06); color: var(--muted); }
 .card-btns { display: flex; gap: 6px; flex-wrap: wrap; }
 .cbtn {
   font-size: 10px; padding: 3px 9px; border-radius: 4px; border: 1px solid var(--border);
@@ -140,7 +163,15 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 .cbtn:hover { background: var(--border); color: var(--ink); }
 .cbtn.maps { color: var(--blue); border-color: #c5dff0; }
 .cbtn.maps:hover { background: var(--blue-bg); border-color: var(--blue); }
-.cbtn.del:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-bg); }
+.cbtn.hide:hover { color: #8a6c00; border-color: #d4a800; background: #fef9e5; }
+.cbtn.restore { color: var(--green); border-color: #a5d4b5; }
+.cbtn.restore:hover { background: var(--green-bg); }
+
+/* ── RESERVATION STATUS ── */
+.resv-badge { font-size: 9px; font-family: var(--mono); padding: 2px 7px; border-radius: 4px; cursor: pointer; flex-shrink: 0; margin-top: 2px; transition: all 0.15s; border: 1px solid transparent; }
+.resv-none     { background: #f0eeea; color: var(--muted); border-color: var(--border); }
+.resv-pending  { background: #fff4e0; color: #8a5c00; border-color: #e8c56a; }
+.resv-booked   { background: #e5f5eb; color: #2a6e42; border-color: #7ec89a; }
 
 /* ── TYPE COLORS ── */
 .bar-museum { background: var(--blue); }
@@ -155,6 +186,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 .dot-architecture { background: var(--green); }
 .dot-restaurant { background: var(--red); }
 .dot-other { background: var(--purple); }
+.dot-hidden { background: #ccc; }
 
 /* ── ADD BUTTON ── */
 .add-row { padding-left: 88px; margin: 6px 0 32px; }
@@ -179,11 +211,19 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 /* ── SIDEBAR ── */
 .sb-close-btn { display: none; position: absolute; top: 14px; right: 16px; background: none; border: none; cursor: pointer; font-size: 18px; color: var(--muted); }
 .sb-title { font-size: 10px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 20px; }
+.sb-hotel {
+  background: var(--blue-bg); border: 1px solid #c5dff0; border-radius: 6px;
+  padding: 10px 12px; margin-bottom: 20px; font-size: 11px;
+}
+.sb-hotel-name { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+.sb-hotel-meta { font-family: var(--mono); font-size: 10px; color: var(--muted); line-height: 1.8; }
+.sb-hotel-maps { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; color: var(--blue); text-decoration: none; margin-top: 4px; }
 .sb-day { margin-bottom: 20px; }
 .sb-day-title { font-size: 11px; font-weight: 700; padding-bottom: 6px; border-bottom: 1px solid var(--border); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 .sb-day-date { font-family: var(--mono); font-size: 10px; color: var(--muted); font-weight: 400; }
 .sb-item { display: flex; gap: 8px; padding: 4px 4px; border-radius: 4px; cursor: pointer; transition: background 0.1s; }
 .sb-item:hover { background: rgba(0,0,0,0.04); }
+.sb-item.is-hidden { opacity: 0.4; }
 .sb-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
 .sb-info { flex: 1; min-width: 0; }
 .sb-name { font-size: 11px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -214,9 +254,25 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 .fg textarea { min-height: 64px; resize: vertical; }
 .fg-row { display: flex; gap: 10px; }
 .fg-row .fg { flex: 1; }
-.who-opts { display: flex; gap: 14px; flex-wrap: wrap; }
-.who-opt { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 13px; }
-.who-opt input[type="checkbox"] { cursor: pointer; width: auto; accent-color: var(--accent); }
+
+/* Member checkboxes */
+.member-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.member-opt {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  border: 1.5px solid var(--border); border-radius: 6px; cursor: pointer;
+  transition: all 0.15s; font-size: 13px;
+}
+.member-opt input[type="checkbox"] { display: none; }
+.member-opt.checked-mo     { border-color: #aaa298; background: #f0ede8; }
+.member-opt.checked-kelly  { border-color: #d48aaa; background: #fde8f2; }
+.member-opt.checked-mia    { border-color: #9985cc; background: #ede8f9; }
+.member-opt.checked-rui    { border-color: #6a9fd4; background: #e5f0fb; }
+.member-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.md-mo { background: #3a3630; }
+.md-kelly { background: #8a2f5a; }
+.md-mia { background: #5e45a0; }
+.md-rui { background: #2d5f9b; }
+
 .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
 .btn-cancel { padding: 9px 18px; border: 1px solid var(--border); border-radius: 5px; background: transparent; cursor: pointer; font-family: var(--serif); font-size: 13px; color: var(--muted); }
 .btn-cancel:hover { background: var(--border); }
@@ -264,21 +320,22 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
   .tl-item { grid-template-columns: 52px 14px 1fr; gap: 0 10px; }
   .add-row { padding-left: 0; }
   .notes-label { margin-left: 0; }
+  .member-grid { grid-template-columns: 1fr 1fr; }
 }
 
 /* ── PRINT ── */
 @media print {
   .hdr-right, .pfab, .sidebar, .sidebar-overlay, .add-row, .card-btns,
-  .modal-overlay, .flight-bar, .toast { display: none !important; }
+  .modal-overlay, .panel, .toast, .show-hidden-btn { display: none !important; }
   .layout { display: block; }
   .content { max-width: 100%; padding: 20px; }
   .item-card { break-inside: avoid; page-break-inside: avoid; margin-bottom: 12px; }
-  .hdr { position: relative; background: white !important; color: black !important; print-color-adjust: exact; }
+  .item-card.hidden-item { display: none; }
+  .hdr { position: relative; background: white !important; color: black !important; }
   body { background: white; }
   .day-tabs { position: relative; overflow: visible; }
   .tab { display: none; }
   .tab.active { display: block; border: none; font-size: 14px; font-weight: 700; padding: 12px 0; }
-  .day-header h2 { font-size: 18px; }
 }
 </style>
 </head>
@@ -286,27 +343,43 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 
 <header class="hdr">
   <div>
-    <div class="hdr-title">Seoul D-Hub ✦ 首爾行程</div>
-    <div class="hdr-sub">2025 / 7/1–7/5 · 明洞 Stanford Hotel · 3人 inc. 13歲</div>
+    <div class="hdr-title">🇰🇷 Seoul D-Hub</div>
+    <div class="hdr-sub">2025 / 7/1–7/5 · Mo · Kelly · Mia · Rui</div>
   </div>
   <div class="hdr-right">
-    <button class="hbtn" onclick="toggleFlight()">✈ 機票</button>
+    <button class="hbtn" onclick="togglePanel('panelFlight')">✈ 機票</button>
+    <button class="hbtn" onclick="togglePanel('panelHotel')">🏨 住宿</button>
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn" onclick="window.print()">⎙ 列印</button>
-    <span class="ver">v1.0</span>
+    <span class="ver">v1.1</span>
   </div>
 </header>
 
-<div id="flightBar" class="flight-bar">
-  <div class="flight-inner">
-    <div class="fld"><label>去程 班號</label><input id="f_out_no" type="text" placeholder="如 CI160"></div>
+<!-- ── FLIGHT PANEL ── -->
+<div id="panelFlight" class="panel panel-flight">
+  <div class="panel-inner">
+    <div class="fld"><label>去程 班號</label><input id="f_out_no"  type="text" placeholder="CI160"></div>
     <div class="fld"><label>去程 出發</label><input id="f_out_dep" type="text" placeholder="TPE 08:45"></div>
     <div class="fld"><label>去程 抵達</label><input id="f_out_arr" type="text" placeholder="ICN 12:15"></div>
-    <div class="fld"><label>回程 班號</label><input id="f_ret_no" type="text" placeholder="如 CI161"></div>
+    <div class="fld"><label>回程 班號</label><input id="f_ret_no"  type="text" placeholder="CI161"></div>
     <div class="fld"><label>回程 出發</label><input id="f_ret_dep" type="text" placeholder="ICN 17:00"></div>
     <div class="fld"><label>回程 抵達</label><input id="f_ret_arr" type="text" placeholder="TPE 18:30"></div>
-    <button class="fsave" onclick="saveFlight()">儲存</button>
+    <button class="psave" onclick="saveFlight()">儲存</button>
+  </div>
+</div>
+
+<!-- ── HOTEL PANEL ── -->
+<div id="panelHotel" class="panel panel-hotel">
+  <div class="panel-inner">
+    <div class="fld"><label>飯店名稱</label><input id="h_name"    type="text" placeholder="明洞斯坦福飯店"></div>
+    <div class="fld"><label>飯店地址</label><input id="h_address" type="text" placeholder="서울 중구 남대문로9길 24"></div>
+    <div class="fld"><label>入住日期</label><input id="h_cin"     type="text" placeholder="7/1 15:00"></div>
+    <div class="fld"><label>退房日期</label><input id="h_cout"    type="text" placeholder="7/5 11:00"></div>
+    <div class="fld"><label>訂單號碼</label><input id="h_conf"    type="text" placeholder="訂單確認碼"></div>
+    <div class="fld"><label>聯絡電話</label><input id="h_phone"   type="text" placeholder="+82-2-..."></div>
+    <div class="fld"><label>備註</label><textarea id="h_notes" placeholder="韓文地址給司機、房型..."></textarea></div>
+    <button class="psave" onclick="saveHotel()">儲存</button>
   </div>
 </div>
 
@@ -323,16 +396,17 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
+<!-- ── ADD MODAL ── -->
 <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
   <div class="modal">
     <div class="modal-title">＋ 新增地點</div>
     <div class="fg">
       <label>地點名稱 *</label>
-      <input id="m_name" type="text" placeholder="如：弘大逛街、益善洞咖啡">
+      <input id="m_name" type="text" placeholder="如：益善洞咖啡、弘大逛街">
     </div>
     <div class="fg">
       <label>地點韓文（選填）</label>
-      <input id="m_nameko" type="text" placeholder="如：홍대">
+      <input id="m_nameko" type="text" placeholder="如：익선동">
     </div>
     <div class="fg-row">
       <div class="fg">
@@ -356,27 +430,36 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
       </div>
     </div>
     <div class="fg-row">
-      <div class="fg"><label>開始時間</label><input id="m_time" type="time" value="10:00"></div>
-      <div class="fg"><label>結束時間</label><input id="m_endtime" type="time" value="12:00"></div>
+      <div class="fg"><label>開始時間</label><input id="m_time"    type="time"></div>
+      <div class="fg"><label>結束時間</label><input id="m_endtime" type="time"></div>
     </div>
     <div class="fg">
-      <label>地址／搜尋關鍵字（用於 Google Maps）</label>
-      <input id="m_address" type="text" placeholder="如：益善洞 서울 카페">
+      <label>地址／搜尋關鍵字（Google Maps 用）</label>
+      <input id="m_address" type="text" placeholder="如：익선동 서울">
     </div>
     <div class="fg-row">
       <div class="fg"><label>門票費用</label><input id="m_admission" type="text" placeholder="免費 / ₩15000"></div>
-      <div class="fg"><label>營業時間</label><input id="m_hours" type="text" placeholder="10:00–18:00，週一休"></div>
+      <div class="fg"><label>營業時間</label><input id="m_hours"     type="text" placeholder="10:00–18:00"></div>
     </div>
     <div class="fg">
       <label>備註說明</label>
-      <textarea id="m_desc" placeholder="想法、注意事項、推薦原因..."></textarea>
+      <textarea id="m_desc" placeholder="想法、注意事項..."></textarea>
     </div>
     <div class="fg">
-      <label>這是誰想去的？</label>
-      <div class="who-opts">
-        <label class="who-opt"><input type="checkbox" id="w_mo" checked> Mo</label>
-        <label class="who-opt"><input type="checkbox" id="w_wife"> 老婆</label>
-        <label class="who-opt"><input type="checkbox" id="w_daughter"> 女兒</label>
+      <label>誰想去？</label>
+      <div class="member-grid">
+        <label class="member-opt" id="opt_mo"    onclick="toggleMember('mo')">
+          <input type="checkbox" id="w_mo"><div class="member-dot md-mo"></div> Mo
+        </label>
+        <label class="member-opt" id="opt_kelly" onclick="toggleMember('kelly')">
+          <input type="checkbox" id="w_kelly"><div class="member-dot md-kelly"></div> Kelly
+        </label>
+        <label class="member-opt" id="opt_mia"   onclick="toggleMember('mia')">
+          <input type="checkbox" id="w_mia"><div class="member-dot md-mia"></div> Mia
+        </label>
+        <label class="member-opt" id="opt_rui"   onclick="toggleMember('rui')">
+          <input type="checkbox" id="w_rui"><div class="member-dot md-rui"></div> Rui
+        </label>
       </div>
     </div>
     <div class="modal-actions">
@@ -391,7 +474,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--serif); min-
 
 <script>
 // ════════════════════════════════════════════
-//  DATA
+//  CONSTANTS
 // ════════════════════════════════════════════
 
 const DAYS_META = [
@@ -402,108 +485,104 @@ const DAYS_META = [
   { day:5, date:'2025/07/05', weekday:'六', label:'Day 5', area:'龍山收尾' },
 ];
 
+const MEMBERS = [
+  { id:'Mo',    cls:'who-mo',    optCls:'checked-mo',    dot:'md-mo' },
+  { id:'Kelly', cls:'who-kelly', optCls:'checked-kelly', dot:'md-kelly' },
+  { id:'Mia',   cls:'who-mia',  optCls:'checked-mia',   dot:'md-mia' },
+  { id:'Rui',   cls:'who-rui',  optCls:'checked-rui',   dot:'md-rui' },
+];
+
+const ALL4 = ['Mo','Kelly','Mia','Rui'];
+
+const RESV_CYCLE = ['none','pending','booked'];
+const RESV_LABEL = { none:'待確認', pending:'待預約', booked:'已預約' };
+
 const DEFAULT_ITEMS = {
   1: [
-    {
-      id:'d1_1', type:'museum',
+    { id:'d1_1', type:'museum',       hidden:false, resv:'none',
       name:'國立現代美術館 MMCA Seoul', nameKo:'국립현대미술관',
       time:'10:00', endTime:'13:00', hours:'10:00–18:00，週三/六延至21:00', admission:'常設展免費',
       desc:'舊機務司令部改建，空間轉換邏輯強烈',
-      address:'국립현대미술관 서울관 삼청로 30', who:['Mo','老婆','女兒'], isDefault:true
-    },
-    {
-      id:'d1_2', type:'restaurant',
+      address:'국립현대미술관 서울관 삼청로 30', who:ALL4, isDefault:true },
+    { id:'d1_2', type:'restaurant',   hidden:false, resv:'pending',
       name:'午餐 Hanmechon 한메촌', nameKo:'한메촌',
       time:'13:00', endTime:'14:30', hours:'需預約，週日休', admission:'',
       desc:'傳統韓屋定食',
-      address:'한메촌 삼청동 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
-    {
-      id:'d1_3', type:'architecture',
+      address:'한메촌 삼청동 서울', who:ALL4, isDefault:true },
+    { id:'d1_3', type:'architecture', hidden:false, resv:'none',
       name:'Kukje Gallery 국제갈러리', nameKo:'국제갈러리',
       time:'15:00', endTime:'17:00', hours:'免費', admission:'免費',
       desc:'多棟建築含 Florian Idenburg 設計新館，首爾頂級私人藝廊',
-      address:'국제갤러리 삼청동 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
+      address:'국제갤러리 삼청동 서울', who:ALL4, isDefault:true },
   ],
   2: [
-    {
-      id:'d2_1', type:'museum',
+    { id:'d2_1', type:'museum',       hidden:false, resv:'none',
       name:'首爾市立美術館 SeMA', nameKo:'서울시립미술관',
       time:'10:00', endTime:'13:00', hours:'免費', admission:'免費',
       desc:'舊大法院1928年建築改建，立面保留內部現代化',
-      address:'서울시립미술관 덕수궁길 61 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
-    {
-      id:'d2_2', type:'restaurant',
+      address:'서울시립미술관 덕수궁길 61', who:ALL4, isDefault:true },
+    { id:'d2_2', type:'restaurant',   hidden:false, resv:'none',
       name:'午餐 明洞教自 Myeongdong Kyoja', nameKo:'명동교자',
       time:'13:00', endTime:'14:00', hours:'飯店步行5分鐘', admission:'',
       desc:'米其林必比登。刀削麵+餃子，菜單4項，operation 極洗練',
-      address:'명동교자 을지로 14 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
-    {
-      id:'d2_3', type:'museum',
+      address:'명동교자 을지로 14 서울', who:ALL4, isDefault:true },
+    { id:'d2_3', type:'museum',       hidden:false, resv:'none',
       name:'Ilmin Museum of Art 일민미술관', nameKo:'일민미술관',
       time:'14:30', endTime:'16:30', hours:'11:00–19:00，週一休', admission:'收費',
       desc:'舊東亞日報大樓改建',
-      address:'일민미술관 세종대로 152 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
+      address:'일민미술관 세종대로 152 서울', who:ALL4, isDefault:true },
   ],
   3: [
-    {
-      id:'d3_1', type:'architecture',
+    { id:'d3_1', type:'architecture', hidden:false, resv:'none',
       name:'DDP 東大門設計廣場（白天）', nameKo:'동대문디자인플라자',
       time:'10:00', endTime:'13:00', hours:'外觀24hr，展覽另計', admission:'外觀免費',
-      desc:'Zaha Hadid 設計，45133塊不重複鋁板。建議白天+晚上各去一次',
-      address:'동대문디자인플라자 DDP 을지로 281 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
-    {
-      id:'d3_2', type:'architecture',
+      desc:'Zaha Hadid 設計，45133塊不重複鋁板。白天+晚上各去一次',
+      address:'동대문디자인플라자 DDP 을지로 281', who:ALL4, isDefault:true },
+    { id:'d3_2', type:'architecture', hidden:false, resv:'none',
       name:'DDP 東大門設計廣場（夜間）', nameKo:'동대문디자인플라자',
       time:'20:00', endTime:'22:00', hours:'夜間燈光效果', admission:'外觀免費',
-      desc:'夜間金屬外皮在燈光下質感截然不同，同一建築兩種表情',
-      address:'동대문디자인플라자 DDP 을지로 281 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
+      desc:'夜間金屬外皮在燈光下質感截然不同',
+      address:'동대문디자인플라자 DDP 을지로 281', who:ALL4, isDefault:true },
   ],
   4: [
-    {
-      id:'d4_1', type:'restaurant',
+    { id:'d4_1', type:'restaurant',   hidden:false, resv:'pending',
       name:'午餐 Soseoul Hannam', nameKo:'소서울한남',
       time:'12:00', endTime:'14:00', hours:'週一二休', admission:'',
       desc:'米其林1星，韓食材×法式手法，Leeum山腳下。備選：Truffle di Alba義式松露（Google 4.9）',
-      address:'소서울한남 한남동 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
-    {
-      id:'d4_2', type:'museum',
+      address:'소서울한남 한남동 서울', who:ALL4, isDefault:true },
+    { id:'d4_2', type:'museum',       hidden:false, resv:'none',
       name:'Leeum Museum of Art 리움미술관', nameKo:'리움미술관',
       time:'14:30', endTime:'17:30', hours:'10:00–18:00，週一休', admission:'收費',
       desc:'Mario Botta + Jean Nouvel + Rem Koolhaas 三位大師各設計一棟',
-      address:'리움미술관 이태원로55길 60-16 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
-    {
-      id:'d4_3', type:'architecture',
+      address:'리움미술관 이태원로55길 60-16 서울', who:ALL4, isDefault:true },
+    { id:'d4_3', type:'architecture', hidden:false, resv:'none',
       name:'Amorepacific 總部', nameKo:'아모레퍼시픽 본사',
       time:'18:00', endTime:'18:45', hours:'外觀免費', admission:'外觀免費',
       desc:'David Chipperfield 2019，方形量體挖出三中庭，龍山站旁',
-      address:'아모레퍼시픽 한강대로 100 용산 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
-    {
-      id:'d4_4', type:'restaurant',
+      address:'아모레퍼시픽 한강대로 100 용산', who:ALL4, isDefault:true },
+    { id:'d4_4', type:'restaurant',   hidden:false, resv:'pending',
       name:'晚餐 Mingles', nameKo:'밍글스',
       time:'19:30', endTime:'22:00', hours:'需提早數週預約，江南', admission:'',
-      desc:'米其林3星，韓國當代料理頂點',
-      address:'밍글스 도산대로67길 19 강남구 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
+      desc:'米其林3星，韓國當代料理頂點。⚠️ 需提早預約',
+      address:'밍글스 도산대로67길 19 강남구 서울', who:ALL4, isDefault:true },
   ],
   5: [
-    {
-      id:'d5_1', type:'museum',
+    { id:'d5_1', type:'museum',       hidden:false, resv:'none',
       name:'國立中央博物館', nameKo:'국립중앙박물관',
       time:'09:30', endTime:'12:30', hours:'9:30–17:30，週三/六延至20:30', admission:'免費',
       desc:'Junglim Architecture 2005，與南山軸線的對應關係值得觀察',
-      address:'국립중앙박물관 서빙고로 137 용산 서울', who:['Mo','老婆','女兒'], isDefault:true
-    },
+      address:'국립중앙박물관 서빙고로 137 용산', who:ALL4, isDefault:true },
   ],
+};
+
+const DEFAULT_HOTEL = {
+  name:    '明洞斯坦福飯店 Stanford Hotel Myeongdong',
+  address: '서울 중구 남대문로9길 24',
+  cin:     '7/1 15:00',
+  cout:    '7/5 11:00',
+  conf:    '',
+  phone:   '',
+  notes:   '',
 };
 
 // ════════════════════════════════════════════
@@ -516,66 +595,69 @@ function loadState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved);
-      // ensure all 5 days exist
+      const p = JSON.parse(saved);
       for (let d = 1; d <= 5; d++) {
-        if (!parsed.items[d]) parsed.items[d] = [];
-        if (parsed.notes[d] === undefined) parsed.notes[d] = '';
+        if (!p.items[d]) p.items[d] = [];
+        if (p.notes[d] === undefined) p.notes[d] = '';
+        // migrate old items: add hidden/resv if missing
+        p.items[d].forEach(i => {
+          if (i.hidden === undefined) i.hidden = false;
+          if (!i.resv) i.resv = 'none';
+        });
       }
-      return parsed;
+      if (!p.hotel) p.hotel = { ...DEFAULT_HOTEL };
+      return p;
     }
   } catch(e) {}
   return {
     flight: { out_no:'', out_dep:'', out_arr:'', ret_no:'', ret_dep:'', ret_arr:'' },
-    items: JSON.parse(JSON.stringify(DEFAULT_ITEMS)),
-    notes: { 1:'', 2:'', 3:'', 4:'', 5:'' }
+    hotel:  { ...DEFAULT_HOTEL },
+    items:  JSON.parse(JSON.stringify(DEFAULT_ITEMS)),
+    notes:  { 1:'', 2:'', 3:'', 4:'', 5:'' },
   };
 }
 
-function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
-let state = loadState();
+let state      = loadState();
 let currentDay = 1;
+let showHidden = { 1:false, 2:false, 3:false, 4:false, 5:false };
 let noteTimers = {};
 
 // ════════════════════════════════════════════
 //  UTILS
 // ════════════════════════════════════════════
 
-function mapsUrl(address) {
-  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(address);
+function mapsUrl(addr) {
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr);
 }
-
 const TYPE_LABEL = { museum:'美術館', architecture:'建築', restaurant:'餐廳', other:'其他' };
 
+function whoClass(name) {
+  const map = { Mo:'who-mo', Kelly:'who-kelly', Mia:'who-mia', Rui:'who-rui' };
+  return map[name] || 'who-other';
+}
+
 function suggestNextTime(dayNum) {
-  const items = state.items[dayNum];
-  if (!items || !items.length) return { start:'10:00', end:'12:00' };
-  const sorted = [...items].sort((a,b) => a.time.localeCompare(b.time));
+  const visible = (state.items[dayNum]||[]).filter(i => !i.hidden);
+  if (!visible.length) return { start:'10:00', end:'12:00' };
+  const sorted = [...visible].sort((a,b) => a.time.localeCompare(b.time));
   const last = sorted[sorted.length - 1];
-  const endStr = last.endTime || last.time;
-  const [h, m] = endStr.split(':').map(Number);
-  const startMin = h * 60 + m + 30;
-  const endMin = startMin + 90;
+  const [h,m] = (last.endTime || last.time).split(':').map(Number);
+  const s = h*60 + m + 30, e = s + 90;
   const pad = n => String(Math.floor(n)).padStart(2,'0');
-  return {
-    start: `${pad(startMin/60)}:${pad(startMin%60)}`,
-    end:   `${pad(endMin/60)}:${pad(endMin%60)}`
-  };
+  return { start:`${pad(s/60)}:${pad(s%60)}`, end:`${pad(e/60)}:${pad(e%60)}` };
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-function uid() {
-  return 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+function uid() { return 'u_' + Date.now() + '_' + Math.random().toString(36).slice(2,7); }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ════════════════════════════════════════════
@@ -584,7 +666,7 @@ function uid() {
 
 function renderTabs() {
   document.getElementById('dayTabs').innerHTML = DAYS_META.map(d => `
-    <button class="tab ${d.day === currentDay ? 'active' : ''}" onclick="switchDay(${d.day})">
+    <button class="tab ${d.day===currentDay?'active':''}" onclick="switchDay(${d.day})">
       ${d.label} ${d.area}
       <span class="tab-date">${d.date.slice(5)} (${d.weekday})</span>
     </button>
@@ -592,66 +674,102 @@ function renderTabs() {
 }
 
 function renderDay() {
-  const meta = DAYS_META[currentDay - 1];
-  const items = (state.items[currentDay] || []).slice().sort((a,b) => a.time.localeCompare(b.time));
+  const meta  = DAYS_META[currentDay - 1];
+  const all   = (state.items[currentDay] || []).slice().sort((a,b) => a.time.localeCompare(b.time));
+  const show  = showHidden[currentDay];
+  const items = show ? all : all.filter(i => !i.hidden);
+  const hiddenCount = all.filter(i => i.hidden).length;
   const note  = state.notes[currentDay] || '';
 
-  const itemsHtml = items.map(item => `
+  const itemsHtml = items.map(item => {
+    const isHidden = item.hidden;
+    const resvCls  = `resv-${item.resv||'none'}`;
+    const resvLbl  = RESV_LABEL[item.resv||'none'];
+    return `
     <div class="tl-item">
       <div class="tl-time">
-        ${item.time}${item.endTime ? '<br><span style="opacity:.55">–' + item.endTime + '</span>' : ''}
+        ${esc(item.time)}${item.endTime?'<br><span style="opacity:.55">–'+esc(item.endTime)+'</span>':''}
       </div>
-      <div class="tl-dot-wrap"><div class="tl-dot dot-${item.type}"></div></div>
-      <div class="item-card">
+      <div class="tl-dot-wrap">
+        <div class="tl-dot ${isHidden ? 'dot-hidden' : 'dot-'+item.type}"></div>
+      </div>
+      <div class="item-card ${isHidden?'hidden-item':''}">
         <div class="card-inner">
           <div class="card-bar bar-${item.type}"></div>
           <div class="card-content">
             <div class="card-top">
               <div>
                 <div class="card-name">${esc(item.name)}</div>
-                ${item.nameKo ? `<div class="card-nameko">${esc(item.nameKo)}</div>` : ''}
+                ${item.nameKo?`<div class="card-nameko">${esc(item.nameKo)}</div>`:''}
               </div>
-              <span class="card-badge badge-${item.type}">${TYPE_LABEL[item.type]||'其他'}</span>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                <span class="card-badge badge-${item.type}">${TYPE_LABEL[item.type]||'其他'}</span>
+                ${isHidden ? '<span class="hidden-label">🙈 已隱藏</span>' : ''}
+                <span class="resv-badge ${resvCls}" onclick="cycleResv('${item.id}',${currentDay})" title="點擊切換預約狀態">${resvLbl}</span>
+              </div>
             </div>
-            ${(item.hours || item.admission) ? `
+            ${(item.hours||item.admission)?`
               <div class="card-meta">
-                ${item.hours     ? `<div class="card-meta-row"><span>🕐</span><span>${esc(item.hours)}</span></div>` : ''}
-                ${item.admission ? `<div class="card-meta-row"><span>🎫</span><span>${esc(item.admission)}</span></div>` : ''}
-              </div>` : ''}
-            ${item.desc ? `<div class="card-desc">${esc(item.desc)}</div>` : ''}
+                ${item.hours    ?`<div class="card-meta-row"><span>🕐</span><span>${esc(item.hours)}</span></div>`:''}
+                ${item.admission?`<div class="card-meta-row"><span>🎫</span><span>${esc(item.admission)}</span></div>`:''}
+              </div>`:''}
+            ${item.desc?`<div class="card-desc">${esc(item.desc)}</div>`:''}
             <div class="card-footer">
               <div class="card-who">
-                ${(item.who||[]).map(w => `<span class="who-tag">${esc(w)}</span>`).join('')}
+                ${(item.who||[]).map(w=>`<span class="who-tag ${whoClass(w)}">${esc(w)}</span>`).join('')}
               </div>
               <div class="card-btns">
-                ${item.address ? `<a class="cbtn maps" href="${mapsUrl(item.address)}" target="_blank" rel="noopener">🗺 地圖</a>` : ''}
-                <button class="cbtn del" onclick="deleteItem('${item.id}', ${currentDay})">✕ 刪除</button>
+                ${item.address?`<a class="cbtn maps" href="${mapsUrl(item.address)}" target="_blank" rel="noopener">🗺 地圖</a>`:''}
+                ${isHidden
+                  ? `<button class="cbtn restore" onclick="toggleHide('${item.id}',${currentDay})">↩ 恢復</button>`
+                  : `<button class="cbtn hide"    onclick="toggleHide('${item.id}',${currentDay})">🙈 隱藏</button>`
+                }
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 
   document.getElementById('mainContent').innerHTML = `
     <div class="day-header">
-      <h2>${meta.label} — ${meta.area}</h2>
-      <div class="day-meta">${meta.date}（${meta.weekday}）· 明洞 Stanford Hotel</div>
+      <div>
+        <h2>${meta.label} — ${meta.area}</h2>
+        <div class="day-meta">${meta.date}（${meta.weekday}）· 明洞 Stanford Hotel</div>
+      </div>
+      ${hiddenCount > 0 ? `
+        <button class="show-hidden-btn ${show?'active':''}" onclick="toggleShowHidden(${currentDay})">
+          ${show ? `👁 隱藏 (${hiddenCount})` : `🙈 顯示隱藏 (${hiddenCount})`}
+        </button>` : ''}
     </div>
-    <div class="timeline">${itemsHtml || '<p style="padding:16px 0 16px 88px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>'}</div>
+    <div class="timeline">${items.length ? itemsHtml : '<p style="padding:16px 0 16px 88px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>'}</div>
     <div class="add-row">
       <button class="add-btn" onclick="openModal(${currentDay})">＋ 新增地點</button>
     </div>
     <div class="notes-section">
       <div class="notes-label">📝 今日備註</div>
-      <textarea class="notes-ta" id="noteTa_${currentDay}" placeholder="輸入備註，自動儲存" oninput="noteInput(${currentDay}, this.value)">${esc(note)}</textarea>
+      <textarea class="notes-ta" id="noteTa_${currentDay}" placeholder="輸入備註，自動儲存" oninput="noteInput(${currentDay},this.value)">${esc(note)}</textarea>
     </div>
   `;
 }
 
 function renderSidebar() {
-  document.getElementById('sidebarContent').innerHTML = DAYS_META.map(meta => {
+  const h = state.hotel;
+  const hotelHtml = h.name ? `
+    <div class="sb-hotel">
+      <div class="sb-hotel-name">🏨 ${esc(h.name)}</div>
+      <div class="sb-hotel-meta">
+        ${h.cin  ? `入住 ${esc(h.cin)}<br>` : ''}
+        ${h.cout ? `退房 ${esc(h.cout)}<br>` : ''}
+        ${h.conf ? `訂單 ${esc(h.conf)}<br>` : ''}
+        ${h.phone? `電話 ${esc(h.phone)}` : ''}
+      </div>
+      ${h.address ? `<a class="sb-hotel-maps" href="${mapsUrl(h.address)}" target="_blank" rel="noopener">🗺 飯店地圖</a>` : ''}
+    </div>
+  ` : '';
+
+  const daysHtml = DAYS_META.map(meta => {
     const items = (state.items[meta.day]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
     return `
       <div class="sb-day">
@@ -660,52 +778,82 @@ function renderSidebar() {
           <span class="sb-day-date">${meta.date.slice(5)}</span>
         </div>
         ${items.length ? items.map(item => `
-          <div class="sb-item" onclick="switchDay(${meta.day}); closeSidebar();">
-            <div class="sb-dot dot-${item.type}"></div>
+          <div class="sb-item ${item.hidden?'is-hidden':''}" onclick="switchDay(${meta.day});closeSidebar();">
+            <div class="sb-dot ${item.hidden?'dot-hidden':'dot-'+item.type}"></div>
             <div class="sb-info">
               <div class="sb-name">${esc(item.name)}</div>
-              <div class="sb-meta">${item.time}${item.endTime?' – '+item.endTime:''}${item.admission?' · 🎫'+item.admission:''}</div>
+              <div class="sb-meta">${esc(item.time)}${item.endTime?' – '+esc(item.endTime):''}${item.admission?' · 🎫'+esc(item.admission):''}</div>
             </div>
-          </div>
-        `).join('') : '<div style="font-size:11px;color:var(--muted);padding:4px 0 4px 15px;">（尚無地點）</div>'}
-      </div>
-    `;
+          </div>`).join('') : '<div style="font-size:11px;color:var(--muted);padding:4px 0 4px 15px;">（尚無地點）</div>'}
+      </div>`;
   }).join('');
+
+  document.getElementById('sidebarContent').innerHTML = hotelHtml + daysHtml;
 }
 
-function esc(str) {
-  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function render() {
-  renderTabs();
-  renderDay();
-  renderSidebar();
-  syncFlightUI();
-}
+function render() { renderTabs(); renderDay(); renderSidebar(); syncPanelUI(); }
 
 // ════════════════════════════════════════════
 //  INTERACTIONS
 // ════════════════════════════════════════════
 
-function switchDay(day) {
-  currentDay = day;
+function switchDay(day) { currentDay = day; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+function toggleShowHidden(day) {
+  showHidden[day] = !showHidden[day];
+  renderDay();
+}
+
+function toggleHide(id, dayNum) {
+  const item = (state.items[dayNum]||[]).find(i => i.id === id);
+  if (!item) return;
+  item.hidden = !item.hidden;
+  saveState();
   render();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast(item.hidden ? '🙈 已隱藏' : '↩ 已恢復顯示');
 }
 
-function toggleFlight() {
-  document.getElementById('flightBar').classList.toggle('open');
+function cycleResv(id, dayNum) {
+  const item = (state.items[dayNum]||[]).find(i => i.id === id);
+  if (!item) return;
+  const idx = RESV_CYCLE.indexOf(item.resv||'none');
+  item.resv = RESV_CYCLE[(idx + 1) % RESV_CYCLE.length];
+  saveState();
+  render();
+  showToast(`預約狀態：${RESV_LABEL[item.resv]}`);
 }
 
-function syncFlightUI() {
-  const f = state.flight;
+function noteInput(day, val) {
+  clearTimeout(noteTimers[day]);
+  noteTimers[day] = setTimeout(() => {
+    state.notes[day] = val; saveState(); showToast('備註已自動儲存');
+  }, 900);
+}
+
+// ── PANELS ──
+function togglePanel(id) {
+  const el = document.getElementById(id);
+  const isOpen = el.classList.contains('open');
+  // close all panels first
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('open'));
+  if (!isOpen) el.classList.add('open');
+}
+
+function syncPanelUI() {
+  const f = state.flight, h = state.hotel;
   document.getElementById('f_out_no').value  = f.out_no  || '';
   document.getElementById('f_out_dep').value = f.out_dep || '';
   document.getElementById('f_out_arr').value = f.out_arr || '';
   document.getElementById('f_ret_no').value  = f.ret_no  || '';
   document.getElementById('f_ret_dep').value = f.ret_dep || '';
   document.getElementById('f_ret_arr').value = f.ret_arr || '';
+  document.getElementById('h_name').value    = h.name    || '';
+  document.getElementById('h_address').value = h.address || '';
+  document.getElementById('h_cin').value     = h.cin     || '';
+  document.getElementById('h_cout').value    = h.cout    || '';
+  document.getElementById('h_conf').value    = h.conf    || '';
+  document.getElementById('h_phone').value   = h.phone   || '';
+  document.getElementById('h_notes').value   = h.notes   || '';
 }
 
 function saveFlight() {
@@ -717,31 +865,45 @@ function saveFlight() {
     ret_dep: document.getElementById('f_ret_dep').value.trim(),
     ret_arr: document.getElementById('f_ret_arr').value.trim(),
   };
-  saveState();
-  showToast('✈ 機票資訊已儲存');
-  document.getElementById('flightBar').classList.remove('open');
+  saveState(); showToast('✈ 機票已儲存');
+  document.getElementById('panelFlight').classList.remove('open');
 }
 
-function noteInput(day, val) {
-  clearTimeout(noteTimers[day]);
-  noteTimers[day] = setTimeout(() => {
-    state.notes[day] = val;
-    saveState();
-    showToast('備註已自動儲存');
-  }, 900);
+function saveHotel() {
+  state.hotel = {
+    name:    document.getElementById('h_name').value.trim(),
+    address: document.getElementById('h_address').value.trim(),
+    cin:     document.getElementById('h_cin').value.trim(),
+    cout:    document.getElementById('h_cout').value.trim(),
+    conf:    document.getElementById('h_conf').value.trim(),
+    phone:   document.getElementById('h_phone').value.trim(),
+    notes:   document.getElementById('h_notes').value.trim(),
+  };
+  saveState(); showToast('🏨 住宿已儲存'); render();
+  document.getElementById('panelHotel').classList.remove('open');
 }
 
-function deleteItem(id, dayNum) {
-  if (!confirm('確定刪除這個地點？')) return;
-  state.items[dayNum] = (state.items[dayNum] || []).filter(i => i.id !== id);
-  saveState();
-  render();
-  showToast('已刪除');
+// ── SIDEBAR ──
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
 }
 
 // ════════════════════════════════════════════
 //  MODAL
 // ════════════════════════════════════════════
+
+function toggleMember(name) {
+  const cb  = document.getElementById('w_' + name);
+  const opt = document.getElementById('opt_' + name);
+  cb.checked = !cb.checked;
+  const m = MEMBERS.find(m => m.id.toLowerCase() === name.toLowerCase());
+  if (m) opt.classList.toggle(m.optCls, cb.checked);
+}
 
 function openModal(day) {
   document.getElementById('m_day').value = String(day);
@@ -752,32 +914,32 @@ function openModal(day) {
     document.getElementById(id).value = '';
   });
   document.getElementById('m_type').value = 'other';
-  document.getElementById('w_mo').checked       = false;
-  document.getElementById('w_wife').checked     = false;
-  document.getElementById('w_daughter').checked = false;
+  // reset member opts
+  MEMBERS.forEach(m => {
+    const cb  = document.getElementById('w_' + m.id.toLowerCase());
+    const opt = document.getElementById('opt_' + m.id.toLowerCase());
+    cb.checked = false;
+    opt.classList.remove(m.optCls);
+  });
   document.getElementById('modalOverlay').classList.add('open');
   setTimeout(() => document.getElementById('m_name').focus(), 200);
 }
 
-function handleOverlayClick(e) {
-  if (e.target === e.currentTarget) closeModal();
-}
-
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('open');
-}
+function handleOverlayClick(e) { if (e.target === e.currentTarget) closeModal(); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
 
 function submitAdd() {
   const name = document.getElementById('m_name').value.trim();
   if (!name) { document.getElementById('m_name').focus(); return; }
   const dayNum = parseInt(document.getElementById('m_day').value, 10);
-  const who = [];
-  if (document.getElementById('w_mo').checked)       who.push('Mo');
-  if (document.getElementById('w_wife').checked)     who.push('老婆');
-  if (document.getElementById('w_daughter').checked) who.push('女兒');
+  const who = MEMBERS
+    .filter(m => document.getElementById('w_' + m.id.toLowerCase()).checked)
+    .map(m => m.id);
   const item = {
     id:        uid(),
     type:      document.getElementById('m_type').value,
+    hidden:    false,
+    resv:      'none',
     name,
     nameKo:    document.getElementById('m_nameko').value.trim(),
     time:      document.getElementById('m_time').value    || '12:00',
@@ -791,46 +953,26 @@ function submitAdd() {
   };
   if (!state.items[dayNum]) state.items[dayNum] = [];
   state.items[dayNum].push(item);
-  saveState();
-  currentDay = dayNum;
-  closeModal();
-  render();
+  saveState(); currentDay = dayNum; closeModal(); render();
   showToast('✅ 已加入 Day ' + dayNum);
 }
 
 // ════════════════════════════════════════════
-//  SIDEBAR
-// ════════════════════════════════════════════
-
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-}
-
-// ════════════════════════════════════════════
-//  EXPORT BACKUP
+//  EXPORT
 // ════════════════════════════════════════════
 
 function exportBackup() {
-  const payload = {
+  const blob = new Blob([JSON.stringify({
     exported: new Date().toISOString(),
     trip: 'Seoul 2025 — 7/1–7/5',
-    members: ['Mo', '老婆', '女兒'],
+    members: ['Mo','Kelly','Mia','Rui'],
     state
-  };
-  const json = JSON.stringify(payload, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `seoul-dhub-${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  }, null, 2)], { type:'application/json' });
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(blob),
+    download: `seoul-dhub-${new Date().toISOString().slice(0,10)}.json`
+  });
+  a.click(); URL.revokeObjectURL(a.href);
   showToast('↓ 備份已下載');
 }
 
@@ -839,9 +981,9 @@ function exportBackup() {
 // ════════════════════════════════════════════
 
 document.addEventListener('keydown', e => {
-  const active = document.activeElement.tagName;
+  const tag = document.activeElement.tagName;
   if (e.key === 'Escape') closeModal();
-  if (['INPUT','TEXTAREA','SELECT'].includes(active)) return;
+  if (['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
   if (e.key === 'ArrowRight' && currentDay < 5) switchDay(currentDay + 1);
   if (e.key === 'ArrowLeft'  && currentDay > 1) switchDay(currentDay - 1);
 });
@@ -849,7 +991,6 @@ document.addEventListener('keydown', e => {
 // ════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════
-
 render();
 </script>
 </body>
