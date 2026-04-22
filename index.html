@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<!-- Firebase compat SDK (no bundler needed) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
@@ -37,28 +36,23 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .hbtn:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.26)}
 .hbtn.mob-hide{display:inline-flex}
 .ver{font-family:var(--mono);font-size:10px;opacity:.22;margin-left:4px;color:#F0E8D8}
-
-/* user selector */
-.user-sel{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.95);padding:5px 9px;border-radius:5px;font-family:var(--mono);font-size:11px;cursor:pointer;outline:none}
-.user-sel option{background:#1C1A17;color:#F5F2EC}
-.user-sel.selected-mo    {border-color:#7a7068;background:rgba(122,112,104,.35)}
-.user-sel.selected-kelly {border-color:#d48aaa;background:rgba(212,138,170,.25)}
-.user-sel.selected-mia   {border-color:#9985cc;background:rgba(153,133,204,.25)}
-.user-sel.selected-rui   {border-color:#6a9fd4;background:rgba(106,159,212,.25)}
-
-/* connection dot */
 .conn-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;transition:background .3s}
 .conn-dot.connected{background:#4CAF50;box-shadow:0 0 5px #4CAF50}
 .conn-dot.offline{background:#666}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 .conn-dot.syncing{background:#FF9800;animation:blink .8s infinite}
+.user-chip{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.18);cursor:pointer;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.85);background:rgba(255,255,255,.07);transition:all .15s;white-space:nowrap}
+.user-chip:hover{background:rgba(255,255,255,.15)}
+.chip-mo{border-color:#8B6820!important;background:rgba(139,104,32,.2)!important;color:#D4A840!important}
+.chip-kelly{border-color:#8B3828!important;background:rgba(139,56,40,.2)!important;color:#D47060!important}
+.chip-mia{border-color:#486840!important;background:rgba(72,104,64,.2)!important;color:#80A870!important}
+.chip-ruei{border-color:#2C5070!important;background:rgba(44,80,112,.2)!important;color:#6090B8!important}
+.chip-switch{opacity:.35;font-size:9px;margin-left:2px}
 
 /* ── PANELS ── */
 .panel{overflow:hidden;max-height:0;transition:max-height .35s ease;border-bottom:1px solid var(--border)}
-.panel.open{max-height:260px}
-.panel-flight{background:#fdf5ed}
-.panel-hotel{background:#edf5fd}
-.panel-emergency{background:#fdf0ed}
+.panel.open{max-height:280px}
+.panel-flight{background:#fdf5ed}.panel-hotel{background:#edf5fd}.panel-emergency{background:#fdf0ed}
 .panel-inner{padding:16px 22px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
 .fld{display:flex;flex-direction:column;gap:4px}
 .fld label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
@@ -73,6 +67,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .weather-banner{background:#fff8e6;border-bottom:1px solid #f0d98a;padding:9px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#7a5c00}
 .weather-dismiss{background:none;border:none;cursor:pointer;font-size:16px;opacity:.5;flex-shrink:0}
 .weather-dismiss:hover{opacity:1}
+.sync-bar{background:rgba(0,0,0,.04);border-bottom:1px solid rgba(0,0,0,.06);padding:4px 20px;font-size:10px;font-family:var(--mono);color:var(--muted);display:flex;align-items:center;gap:6px}
 
 /* ── DAY TABS ── */
 .day-tabs{background:#2A2018;border-bottom:1px solid rgba(184,90,56,.2);display:flex;overflow-x:auto;padding:0 14px;scrollbar-width:none}
@@ -84,105 +79,131 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 
 /* ── LAYOUT ── */
 .layout{display:flex;min-height:calc(100vh - 92px)}
-.content{flex:1;padding:26px 26px;max-width:740px;min-width:0}
-.sidebar{width:296px;flex-shrink:0;background:var(--card);border-left:1px solid var(--border);padding:22px 17px 22px 18px;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto}
+.content{flex:1;padding:22px 22px;max-width:740px;min-width:0}
+.sidebar{width:288px;flex-shrink:0;background:var(--card);border-left:1px solid var(--border);padding:20px 16px;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:140}
+.sb-close-btn{display:none;position:absolute;top:14px;right:16px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted)}
 
 /* ── DAY HEADER ── */
-.day-header{margin-bottom:22px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
-.day-header h2{font-size:21px;font-weight:700}
-.day-meta{font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:3px}
-.show-hidden-btn{font-size:11px;font-family:var(--mono);padding:5px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);white-space:nowrap;align-self:flex-start;margin-top:4px}
-.show-hidden-btn:hover{background:var(--border);color:var(--ink)}
-.show-hidden-btn.active{background:#fef9e5;border-color:#d4a800;color:#8a6c00}
+.day-header{margin-bottom:18px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px}
+.day-header-left h2{font-size:21px;font-weight:700}
+.day-meta{font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:2px}
+.day-header-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.day-btn{font-size:10px;font-family:var(--mono);padding:5px 10px;border-radius:5px;cursor:pointer;white-space:nowrap;border:1px solid transparent;transition:all .12s}
+.day-btn-sched{border-color:var(--blue);background:var(--blue-bg);color:var(--blue)}
+.day-btn-sched:hover{background:var(--blue);color:#fff}
+.day-btn-gray{border-color:var(--border);background:transparent;color:var(--muted)}
+.day-btn-gray:hover{background:var(--border);color:var(--ink)}
+.day-btn-gray.active{background:#fef9e5;border-color:#d4a800;color:#8a6c00}
 
 /* ── TIMELINE ── */
 .timeline{position:relative}
-.timeline::before{content:'';position:absolute;left:79px;top:12px;bottom:20px;width:1px;background:var(--border)}
-.tl-item{display:grid;grid-template-columns:60px 16px 1fr;gap:0 12px;margin-bottom:14px;align-items:start}
-.tl-time{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right;padding-top:16px;line-height:1.4}
-.tl-dot-wrap{display:flex;justify-content:center;padding-top:18px;position:relative;z-index:1}
-.tl-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 0 1.5px var(--border)}
+.timeline::before{content:'';position:absolute;left:66px;top:8px;bottom:8px;width:1px;background:var(--border)}
+.tl-item{display:grid;grid-template-columns:50px 16px 1fr;gap:0 10px;margin-bottom:10px;align-items:start}
 
-/* ── ITEM CARD ── */
-.item-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:box-shadow .15s,opacity .2s;box-shadow:0 2px 8px rgba(14,12,38,.06)}
-.item-card:hover{box-shadow:0 4px 20px rgba(14,12,38,.13)}
-.item-card.hidden-item{opacity:.4}
+/* Time column — clickable to edit */
+.tl-time-wrap{padding-top:12px;text-align:right}
+.tl-time{font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer;border-radius:4px;padding:2px 3px;transition:color .15s, background .15s;line-height:1.4;display:inline-block;position:relative}
+.tl-time:hover{color:var(--accent);background:var(--accent-bg)}
+.tl-time.locked{cursor:default;color:var(--muted)}
+.tl-time.locked:hover{color:var(--muted);background:transparent}
+.tl-time-end{display:block;font-size:9px;opacity:.5;margin-top:1px}
+.tl-lock-icon{display:block;font-size:9px;margin-top:1px;opacity:.7}
+.tl-time-input{width:58px;font-family:var(--mono);font-size:11px;border:1.5px solid var(--accent);border-radius:4px;padding:3px 4px;background:white;color:var(--ink);outline:none;margin-top:1px;display:block}
+.tl-hint{display:block;font-size:8px;color:var(--accent);margin-top:2px;font-family:var(--mono);opacity:.7}
+
+.tl-dot-wrap{display:flex;justify-content:center;padding-top:16px;position:relative;z-index:1}
+.tl-dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 0 1.5px var(--border)}
+
+/* ── CARD ── */
+.item-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:box-shadow .15s;box-shadow:0 1px 5px rgba(14,12,38,.05)}
+.item-card:hover{box-shadow:0 3px 14px rgba(14,12,38,.1)}
+.item-card.is-expanded{box-shadow:0 4px 18px rgba(14,12,38,.12)}
+.item-card.hidden-item{opacity:.42}
 .card-inner{display:flex}
-.card-bar{width:4px;flex-shrink:0}
-.card-content{padding:13px 15px;flex:1;min-width:0}
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px}
-.card-name{font-size:14px;font-weight:700;line-height:1.35}
-.card-nameko{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px}
-.card-badges{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
-.card-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:4px;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
-.hidden-label{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:4px;background:#fef9e5;color:#8a6c00;border:1px solid #d4a800;white-space:nowrap}
+.card-bar{width:3px;flex-shrink:0}
+.card-content{padding:12px 14px;flex:1;min-width:0}
+
+/* TYPE COLORS */
+.bar-museum{background:var(--blue)}.bar-architecture{background:var(--green)}.bar-restaurant{background:var(--red)}.bar-other{background:var(--purple)}.bar-flight{background:#C8921E}
+.dot-museum{background:var(--blue)}.dot-architecture{background:var(--green)}.dot-restaurant{background:var(--red)}.dot-other{background:var(--purple)}.dot-flight{background:#C8921E}.dot-hidden{background:#ccc}
+.badge-museum{background:var(--blue-bg);color:var(--blue)}.badge-architecture{background:var(--green-bg);color:var(--green)}.badge-restaurant{background:var(--red-bg);color:var(--red)}.badge-other{background:var(--purple-bg);color:var(--purple)}.badge-flight{background:#FFF4DC;color:#7A5800}
+
+/* COMPACT ROW (always visible) */
+.card-compact{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:28px}
+.card-name-wrap{display:flex;align-items:center;gap:7px;min-width:0;flex:1}
+.card-type-icon{font-size:15px;flex-shrink:0;line-height:1}
+.card-name{font-size:13px;font-weight:700;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-compact-meta{font-size:10px;font-family:var(--mono);color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+
+/* RESV BADGE */
 .resv-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:4px;cursor:pointer;border:1px solid transparent;white-space:nowrap;transition:opacity .15s}
 .resv-badge:hover{opacity:.7}
 .resv-none{background:#f0eeea;color:var(--muted);border-color:var(--border)}
 .resv-pending{background:#fff4e0;color:#8a5c00;border-color:#e8c56a}
 .resv-booked{background:#e5f5eb;color:#2a6e42;border-color:#7ec89a}
-.card-meta{display:flex;flex-direction:column;gap:3px;margin-top:7px}
-.card-meta-row{font-size:11px;color:var(--muted);display:flex;gap:5px;align-items:flex-start}
-.card-desc{font-size:12px;color:var(--muted);line-height:1.65;font-style:italic;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
 
-/* ── VOTES ── */
-.vote-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid var(--border)}
-.vote-btn{font-size:10px;font-family:var(--mono);padding:3px 8px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;background:transparent;display:inline-flex;align-items:center;gap:3px;color:var(--muted);transition:all .12s}
+/* VOTE DOTS (compact) */
+.vote-dots{display:flex;gap:2px;align-items:center}
+.vd{font-size:11px;cursor:pointer;line-height:1;padding:1px 2px;border-radius:3px;transition:opacity .1s, background .1s;opacity:.25}
+.vd.voted{opacity:1}
+.vd.is-me{outline:1.5px solid var(--accent);border-radius:3px;opacity:1}
+
+/* EXPAND SECTION */
+.card-expand{display:none;margin-top:11px;padding-top:11px;border-top:1px solid var(--border)}
+.card-expand.open{display:block}
+.exp-nameko{font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:8px}
+.exp-meta{display:flex;flex-direction:column;gap:4px;margin-bottom:9px}
+.exp-meta-row{font-size:11px;color:var(--muted);display:flex;gap:7px;align-items:flex-start;line-height:1.5}
+.exp-desc{font-size:11px;color:var(--muted);font-style:italic;margin:8px 0;padding-top:8px;border-top:1px solid var(--border);line-height:1.65}
+
+/* VOTE ROW (expanded) */
+.vote-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+.vote-btn{font-size:10px;font-family:var(--mono);padding:4px 9px;border-radius:10px;border:1.5px solid var(--border);cursor:pointer;background:transparent;display:inline-flex;align-items:center;gap:3px;color:var(--muted);transition:all .12s}
 .vote-btn:hover{border-color:var(--muted)}
 .vote-btn.me{border-style:solid;font-weight:700}
 .vote-v1{background:#e8f4ee;border-color:#7ec89a;color:#2a6e42}
 .vote-v2{background:#fde8f2;border-color:#d48aaa;color:#8a2f5a}
 .vote-v3{background:#fef9e5;border-color:#d4a800;color:#8a6c00}
 
-/* ── FOOTER ── */
-.card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:6px}
-.card-who{display:flex;gap:4px;flex-wrap:wrap}
-.who-tag{font-size:9px;font-family:var(--mono);padding:2px 8px;border-radius:10px}
-.who-mo{background:#E8D8A8;color:#5A3E10}
-.who-kelly{background:#F2D8D0;color:#7A3020}
-.who-mia{background:#D5E8CC;color:#3A5828}
-.who-ruei{background:#C8DCEA;color:#2A4A60}
-.who-other{background:rgba(0,0,0,.06);color:var(--muted)}
-.card-btns{display:flex;gap:6px;flex-wrap:wrap}
-.cbtn{font-size:10px;padding:3px 9px;border-radius:4px;border:1px solid var(--border);cursor:pointer;background:transparent;color:var(--muted);font-family:var(--mono);text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:all .12s}
+/* ACTION BUTTONS */
+.card-btns{display:flex;gap:5px;flex-wrap:wrap}
+.cbtn{font-size:10px;padding:4px 9px;border-radius:4px;border:1px solid var(--border);cursor:pointer;background:transparent;color:var(--muted);font-family:var(--mono);text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:all .12s}
 .cbtn:hover{background:var(--border);color:var(--ink)}
 .cbtn.maps{color:var(--blue);border-color:#c5dff0}
 .cbtn.maps:hover{background:var(--blue-bg);border-color:var(--blue)}
-.cbtn.hide:hover{color:#8a6c00;border-color:#d4a800;background:#fef9e5}
+.cbtn.edit:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-bg)}
 .cbtn.restore{color:var(--green);border-color:#a5d4b5}
 .cbtn.restore:hover{background:var(--green-bg)}
+.cbtn.hide:hover{color:#8a6c00;border-color:#d4a800;background:#fef9e5}
 
-/* ── TYPE ── */
-.bar-museum{background:var(--blue)}.bar-architecture{background:var(--green)}.bar-restaurant{background:var(--red)}.bar-other{background:var(--purple)}
-.badge-museum{background:var(--blue-bg);color:var(--blue)}.badge-architecture{background:var(--green-bg);color:var(--green)}.badge-restaurant{background:var(--red-bg);color:var(--red)}.badge-other{background:var(--purple-bg);color:var(--purple)}
-.dot-museum{background:var(--blue)}.dot-architecture{background:var(--green)}.dot-restaurant{background:var(--red)}.dot-other{background:var(--purple)}.dot-hidden{background:#ccc}
-/* flight */
-.bar-flight{background:#C8921E}.badge-flight{background:#FFF4DC;color:#7A5800}.dot-flight{background:#C8921E}
+/* FLIGHT CARD */
 .flight-card{background:linear-gradient(135deg,#FFFAF0,#FFF4DC);border-color:#E8D090}
 .flight-card .card-name{color:#6A4800}
+.flight-card .card-type-icon{opacity:.85}
 
-/* ── ADD ── */
-.add-row{padding-left:88px;margin:4px 0 26px}
-.add-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:transparent;border:1.5px dashed var(--border);border-radius:var(--r);cursor:pointer;color:var(--muted);font-family:var(--serif);font-size:13px;transition:all .15s}
+/* ADD ROW */
+.add-row{padding-left:76px;margin:4px 0 24px}
+.add-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:transparent;border:1.5px dashed var(--border);border-radius:var(--r);cursor:pointer;color:var(--muted);font-family:var(--serif);font-size:12px;transition:all .15s}
 .add-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
 
-/* ── NOTES ── */
-.notes-section{margin-bottom:36px}
-.notes-label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;margin-left:88px}
-.notes-ta{width:100%;min-height:68px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:11px 13px;font-family:var(--serif);font-size:13px;color:var(--ink);resize:vertical;outline:none;transition:border-color .15s}
+/* NOTES */
+.notes-section{margin-bottom:32px}
+.notes-label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;margin-left:76px}
+.notes-ta{width:100%;min-height:64px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-family:var(--serif);font-size:13px;color:var(--ink);resize:vertical;outline:none;transition:border-color .15s}
 .notes-ta:focus{border-color:var(--muted)}
 
 /* ── SIDEBAR ── */
-.sb-close-btn{display:none;position:absolute;top:14px;right:16px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--muted)}
 .sb-title{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:14px}
-.sb-section{border:1px solid #c5dff0;border-radius:6px;padding:10px 12px;margin-bottom:14px;font-size:11px}
+.sb-section{border:1px solid #c5dff0;border-radius:6px;padding:10px 12px;margin-bottom:12px;font-size:11px}
 .sb-section.hotel{background:var(--blue-bg)}
 .sb-section.emergency{background:var(--red-bg);border-color:#e8b0a0}
 .sb-section-title{font-weight:700;font-size:12px;margin-bottom:4px}
 .sb-section-meta{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.9}
 .sb-section.emergency .sb-section-meta{color:#7a3020}
 .sb-section-link{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--blue);text-decoration:none;margin-top:4px}
-.sb-day{margin-bottom:16px}
+.sb-day{margin-bottom:14px}
 .sb-day-title{font-size:11px;font-weight:700;padding-bottom:5px;border-bottom:1px solid var(--border);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
 .sb-day-date{font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400}
 .sb-item{display:flex;gap:7px;padding:4px;border-radius:4px;cursor:pointer;transition:background .1s}
@@ -192,19 +213,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .sb-info{flex:1;min-width:0}
 .sb-name{font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sb-meta{font-size:10px;font-family:var(--mono);color:var(--muted)}
-.sb-votes{font-size:10px;font-family:var(--mono);color:var(--muted)}
 
-/* ── MODAL ── */
+/* ── MODAL (Add / Edit) ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--bg);border-radius:12px;padding:26px;width:min(92vw,520px);max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .2s}
+.modal{background:var(--bg);border-radius:12px;padding:24px;width:min(92vw,500px);max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .2s}
 .modal-overlay.open .modal{transform:translateY(0)}
-.modal-title{font-size:17px;font-weight:700;margin-bottom:18px}
-.fg{margin-bottom:12px}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:16px}
+.fg{margin-bottom:11px}
 .fg label{display:block;font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px}
-.fg input,.fg select,.fg textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:5px;padding:8px 11px;font-family:var(--serif);font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-family:var(--serif);font-size:13px;color:var(--ink);outline:none;transition:border-color .15s}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--muted)}
-.fg textarea{min-height:58px;resize:vertical}
+.fg textarea{min-height:54px;resize:vertical}
 .fg-row{display:flex;gap:10px}.fg-row .fg{flex:1}
 .member-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .member-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;user-select:none}
@@ -215,17 +235,37 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .checked-kelly{border-color:#d48aaa;background:#fde8f2}
 .checked-mia{border-color:#9985cc;background:#ede8f9}
 .checked-ruei{border-color:#6a9fd4;background:#e5f0fb}
-.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
-.btn-cancel{padding:9px 18px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-family:var(--serif);font-size:13px;color:var(--muted)}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+.btn-cancel{padding:8px 16px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-family:var(--serif);font-size:13px;color:var(--muted)}
 .btn-cancel:hover{background:var(--border)}
-.btn-submit{padding:9px 22px;background:var(--accent);color:white;border:none;border-radius:5px;cursor:pointer;font-family:var(--serif);font-size:13px;font-weight:600}
+.btn-submit{padding:8px 20px;background:var(--accent);color:white;border:none;border-radius:5px;cursor:pointer;font-family:var(--serif);font-size:13px;font-weight:600}
 .btn-submit:hover{background:#a83520}
 
-/* ── FAB ── */
-.pfab{position:fixed;bottom:24px;right:24px;background:var(--ink);color:var(--bg);border:none;border-radius:50px;padding:12px 22px;cursor:pointer;font-family:var(--serif);font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.18);display:flex;align-items:center;gap:7px;z-index:50;transition:transform .15s}
-.pfab:hover{transform:translateY(-2px)}
+/* day suggest in modal */
+.day-suggest{background:var(--blue-bg);border:1px solid #b8ceff;border-radius:6px;padding:7px 11px;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.day-suggest.hidden{display:none}
+.day-suggest-text{font-size:11px;font-family:var(--mono);color:var(--blue);flex:1}
+.day-suggest-text strong{font-weight:700}
+.day-suggest-apply{background:var(--blue);color:#fff;border:none;border-radius:4px;padding:3px 10px;font-size:10px;font-family:var(--mono);cursor:pointer;white-space:nowrap}
 
-/* ── LOGIN OVERLAY ── */
+/* ── MOVE SHEET ── */
+.move-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:210;display:none;align-items:flex-end;justify-content:center}
+.move-modal.open{display:flex}
+.move-sheet{background:var(--card);border-radius:16px 16px 0 0;padding:20px 20px 36px;width:100%;max-width:500px}
+.move-sheet-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.move-sheet-name{font-size:11px;font-family:var(--mono);color:var(--muted);margin-bottom:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.move-day-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
+.move-day-btn{padding:10px 4px;border-radius:8px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--muted);text-align:center;line-height:1.5;transition:all .12s}
+.move-day-btn span{display:block;font-size:9px;font-weight:400;opacity:.6}
+.move-day-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.move-day-btn.suggested{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.move-day-btn.current{opacity:.3;cursor:default;pointer-events:none;border-style:dashed}
+.move-suggest-label{font-size:10px;font-family:var(--mono);color:var(--blue);margin-bottom:10px}
+.move-suggest-label.hidden{display:none}
+.move-cancel{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-family:var(--serif);font-size:13px;color:var(--muted)}
+.move-cancel:hover{background:var(--border)}
+
+/* ── LOGIN ── */
 .login-overlay{position:fixed;inset:0;background:#1E1810;z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px}
 .login-overlay.hidden{display:none}
 .login-logo{font-size:48px;line-height:1}
@@ -237,13 +277,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .login-btn .lb-emoji{font-size:24px;line-height:1}
 .login-btn .lb-role{font-size:9px;font-family:var(--mono);opacity:.65;font-weight:400;letter-spacing:.05em}
 .login-btn:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.5)}
-.login-btn:active{transform:none}
-.lbtn-mo   {background:#8B6820;color:#FFF0C8}
+.lbtn-mo{background:#8B6820;color:#FFF0C8}
 .lbtn-kelly{background:#8B3828;color:#FFE8E0}
-.lbtn-mia  {background:#486840;color:#E8F5E0}
-.lbtn-ruei  {background:#2C5070;color:#DCF0FF}
-
-/* ── GUIDE PAGE (step 2, same overlay) ── */
+.lbtn-mia{background:#486840;color:#E8F5E0}
+.lbtn-ruei{background:#2C5070;color:#DCF0FF}
 .guide-page{display:none;flex-direction:column;align-items:center;gap:22px;width:min(92vw,360px)}
 .guide-page.active{display:flex}
 .guide-who{font-size:16px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
@@ -263,57 +300,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .login-page{display:flex;flex-direction:column;align-items:center;gap:28px}
 .login-page.hidden{display:none}
 
-/* user chip in header */
-.user-chip{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.18);cursor:pointer;font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.85);background:rgba(255,255,255,.07);transition:all .15s;white-space:nowrap}
-.user-chip:hover{background:rgba(255,255,255,.15)}
-.chip-mo   {border-color:#8B6820!important;background:rgba(139,104,32,.2)!important;color:#D4A840!important}
-.chip-kelly{border-color:#8B3828!important;background:rgba(139,56,40,.2)!important;color:#D47060!important}
-.chip-mia  {border-color:#486840!important;background:rgba(72,104,64,.2)!important;color:#80A870!important}
-.chip-ruei  {border-color:#2C5070!important;background:rgba(44,80,112,.2)!important;color:#6090B8!important}
-.chip-switch{opacity:.35;font-size:9px;margin-left:2px}
-
-/* ── DAY SUGGEST (modal) ── */
-.day-suggest{background:var(--blue-bg);border:1px solid #b8ceff;border-radius:7px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
-.day-suggest.hidden{display:none}
-.day-suggest-text{font-size:11px;font-family:var(--mono);color:var(--blue);flex:1}
-.day-suggest-text strong{font-weight:700}
-.day-suggest-apply{background:var(--blue);color:#fff;border:none;border-radius:4px;padding:4px 11px;font-size:10px;font-family:var(--mono);cursor:pointer;white-space:nowrap}
-.day-suggest-apply:hover{opacity:.85}
-
-/* ── MOVE SHEET ── */
-.move-modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:210;display:none;align-items:flex-end;justify-content:center}
-.move-modal.open{display:flex}
-.move-sheet{background:var(--card);border-radius:16px 16px 0 0;padding:20px 20px 36px;width:100%;max-width:500px}
-.move-sheet-title{font-size:13px;font-weight:700;margin-bottom:3px}
-.move-sheet-name{font-size:11px;font-family:var(--mono);color:var(--muted);margin-bottom:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.move-day-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:12px}
-.move-day-btn{padding:10px 4px;border-radius:8px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--muted);text-align:center;line-height:1.5;transition:all .12s}
-.move-day-btn span{display:block;font-size:9px;font-weight:400;opacity:.6}
-.move-day-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
-.move-day-btn.suggested{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
-.move-day-btn.current{opacity:.3;cursor:default;pointer-events:none;border-style:dashed}
-.move-suggest-label{font-size:10px;font-family:var(--mono);color:var(--blue);margin-bottom:10px}
-.move-suggest-label.hidden{display:none}
-.move-cancel{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-family:var(--serif);font-size:13px;color:var(--muted)}
-.move-cancel:hover{background:var(--border)}
-
-/* ── LOCK & SCHEDULE (v2.0) ── */
-.tl-lock{font-size:9px;display:block;text-align:right;line-height:1;margin-top:3px;letter-spacing:0}
-.sched-btns{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}
-.reschedule-btn,.opt-sort-btn{font-size:10px;font-family:var(--mono);padding:5px 10px;border-radius:5px;cursor:pointer;white-space:nowrap;border:1px solid transparent;transition:all .12s}
-.reschedule-btn{border-color:var(--blue);background:var(--blue-bg);color:var(--blue)}
-.reschedule-btn:hover{background:var(--blue);color:#fff}
-.opt-sort-btn{border-color:var(--green);background:var(--green-bg);color:var(--green)}
-.opt-sort-btn:hover{background:var(--green);color:#fff}
-
 /* ── TOAST ── */
-.toast{position:fixed;bottom:72px;right:24px;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:12px;font-family:var(--mono);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:300}
-.toast.show{opacity:1;transform:translateY(0)}
-
-/* ── SYNC INFO ── */
-.sync-bar{background:rgba(255,255,255,.06);border-top:1px solid rgba(255,255,255,.08);padding:4px 20px;font-size:10px;font-family:var(--mono);color:rgba(255,255,255,.45);display:flex;align-items:center;gap:6px}
-
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:140}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:9px 18px;border-radius:20px;font-size:12px;font-family:var(--mono);opacity:0;transition:all .22s;pointer-events:none;z-index:300;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
@@ -323,99 +312,59 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
   .sb-close-btn{display:block}
 }
 @media(max-width:640px){
-  /* Header */
   .hdr{padding:9px 12px}
   .hdr-sub{display:none}
   .hbtn.mob-hide{display:none}
   .hdr-right{max-width:calc(100vw - 140px)}
-
-  /* Content */
   .content{padding:14px 12px}
   .day-tabs{padding:0 8px}
   .tab{padding:10px 10px;font-size:11px}
-
-  /* Timeline — narrower time column */
-  .timeline::before{left:56px}
-  .tl-item{grid-template-columns:42px 12px 1fr;gap:0 8px}
-  .tl-time{font-size:10px;padding-top:14px}
-
-  /* Card — bigger touch targets */
-  .card-content{padding:12px 13px}
-  .cbtn{padding:7px 11px;font-size:11px}
-  .vote-btn{padding:6px 10px;font-size:11px}
-  .card-footer{gap:8px}
-  .card-btns{gap:7px}
-
-  /* Notes */
+  .timeline::before{left:54px}
+  .tl-item{grid-template-columns:40px 12px 1fr;gap:0 8px}
+  .tl-time{font-size:10px}
+  .card-content{padding:10px 11px}
+  .card-name{font-size:12px}
   .add-row{padding-left:0}
   .notes-label{margin-left:0}
-
-  /* Move sheet full width on mobile */
-  .move-sheet{border-radius:16px 16px 0 0;padding:18px 16px 40px}
-  .move-day-btn{padding:12px 4px;font-size:10px}
+  .move-sheet{padding:18px 16px 40px}
 }
 @media print{
-  .hdr-right,.pfab,.sidebar,.sidebar-overlay,.add-row,.card-btns,
-  .modal-overlay,.panel,.toast,.show-hidden-btn,.weather-banner,.vote-row,.sync-bar{display:none!important}
+  .hdr-right,.sidebar,.sidebar-overlay,.add-row,.card-btns,.modal-overlay,.panel,.toast,.sync-bar,.day-header-right,.weather-banner,.vote-row,.vote-dots{display:none!important}
   .layout{display:block}
   .content{max-width:100%;padding:20px}
-  .item-card{break-inside:avoid;page-break-inside:avoid;margin-bottom:12px}
+  .item-card{break-inside:avoid;margin-bottom:10px}
   .item-card.hidden-item{display:none}
+  .card-expand{display:block!important}
   .hdr{position:relative;background:white!important;color:black!important}
   body{background:white}
-  .tab{display:none}
-  .tab.active{display:block;border:none;font-size:14px;font-weight:700;padding:12px 0}
 }
 </style>
 </head>
 <body>
 
-<!-- LOGIN OVERLAY (step 1 + step 2 in one element) -->
+<!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
-  <!-- Page 1: 選身份 -->
   <div class="login-page" id="loginPage1">
     <div class="login-logo">🇰🇷</div>
     <div class="login-title">Seoul D-Hub</div>
     <div class="login-sub">2025 · 07/01 — 07/05</div>
     <div class="login-prompt">你是誰？</div>
     <div class="login-grid">
-      <button class="login-btn lbtn-mo"    onclick="showGuide('Mo')">
-        <span class="lb-emoji">🎨</span>Mo<span class="lb-role">爸爸</span>
-      </button>
-      <button class="login-btn lbtn-kelly" onclick="showGuide('Kelly')">
-        <span class="lb-emoji">🌸</span>Kelly<span class="lb-role">媽媽</span>
-      </button>
-      <button class="login-btn lbtn-mia"   onclick="showGuide('Mia')">
-        <span class="lb-emoji">✨</span>Mia<span class="lb-role">女兒</span>
-      </button>
-      <button class="login-btn lbtn-ruei"   onclick="showGuide('Ruei')">
-        <span class="lb-emoji">⚡</span>Ruei<span class="lb-role">兒子</span>
-      </button>
+      <button class="login-btn lbtn-mo"    onclick="showGuide('Mo')"><span class="lb-emoji">🎨</span>Mo<span class="lb-role">爸爸</span></button>
+      <button class="login-btn lbtn-kelly" onclick="showGuide('Kelly')"><span class="lb-emoji">🌸</span>Kelly<span class="lb-role">媽媽</span></button>
+      <button class="login-btn lbtn-mia"   onclick="showGuide('Mia')"><span class="lb-emoji">✨</span>Mia<span class="lb-role">女兒</span></button>
+      <button class="login-btn lbtn-ruei"  onclick="showGuide('Ruei')"><span class="lb-emoji">⚡</span>Ruei<span class="lb-role">兒子</span></button>
     </div>
   </div>
-
-  <!-- Page 2: 操作指南 -->
   <div class="guide-page" id="loginPage2">
     <div class="guide-who">你好，<span class="guide-who-badge" id="guideWho"></span> 👋</div>
     <div class="guide-card">
       <div class="guide-card-title">如何使用 Seoul D-Hub</div>
       <div class="guide-items">
-        <div class="guide-item">
-          <div class="guide-icon">📅</div>
-          <div class="guide-text"><strong>切換日期</strong><span>點上方分頁，或按 ← → 鍵</span></div>
-        </div>
-        <div class="guide-item">
-          <div class="guide-icon">👍</div>
-          <div class="guide-text"><strong>對景點投票</strong><span>每張卡片底部，點按鈕表達意見</span></div>
-        </div>
-        <div class="guide-item">
-          <div class="guide-icon">＋</div>
-          <div class="guide-text"><strong>新增地點</strong><span>每天底部有「新增地點」按鈕</span></div>
-        </div>
-        <div class="guide-item">
-          <div class="guide-icon">🔄</div>
-          <div class="guide-text"><strong>即時同步</strong><span>所有人的更改即時反映，不用重新整理</span></div>
-        </div>
+        <div class="guide-item"><div class="guide-icon">📅</div><div class="guide-text"><strong>切換日期</strong><span>點上方分頁，或按 ← → 鍵</span></div></div>
+        <div class="guide-item"><div class="guide-icon">⏱</div><div class="guide-text"><strong>修改時間</strong><span>點左側時間欄位，直接輸入新時間</span></div></div>
+        <div class="guide-item"><div class="guide-icon">👆</div><div class="guide-text"><strong>展開卡片</strong><span>點卡片查看詳情、投票、編輯</span></div></div>
+        <div class="guide-item"><div class="guide-icon">🔄</div><div class="guide-text"><strong>即時同步</strong><span>所有人的更改即時反映</span></div></div>
       </div>
     </div>
     <button class="guide-enter" onclick="enterApp()">✈ 進入行程</button>
@@ -431,8 +380,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
   <div class="hdr-right">
     <span id="connDot" class="conn-dot offline" title="連線狀態"></span>
     <div class="user-chip" id="userChip" onclick="showLoginOverlay()" title="切換身份">
-      <span id="userChipName">—</span>
-      <span class="chip-switch">切換</span>
+      <span id="userChipName">—</span><span class="chip-switch">切換</span>
     </div>
     <button class="hbtn" onclick="togglePanel('panelFlight')">✈ 機票</button>
     <button class="hbtn" onclick="togglePanel('panelHotel')">🏨 住宿</button>
@@ -440,17 +388,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn mob-hide" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn mob-hide" onclick="window.print()">⎙ 列印</button>
-    <span class="ver">v2.0</span>
+    <span class="ver">v2.1</span>
   </div>
 </header>
 
-<!-- sync info bar -->
 <div class="sync-bar" id="syncBar">
   <span id="connDot2" class="conn-dot offline"></span>
   <span id="syncInfo">連線中…</span>
 </div>
 
-<!-- FLIGHT -->
+<!-- PANELS -->
 <div id="panelFlight" class="panel panel-flight">
   <div class="panel-inner">
     <div class="fld"><label>去程 班號</label><input id="f_out_no"  type="text" placeholder="CI160"></div>
@@ -462,8 +409,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="psave" onclick="saveFlight()">儲存</button>
   </div>
 </div>
-
-<!-- HOTEL -->
 <div id="panelHotel" class="panel panel-hotel">
   <div class="panel-inner">
     <div class="fld"><label>飯店名稱</label><input id="h_name"    type="text" placeholder="明洞斯坦福飯店"></div>
@@ -472,12 +417,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <div class="fld"><label>退房</label><input id="h_cout" type="text" placeholder="7/5 11:00"></div>
     <div class="fld"><label>訂單號碼</label><input id="h_conf"  type="text" placeholder="確認碼"></div>
     <div class="fld"><label>聯絡電話</label><input id="h_phone" type="text" placeholder="+82-2-..."></div>
-    <div class="fld"><label>備註</label><textarea id="h_notes" placeholder="房型、特殊需求..."></textarea></div>
+    <div class="fld"><label>備註</label><textarea id="h_notes" placeholder="房型…"></textarea></div>
     <button class="psave" onclick="saveHotel()">儲存</button>
   </div>
 </div>
-
-<!-- EMERGENCY -->
 <div id="panelEmergency" class="panel panel-emergency">
   <div class="panel-inner">
     <div class="fld"><label>警察</label><input id="e_police"    type="text" placeholder="112"></div>
@@ -485,14 +428,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <div class="fld"><label>飯店韓文地址</label><input id="e_hotel_kr"  type="text" placeholder="서울 중구 남대문로9길 24"></div>
     <div class="fld"><label>附近醫院</label><input id="e_hospital"   type="text" placeholder="最近醫院名稱"></div>
     <div class="fld"><label>旅遊保險單號</label><input id="e_insurance" type="text" placeholder="保單號碼"></div>
-    <div class="fld"><label>其他聯絡</label><textarea id="e_notes" placeholder="台灣緊急聯絡人、信用卡掛失..."></textarea></div>
+    <div class="fld"><label>其他聯絡</label><textarea id="e_notes" placeholder="台灣緊急聯絡人…"></textarea></div>
     <button class="psave" onclick="saveEmergency()">儲存</button>
   </div>
 </div>
 
-<!-- WEATHER -->
 <div id="weatherBanner" class="weather-banner">
-  <span>☀️ <strong>7月首爾氣候提醒</strong>：氣溫 30–34°C，濕度高，午後雷陣雨機率高。建議攜帶雨傘、防曬。DDP 夜間場次若下午大雨請備替代方案。</span>
+  <span>☀️ <strong>7月首爾氣候提醒</strong>：氣溫 30–34°C，濕度高，午後雷陣雨機率高。建議攜帶雨傘、防曬。</span>
   <button class="weather-dismiss" onclick="dismissWeather()">✕</button>
 </div>
 
@@ -509,16 +451,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
-<!-- ADD MODAL -->
+<!-- ADD / EDIT MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
   <div class="modal">
-    <div class="modal-title">＋ 新增地點</div>
+    <div class="modal-title" id="modalTitle">＋ 新增地點</div>
     <div class="fg"><label>地點名稱 *</label><input id="m_name" type="text" placeholder="如：益善洞咖啡、弘大逛街" oninput="updateDaySuggest()"></div>
     <div class="fg"><label>地點韓文（選填）</label><input id="m_nameko" type="text" placeholder="如：익선동"></div>
     <div class="fg-row">
       <div class="fg">
         <label>類型</label>
-        <select id="m_type">
+        <select id="m_type" onchange="autoFillEndTime()">
           <option value="museum">🔵 美術館／博物館</option>
           <option value="architecture">🟢 建築地標</option>
           <option value="restaurant">🔴 餐廳／咖啡</option>
@@ -541,24 +483,24 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
       </div>
     </div>
     <div class="fg-row">
-      <div class="fg"><label>開始時間</label><input id="m_time" type="time"></div>
-      <div class="fg"><label>結束時間</label><input id="m_endtime" type="time"></div>
+      <div class="fg"><label>開始時間</label><input id="m_time" type="time" oninput="autoFillEndTime()"></div>
+      <div class="fg"><label>結束時間（自動估算）</label><input id="m_endtime" type="time"></div>
     </div>
     <div class="fg" style="margin-top:-4px">
       <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--muted)">
-        <input type="checkbox" id="m_manual_time" style="width:14px;height:14px;cursor:pointer"> 🔸 固定此時間（排程不自動調整）
+        <input type="checkbox" id="m_manual_time" style="width:14px;height:14px;cursor:pointer"> 📌 固定此時間（不讓排程系統自動調整）
       </label>
     </div>
     <div class="fg"><label>地址／搜尋（Google Maps 用）</label><input id="m_address" type="text" placeholder="如：익선동 서울" oninput="updateDaySuggest()"></div>
     <div class="fg-row">
       <div class="fg"><label>門票費用</label><input id="m_admission" type="text" placeholder="免費 / ₩15,000"></div>
-      <div class="fg"><label>預算估算</label><input id="m_budget" type="text" placeholder="₩30,000 / NT$700"></div>
+      <div class="fg"><label>預算估算</label><input id="m_budget" type="text" placeholder="₩30,000"></div>
     </div>
     <div class="fg-row">
       <div class="fg"><label>營業時間</label><input id="m_hours" type="text" placeholder="10:00–18:00"></div>
-      <div class="fg"><label>交通方式</label><input id="m_transport" type="text" placeholder="地鐵4號線，明洞站"></div>
+      <div class="fg"><label>交通方式</label><input id="m_transport" type="text" placeholder="地鐵4號線"></div>
     </div>
-    <div class="fg"><label>備註說明</label><textarea id="m_desc" placeholder="想法、注意事項..."></textarea></div>
+    <div class="fg"><label>備註說明</label><textarea id="m_desc" placeholder="想法、注意事項…"></textarea></div>
     <div class="fg">
       <label>誰想去？</label>
       <div class="member-grid">
@@ -570,12 +512,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">取消</button>
-      <button class="btn-submit" onclick="submitAdd()">加入行程</button>
+      <button class="btn-submit" onclick="submitModal()">確認</button>
     </div>
   </div>
 </div>
 
-<!-- MOVE MODAL -->
+<!-- MOVE SHEET -->
 <div class="move-modal" id="moveModal" onclick="handleMoveOverlay(event)">
   <div class="move-sheet">
     <div class="move-sheet-title">移到哪一天？</div>
@@ -587,13 +529,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 </div>
 
 <div id="toast" class="toast"></div>
-<button class="pfab" onclick="window.print()">⎙ 列印 / 存 PDF</button>
 
 <script>
 // ═══════════════════════════════════════════
-//  FIREBASE CONFIG
+//  FIREBASE
 // ═══════════════════════════════════════════
-
 const firebaseConfig = {
   apiKey: "AIzaSyA0TAG5ykB_6E-vTc83lURNUliJYjj4a0E",
   authDomain: "seoul-dhub.firebaseapp.com",
@@ -603,7 +543,6 @@ const firebaseConfig = {
   messagingSenderId: "174228162580",
   appId: "1:174228162580:web:cb38272c12a51df2a77f01"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const DB_PATH = 'trip';
@@ -611,7 +550,6 @@ const DB_PATH = 'trip';
 // ═══════════════════════════════════════════
 //  CONSTANTS
 // ═══════════════════════════════════════════
-
 const DAYS_META = [
   {day:1,date:'2025/07/01',weekday:'二',label:'Day 1',area:'三清洞'},
   {day:2,date:'2025/07/02',weekday:'三',label:'Day 2',area:'光化門'},
@@ -619,7 +557,6 @@ const DAYS_META = [
   {day:4,date:'2025/07/04',weekday:'五',label:'Day 4',area:'龍山·漢南洞'},
   {day:5,date:'2025/07/05',weekday:'六',label:'Day 5',area:'龍山收尾'},
 ];
-
 const MEMBERS = [
   {id:'Mo',    low:'mo',    optCls:'checked-mo'},
   {id:'Kelly', low:'kelly', optCls:'checked-kelly'},
@@ -629,11 +566,16 @@ const MEMBERS = [
 const ALL4 = ['Mo','Kelly','Mia','Ruei'];
 const RESV_CYCLE = ['none','pending','booked'];
 const RESV_LABEL = {none:'待確認', pending:'待預約', booked:'已預約✓'};
-const VOTE_ICONS = ['○','👍','❤️','🤔'];
+const VOTE_ICONS = ['·','👍','❤️','🤔'];
 const VOTE_CLS   = ['','vote-v1','vote-v2','vote-v3'];
-const TYPE_LABEL = {museum:'美術館',architecture:'建築',restaurant:'餐廳',other:'其他'};
+const TYPE_LABEL = {museum:'美術館',architecture:'建築',restaurant:'餐廳',other:'其他',flight:'班機'};
+const TYPE_ICON  = {museum:'🏛',architecture:'🏗',restaurant:'🍽',other:'📍',flight:'✈'};
+const STAY_MINS  = {museum:120, architecture:60, restaurant:90, other:60};
 const EMPTY_VOTES = () => ({Mo:0,Kelly:0,Mia:0,Ruei:0});
 
+// ═══════════════════════════════════════════
+//  DEFAULT DATA
+// ═══════════════════════════════════════════
 const DEFAULT_ITEMS = {
   1:[
     {id:'d1_1',type:'museum',hidden:false,resv:'none',votes:EMPTY_VOTES(),
@@ -646,7 +588,7 @@ const DEFAULT_ITEMS = {
      name:'午餐 Hanmechon 한메촌',nameKo:'한메촌',
      time:'13:00',endTime:'14:30',hours:'需預約，週日休',admission:'',
      budget:'₩20,000/人',transport:'步行可達',
-     desc:'傳統韓屋定食',
+     desc:'傳統韓屋定食，北村韓屋環境',
      address:'한메촌 삼청동 서울',who:ALL4,isDefault:true},
     {id:'d1_3',type:'architecture',hidden:false,resv:'none',votes:EMPTY_VOTES(),
      name:'Kukje Gallery 국제갈러리',nameKo:'국제갈러리',
@@ -672,7 +614,7 @@ const DEFAULT_ITEMS = {
      name:'Ilmin Museum of Art 일민미술관',nameKo:'일민미술관',
      time:'14:30',endTime:'16:30',hours:'11:00–19:00，週一休',admission:'收費',
      budget:'₩5,000',transport:'地鐵1/5號線 광화문역，步行5分',
-     desc:'舊東亞日報大樓改建',
+     desc:'舊東亞日報大樓改建，光化門正前方',
      address:'일민미술관 세종대로 152 서울',who:ALL4,isDefault:true},
   ],
   3:[
@@ -739,7 +681,6 @@ const DEFAULT_EMERGENCY = {
 // ═══════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════
-
 const LOCAL_KEY = 'seoul_dhub_v3';
 
 function freshState() {
@@ -753,12 +694,12 @@ function freshState() {
 }
 
 function migrateItem(i) {
-  if (!i.hidden    && i.hidden    !== false) i.hidden    = false;
-  if (!i.resv)                               i.resv      = 'none';
-  if (!i.votes)                              i.votes     = EMPTY_VOTES();
-  if (i.budget    === undefined)             i.budget    = '';
-  if (i.transport === undefined)             i.transport = '';
-  // rename Rui → Ruei in old data
+  if (i.hidden    === undefined) i.hidden    = false;
+  if (!i.resv)                  i.resv      = 'none';
+  if (!i.votes)                 i.votes     = EMPTY_VOTES();
+  if (i.budget    === undefined) i.budget    = '';
+  if (i.transport === undefined) i.transport = '';
+  if (i.manualTime === undefined) i.manualTime = false;
   if (i.votes && i.votes.Rui !== undefined && i.votes.Ruei === undefined) {
     i.votes.Ruei = i.votes.Rui; delete i.votes.Rui;
   }
@@ -769,6 +710,7 @@ function migrateItem(i) {
 function migrateState(s) {
   if (!s.hotel)     s.hotel     = {...DEFAULT_HOTEL};
   if (!s.emergency) s.emergency = {...DEFAULT_EMERGENCY};
+  if (!s.notes)     s.notes     = {1:'',2:'',3:'',4:'',5:''};
   for (let d=1;d<=5;d++) {
     if (!s.items[d])  s.items[d]  = [];
     if (s.notes[d] === undefined) s.notes[d] = '';
@@ -778,68 +720,61 @@ function migrateState(s) {
 }
 
 function loadLocal() {
-  try {
-    const s = localStorage.getItem(LOCAL_KEY);
-    return s ? migrateState(JSON.parse(s)) : null;
-  } catch(e) { return null; }
+  try { const s = localStorage.getItem(LOCAL_KEY); return s ? migrateState(JSON.parse(s)) : null; }
+  catch(e) { return null; }
 }
+function saveLocal() { localStorage.setItem(LOCAL_KEY, JSON.stringify(state)); }
 
-function saveLocal() {
-  localStorage.setItem(LOCAL_KEY, JSON.stringify(state));
-}
-
-// Local-only prefs (not synced)
 let weatherDismissed = localStorage.getItem('seoul_weather_dismissed') === '1';
 let currentUser      = localStorage.getItem('seoul_current_user') || '';
-
 let state       = loadLocal() || freshState();
 let currentDay  = 1;
 let showHidden  = {1:false,2:false,3:false,4:false,5:false};
 let noteTimers  = {};
 let localWriteId = null;
 let fbReady     = false;
+let expandedItems = new Set();
+let modalEditingId = null, modalEditingDay = null;
 
 // ═══════════════════════════════════════════
 //  FIREBASE SYNC
 // ═══════════════════════════════════════════
-
-// Connection status
 db.ref('.info/connected').on('value', snap => {
-  const ok = snap.val();
-  setConnUI(ok ? 'connected' : 'offline');
-  setSyncInfo(ok ? '已連線，即時同步中' : '離線模式');
+  setConnUI(snap.val() ? 'connected' : 'offline');
+  setSyncInfo(snap.val() ? '已連線，即時同步中' : '離線模式');
 });
 
-// Initial load from Firebase
 db.ref(DB_PATH).once('value').then(snap => {
   const fbData = snap.val();
   if (fbData && fbData.items) {
     state = migrateState(fbData);
     saveLocal();
   } else {
-    // First time: seed Firebase with defaults
     const seed = freshState();
     db.ref(DB_PATH).set(seed);
     state = seed;
   }
   fbReady = true;
+  // Auto-schedule Day 1 if flight arrival known and no manual times set
+  if (state.flight && state.flight.out_arr) {
+    const noManual = (state.items[1]||[]).every(i => !i.manualTime);
+    if (noManual) {
+      rescheduleDay(1, true);
+      return;
+    }
+  }
   render();
-}).catch(() => {
-  fbReady = true;
-  render(); // offline fallback
-});
+}).catch(() => { fbReady = true; render(); });
 
-// Real-time listener
 db.ref(DB_PATH).on('value', snap => {
   if (!fbReady) return;
   const fbData = snap.val();
   if (!fbData) return;
-  if (fbData._wid === localWriteId) return; // echo of own write
+  if (fbData._wid === localWriteId) return;
   state = migrateState(fbData);
   saveLocal();
   render();
-  const who = fbData._by ? fbData._by + ' 更新了行程' : '行程已同步';
-  showToast('🔄 ' + who);
+  showToast('🔄 ' + (fbData._by ? fbData._by + ' 更新了行程' : '行程已同步'));
 });
 
 function saveState() {
@@ -856,118 +791,23 @@ function saveState() {
   }
 }
 
-function setConnUI(status) {
+function setConnUI(s) {
   ['connDot','connDot2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.className = 'conn-dot ' + status;
+    const el = document.getElementById(id); if (el) el.className = 'conn-dot ' + s;
   });
 }
-
-function setSyncInfo(msg) {
-  const el = document.getElementById('syncInfo');
-  if (el) el.textContent = msg;
-}
+function setSyncInfo(msg) { const el = document.getElementById('syncInfo'); if(el) el.textContent=msg; }
 
 // ═══════════════════════════════════════════
-//  UTILS
+//  SMART SCHEDULER
 // ═══════════════════════════════════════════
-
-function mapsUrl(a) { return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a); }
-function whoClass(n) { return ({Mo:'who-mo',Kelly:'who-kelly',Mia:'who-mia',Ruei:'who-ruei',Rui:'who-ruei'})[n]||'who-other'; }
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function uid() { return 'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
-
-function suggestNextTime(d) {
-  const vis = (state.items[d]||[]).filter(i=>!i.hidden);
-  if (!vis.length) return {start:'10:00',end:'12:00'};
-  const last = [...vis].sort((a,b)=>a.time.localeCompare(b.time)).pop();
-  const [h,m] = (last.endTime||last.time).split(':').map(Number);
-  const s=h*60+m+30, e=s+90;
-  const p=n=>String(Math.floor(n)).padStart(2,'0');
-  return {start:`${p(s/60)}:${p(s%60)}`,end:`${p(e/60)}:${p(e%60)}`};
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2400);
-}
-
-function voteStr(votes) {
-  if (!votes) return '';
-  return Object.entries(votes).filter(([,v])=>v>0).map(([k,v])=>`${k}${VOTE_ICONS[v]}`).join(' ');
-}
-
-// ═══════════════════════════════════════════
-//  USER
-// ═══════════════════════════════════════════
-
-function setCurrentUser(name) {
-  currentUser = name;
-  localStorage.setItem('seoul_current_user', name);
-  const chip = document.getElementById('userChip');
-  const chipName = document.getElementById('userChipName');
-  if (chip && chipName) {
-    chipName.textContent = name || '—';
-    chip.className = 'user-chip' + (name ? ' chip-'+name.toLowerCase() : '');
-  }
-  setSyncInfo(name ? `Hi ${name}，已連線` : '已連線，即時同步中');
-}
-
-const GUIDE_BADGE_COLORS = {
-  Mo:'#8B6820', Kelly:'#8B3828', Mia:'#486840', Ruei:'#2C5070'
-};
-let pendingUser = '';
-
-function showGuide(name) {
-  pendingUser = name;
-  const badge = document.getElementById('guideWho');
-  badge.textContent = name;
-  badge.style.background = GUIDE_BADGE_COLORS[name] || '#666';
-  badge.style.color = name === 'Mo' ? '#2A1E00' : '#fff';
-  document.getElementById('loginPage1').classList.add('hidden');
-  document.getElementById('loginPage2').classList.add('active');
-}
-
-function enterApp() {
-  setCurrentUser(pendingUser);
-  document.getElementById('loginOverlay').classList.add('hidden');
-  render();
-}
-
-function backToSelect() {
-  document.getElementById('loginPage2').classList.remove('active');
-  document.getElementById('loginPage1').classList.remove('hidden');
-}
-
-function showLoginOverlay() {
-  pendingUser = '';
-  document.getElementById('loginPage2').classList.remove('active');
-  document.getElementById('loginPage1').classList.remove('hidden');
-  document.getElementById('loginOverlay').classList.remove('hidden');
-}
-
-// Restore user on load or show login screen
-if (currentUser) {
-  setCurrentUser(currentUser);
-  document.getElementById('loginOverlay').classList.add('hidden');
-}
-// else: overlay stays visible until user picks identity
-
-// ═══════════════════════════════════════════
-//  SMART SCHEDULER (v2.0)
-// ═══════════════════════════════════════════
-
 const ZONE_ORDER = ['삼청','광화문','동대문','한남','이촌','강남'];
-const STAY_MINS  = { museum:120, architecture:60, restaurant:90, other:60 };
 const ZONE_KEYWORDS = {
-  '삼청':   ['삼청','안국','북촌','경복','소격','인사동','가회','팔판','삼청동','kukje','국제갈러리','mmca'],
-  '광화문': ['광화문','세종','시청','덕수궁','일민','명동','남대문','중구','세종대로','seма','서울시립'],
+  '삼청':   ['삼청','안국','북촌','경복','소격','인사동','가회','삼청동','kukje','국제갈러리','mmca'],
+  '광화문': ['광화문','세종','시청','덕수궁','일민','명동','남대문','중구','세종대로','sema','서울시립'],
   '동대문': ['동대문','ddp','성수','을지로3','을지로4','왕십리','신당','동대문디자인'],
   '한남':   ['한남','이태원','한강진','리움','소서울','한남동','leeum'],
-  '이촌':   ['이촌','서빙고','용산역','아모레','아모레퍼시픽','국립중앙박물관','국립중앙','amorepacific'],
+  '이촌':   ['이촌','서빙고','용산역','아모레','아모레퍼시픽','국립중앙박물관','국립중앙'],
   '강남':   ['강남','압구정','신사','청담','도산','밍글스','mingles'],
 };
 
@@ -979,16 +819,13 @@ function getItemZone(item) {
   }
   return null;
 }
-
-function transitMins(zA, zB) {
+function transitGap(zA, zB) {
   if (!zA || !zB || zA === zB) return 20;
-  const diff = Math.abs(ZONE_ORDER.indexOf(zA) - ZONE_ORDER.indexOf(zB));
-  return diff <= 1 ? 35 : 55;
+  const d = Math.abs(ZONE_ORDER.indexOf(zA) - ZONE_ORDER.indexOf(zB));
+  return d <= 1 ? 35 : 55;
 }
-
 function isHardLock(item) { return item.resv === 'booked'; }
 function isSoftLock(item) { return item.manualTime === true && !isHardLock(item); }
-
 function itemEndMins(item) {
   if (item.endTime && item.endTime !== item.time) {
     const [h,m] = item.endTime.split(':').map(Number); return h*60+m;
@@ -996,19 +833,16 @@ function itemEndMins(item) {
   const [h,m] = item.time.split(':').map(Number);
   return h*60+m + (STAY_MINS[item.type]||60);
 }
-
 function minsToTime(mins) {
   const c = Math.max(0, Math.min(mins, 23*60+59));
   return String(Math.floor(c/60)).padStart(2,'0')+':'+String(c%60).padStart(2,'0');
 }
 
-function rescheduleDay(day) {
+function rescheduleDay(day, silent) {
   const sorted = (state.items[day]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
-  if (!sorted.length) { showToast('這天沒有地點'); return; }
+  if (!sorted.length) { if(!silent) showToast('這天沒有地點'); render(); return; }
 
   let cursor = null, lastZone = null;
-
-  // Day 1: 去程落地 +90min 為首個錨點
   if (day === 1) {
     const f = state.flight||{};
     if (f.out_arr) {
@@ -1020,82 +854,153 @@ function rescheduleDay(day) {
   let moved = 0;
   for (const item of sorted) {
     if (isHardLock(item) || isSoftLock(item) || cursor === null) {
-      cursor = itemEndMins(item);
-      lastZone = getItemZone(item);
-      continue;
+      cursor = itemEndMins(item); lastZone = getItemZone(item); continue;
     }
     const zone = getItemZone(item);
-    const gap  = transitMins(lastZone, zone);
-    const newStart = cursor + gap;
+    const gap  = transitGap(lastZone, zone);
+    const ns   = cursor + gap;
     const dur  = STAY_MINS[item.type]||60;
     const si   = (state.items[day]||[]).find(i=>i.id===item.id);
-    if (si && (si.time !== minsToTime(newStart) || si.endTime !== minsToTime(newStart+dur))) {
-      si.time = minsToTime(newStart);
-      si.endTime = minsToTime(newStart+dur);
-      moved++;
-    }
-    cursor = newStart + dur;
-    lastZone = zone;
+    if (si) { si.time = minsToTime(ns); si.endTime = minsToTime(ns+dur); moved++; }
+    cursor = ns + dur; lastZone = zone;
   }
-
-  if (!moved) { showToast('⏱ 時間已是最佳排列'); return; }
   saveState(); render();
-  showToast(`⏱ 已重新排程 ${moved} 個地點`);
+  if (!silent && moved>0) showToast(`⏱ 已重新排程 ${moved} 個地點`);
+  else if (!silent) showToast('⏱ 時間已是最佳排列');
+  else if (moved>0) showToast('✈ 已依班機時間自動排程 Day 1');
 }
 
-function optSortDay(day) {
-  const items = state.items[day];
-  if (!items || items.length < 2) { showToast('地點太少，無需排序'); return; }
-  state.items[day] = items.slice().sort((a,b) => {
-    if (isHardLock(a) !== isHardLock(b)) return isHardLock(a) ? -1 : 1;
-    const zA = ZONE_ORDER.indexOf(getItemZone(a)||'');
-    const zB = ZONE_ORDER.indexOf(getItemZone(b)||'');
-    if (zA !== zB) return (zA<0?99:zA)-(zB<0?99:zB);
-    return a.time.localeCompare(b.time);
-  });
-  saveState(); render();
-  showToast('🗺 已依地理區域排序，可再按「重新排程」更新時間');
+// ═══════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════
+function mapsUrl(a) { return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function uid() { return 'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function suggestNextTime(d) {
+  const vis = (state.items[d]||[]).filter(i=>!i.hidden);
+  if (!vis.length) return {start:'10:00',end:'12:00'};
+  const last = [...vis].sort((a,b)=>a.time.localeCompare(b.time)).pop();
+  const [h,m] = (last.endTime||last.time).split(':').map(Number);
+  const s=h*60+m+30, e=s+90;
+  const p=n=>String(Math.floor(n)).padStart(2,'0');
+  return {start:`${p(s/60)}:${p(s%60)}`,end:`${p(e/60)}:${p(e%60)}`};
 }
 
 // ═══════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════
-
 function renderTabs() {
   document.getElementById('dayTabs').innerHTML = DAYS_META.map(d=>`
     <button class="tab ${d.day===currentDay?'active':''}" onclick="switchDay(${d.day})">
-      ${d.label} ${d.area}
-      <span class="tab-date">${d.date.slice(5)} (${d.weekday})</span>
+      ${d.label} ${d.area}<span class="tab-date">${d.date.slice(5)} (${d.weekday})</span>
     </button>`).join('');
 }
 
-function flightCard(isOutbound) {
-  const f = state.flight || {};
-  const dep = isOutbound ? f.out_dep : f.ret_dep;
-  const arr = isOutbound ? f.out_arr : f.ret_arr;
-  const no  = isOutbound ? f.out_no  : f.ret_no;
+function flightCard(isOut) {
+  const f = state.flight||{};
+  const dep = isOut ? f.out_dep : f.ret_dep;
+  const arr = isOut ? f.out_arr : f.ret_arr;
+  const no  = isOut ? f.out_no  : f.ret_no;
   if (!dep && !arr) return '';
-  const label = isOutbound ? '去程' : '回程';
-  const route = isOutbound ? 'TPE → ICN' : 'ICN → TPE';
-  const time  = (dep||arr||'').match(/\d{1,2}:\d{2}/)?.[0] || (isOutbound?'08:00':'17:00');
+  const label = isOut ? '去程' : '回程';
+  const route = isOut ? 'TPE → ICN' : 'ICN → TPE';
+  const time  = (dep||arr||'').match(/\d{1,2}:\d{2}/)?.[0] || (isOut?'08:00':'17:00');
   return `
   <div class="tl-item">
-    <div class="tl-time">${time}</div>
+    <div class="tl-time-wrap"><div class="tl-time locked">${time}</div></div>
     <div class="tl-dot-wrap"><div class="tl-dot dot-flight"></div></div>
-    <div class="item-card flight-card">
+    <div class="item-card flight-card" style="cursor:default">
       <div class="card-inner">
         <div class="card-bar bar-flight"></div>
         <div class="card-content">
-          <div class="card-top">
-            <div>
-              <div class="card-name">✈ ${label}${no?' '+esc(no):''}</div>
-              <div class="card-nameko">${route}</div>
+          <div class="card-compact">
+            <div class="card-name-wrap">
+              <span class="card-type-icon">✈</span>
+              <div><div class="card-name">${label}${no?' '+esc(no):''}</div><div class="card-compact-meta">${route}${dep?' · 出發 '+esc(dep):''}${arr?' · 抵達 '+esc(arr):''}</div></div>
             </div>
-            <span class="card-badge badge-flight">班機</span>
+            <span class="resv-badge resv-booked" style="cursor:default">班機</span>
           </div>
-          <div class="card-meta">
-            ${dep?`<div class="card-meta-row"><span>🛫</span><span>出發 ${esc(dep)}</span></div>`:''}
-            ${arr?`<div class="card-meta-row"><span>🛬</span><span>抵達 ${esc(arr)}</span></div>`:''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderItem(item) {
+  const isH  = item.hidden;
+  const hl   = isHardLock(item);
+  const sl   = isSoftLock(item);
+  const votes = item.votes || EMPTY_VOTES();
+  const isExp = expandedItems.has(item.id);
+
+  const voteDots = ALL4.map(n => {
+    const v = votes[n]||0;
+    const isMe = n === currentUser;
+    const cls = `vd${v>0?' voted':''}${isMe?' is-me':''}`;
+    return `<span class="${cls}" onclick="event.stopPropagation();cycleVote('${item.id}',${currentDay},'${n}')" title="${n}">${VOTE_ICONS[v]}</span>`;
+  }).join('');
+
+  const voteFull = ALL4.map(n => {
+    const v = votes[n]||0;
+    const isMe = n === currentUser;
+    return `<button class="vote-btn ${VOTE_CLS[v]} ${isMe?'me':''}" onclick="event.stopPropagation();cycleVote('${item.id}',${currentDay},'${n}')">${n} ${VOTE_ICONS[v]}</button>`;
+  }).join('');
+
+  const lockIcon = hl ? '<span class="tl-lock-icon">🔒</span>' : sl ? '<span class="tl-lock-icon">📌</span>' : '';
+
+  return `
+  <div class="tl-item" id="tli_${item.id}">
+    <div class="tl-time-wrap">
+      <div class="tl-time${hl?' locked':''}" data-id="${item.id}" data-day="${currentDay}"
+        onclick="startTimeEdit('${item.id}',${currentDay},event)" title="${hl?'已預約，不可修改':'點擊修改時間'}">
+        ${esc(item.time)}
+        ${item.endTime?`<span class="tl-time-end">${esc(item.endTime)}</span>`:''}
+        ${lockIcon}
+      </div>
+    </div>
+    <div class="tl-dot-wrap"><div class="tl-dot ${isH?'dot-hidden':'dot-'+item.type}"></div></div>
+    <div class="item-card ${isH?'hidden-item':''} ${isExp?'is-expanded':''}" id="card_${item.id}" onclick="toggleExpand('${item.id}',event)">
+      <div class="card-inner">
+        <div class="card-bar bar-${item.type}"></div>
+        <div class="card-content">
+          <div class="card-compact">
+            <div class="card-name-wrap">
+              <span class="card-type-icon">${TYPE_ICON[item.type]||'📍'}</span>
+              <div style="min-width:0">
+                <div class="card-name">${esc(item.name)}</div>
+                ${item.budget||item.hours?`<div class="card-compact-meta">${item.budget?esc(item.budget):''}${item.budget&&item.hours?' · ':''}${item.hours?esc(item.hours):''}</div>`:''}
+              </div>
+            </div>
+            <div class="card-right">
+              <span class="resv-badge resv-${item.resv||'none'}" onclick="event.stopPropagation();cycleResv('${item.id}',${currentDay})">${RESV_LABEL[item.resv||'none']}</span>
+              <div class="vote-dots">${voteDots}</div>
+            </div>
+          </div>
+          <div class="card-expand ${isExp?'open':''}" id="exp_${item.id}">
+            ${item.nameKo?`<div class="exp-nameko">${esc(item.nameKo)}</div>`:''}
+            <div class="exp-meta">
+              ${item.hours?    `<div class="exp-meta-row"><span>🕐</span><span>${esc(item.hours)}</span></div>`:''}
+              ${item.admission?`<div class="exp-meta-row"><span>🎫</span><span>${esc(item.admission)}</span></div>`:''}
+              ${item.budget?   `<div class="exp-meta-row"><span>💰</span><span>${esc(item.budget)}</span></div>`:''}
+              ${item.transport?`<div class="exp-meta-row"><span>🚇</span><span>${esc(item.transport)}</span></div>`:''}
+            </div>
+            ${item.desc?`<div class="exp-desc">${esc(item.desc)}</div>`:''}
+            <div class="vote-row">${voteFull}</div>
+            <div class="card-btns">
+              ${item.address?`<a class="cbtn maps" href="${mapsUrl(item.address)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🗺 地圖</a>`:''}
+              <button class="cbtn edit" onclick="event.stopPropagation();openEditModal('${item.id}',${currentDay})">✏️ 編輯</button>
+              <button class="cbtn" onclick="event.stopPropagation();openMoveModal('${item.id}',${currentDay})">📅 移到…</button>
+              ${isH
+                ?`<button class="cbtn restore" onclick="event.stopPropagation();toggleHide('${item.id}',${currentDay})">↩ 恢復</button>`
+                :`<button class="cbtn hide"    onclick="event.stopPropagation();toggleHide('${item.id}',${currentDay})">🙈 隱藏</button>`}
+            </div>
           </div>
         </div>
       </div>
@@ -1110,79 +1015,27 @@ function renderDay() {
   const items = show ? all : all.filter(i=>!i.hidden);
   const hCount = all.filter(i=>i.hidden).length;
 
-  const itemsHtml = items.map(item => {
-    const isH   = item.hidden;
-    const votes = item.votes || EMPTY_VOTES();
-    return `
-    <div class="tl-item">
-      <div class="tl-time">${esc(item.time)}${item.endTime?'<br><span style="opacity:.55">–'+esc(item.endTime)+'</span>':''}${isHardLock(item)?'<span class="tl-lock">🔒</span>':isSoftLock(item)?'<span class="tl-lock">🔸</span>':''}</div>
-      <div class="tl-dot-wrap"><div class="tl-dot ${isH?'dot-hidden':'dot-'+item.type}"></div></div>
-      <div class="item-card ${isH?'hidden-item':''}">
-        <div class="card-inner">
-          <div class="card-bar bar-${item.type}"></div>
-          <div class="card-content">
-            <div class="card-top">
-              <div>
-                <div class="card-name">${esc(item.name)}</div>
-                ${item.nameKo?`<div class="card-nameko">${esc(item.nameKo)}</div>`:''}
-              </div>
-              <div class="card-badges">
-                <span class="card-badge badge-${item.type}">${TYPE_LABEL[item.type]||'其他'}</span>
-                ${isH?'<span class="hidden-label">🙈 已隱藏</span>':''}
-                <span class="resv-badge resv-${item.resv||'none'}" onclick="cycleResv('${item.id}',${currentDay})" title="點擊切換預約狀態">${RESV_LABEL[item.resv||'none']}</span>
-              </div>
-            </div>
-            <div class="card-meta">
-              ${item.hours    ?`<div class="card-meta-row"><span>🕐</span><span>${esc(item.hours)}</span></div>`:''}
-              ${item.admission?`<div class="card-meta-row"><span>🎫</span><span>${esc(item.admission)}</span></div>`:''}
-              ${item.budget   ?`<div class="card-meta-row"><span>💰</span><span>${esc(item.budget)}</span></div>`:''}
-              ${item.transport?`<div class="card-meta-row"><span>🚇</span><span>${esc(item.transport)}</span></div>`:''}
-            </div>
-            ${item.desc?`<div class="card-desc">${esc(item.desc)}</div>`:''}
-            <div class="vote-row">
-              ${ALL4.map(name=>{
-                const v=votes[name]||0;
-                const isMe=name===currentUser;
-                return `<button class="vote-btn ${VOTE_CLS[v]} ${isMe?'me':''}" onclick="cycleVote('${item.id}',${currentDay},'${name}')" title="${name}"><span>${name}</span><span>${VOTE_ICONS[v]}</span></button>`;
-              }).join('')}
-            </div>
-            <div class="card-footer">
-              <div class="card-who">${currentUser
-                ? `<span class="who-tag ${whoClass(currentUser)}">${esc(currentUser)}</span>`
-                : (item.addedBy&&item.addedBy!=='—'?`<span class="who-tag who-other">${esc(item.addedBy)}</span>`:'')}
-              ${item.addedBy&&item.addedBy!=='—'&&item.addedBy!==currentUser?`<span class="who-tag who-other" style="opacity:.55">by ${esc(item.addedBy)}</span>`:''}</div>
-              <div class="card-btns">
-                ${item.address?`<a class="cbtn maps" href="${mapsUrl(item.address)}" target="_blank" rel="noopener">🗺 地圖</a>`:''}
-                <button class="cbtn" onclick="openMoveModal('${item.id}',${currentDay})">📅 移到…</button>
-                ${isH
-                  ?`<button class="cbtn restore" onclick="toggleHide('${item.id}',${currentDay})">↩ 恢復</button>`
-                  :`<button class="cbtn hide"    onclick="toggleHide('${item.id}',${currentDay})">🙈 隱藏</button>`}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
+  const itemsHtml = items.map(renderItem).join('');
   const flightTop    = currentDay === 1 ? flightCard(true)  : '';
   const flightBottom = currentDay === 5 ? flightCard(false) : '';
 
   document.getElementById('mainContent').innerHTML = `
     <div class="day-header">
-      <div>
+      <div class="day-header-left">
         <h2>${meta.label} — ${meta.area}</h2>
         <div class="day-meta">${meta.date}（${meta.weekday}）· 明洞 Stanford</div>
       </div>
-      <div class="sched-btns">
-        ${hCount?`<button class="show-hidden-btn ${show?'active':''}" onclick="toggleShowHidden(${currentDay})">
-          ${show?`👁 收起 (${hCount})`:`🙈 隱藏 (${hCount})`}
-        </button>`:''}
-        <button class="reschedule-btn" onclick="rescheduleDay(${currentDay})" title="從鎖定錨點往後，自動填入浮動地點時間">⏱ 重新排程</button>
-        <button class="opt-sort-btn" onclick="optSortDay(${currentDay})" title="依地理區域重新排列順序">🗺 優化排序</button>
+      <div class="day-header-right">
+        ${hCount?`<button class="day-btn day-btn-gray ${show?'active':''}" onclick="toggleShowHidden(${currentDay})">
+          ${show?`👁 收起(${hCount})`:`🙈 隱藏(${hCount})`}</button>`:''}
+        <button class="day-btn day-btn-sched" onclick="rescheduleDay(${currentDay},false)" title="從鎖定錨點往後，自動計算浮動地點時間">⏱ 重新排程</button>
       </div>
     </div>
-    <div class="timeline">${flightTop}${items.length?itemsHtml:'<p style="padding:16px 0 16px 88px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>'}${flightBottom}</div>
+    <div class="timeline">
+      ${flightTop}
+      ${items.length ? itemsHtml : '<p style="padding:16px 0 16px 76px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>'}
+      ${flightBottom}
+    </div>
     <div class="add-row"><button class="add-btn" onclick="openModal(${currentDay})">＋ 新增地點</button></div>
     <div class="notes-section">
       <div class="notes-label">📝 今日備註</div>
@@ -1195,38 +1048,29 @@ function renderSidebar() {
   const hotelCard = h.name?`
     <div class="sb-section hotel">
       <div class="sb-section-title">🏨 ${esc(h.name)}</div>
-      <div class="sb-section-meta">
-        ${h.cin?`入住 ${esc(h.cin)}<br>`:''}${h.cout?`退房 ${esc(h.cout)}<br>`:''}
-        ${h.conf?`訂單 ${esc(h.conf)}<br>`:''}${h.phone?`📞 ${esc(h.phone)}`:''}
-      </div>
+      <div class="sb-section-meta">${h.cin?`入住 ${esc(h.cin)}<br>`:''}${h.cout?`退房 ${esc(h.cout)}<br>`:''}${h.conf?`訂單 ${esc(h.conf)}<br>`:''}${h.phone?`📞 ${esc(h.phone)}`:''}</div>
       ${h.address?`<a class="sb-section-link" href="${mapsUrl(h.address)}" target="_blank" rel="noopener">🗺 飯店地圖</a>`:''}
     </div>`:'';
-  const emergCard = (e.police)?`
+  const emergCard = e.police?`
     <div class="sb-section emergency">
       <div class="sb-section-title">🆘 緊急聯絡</div>
-      <div class="sb-section-meta">警察 ${esc(e.police)} · 救護 ${esc(e.ambulance||'119')}
-        ${e.hospital?`<br>醫院 ${esc(e.hospital)}`:''}
-        ${e.insurance?`<br>保險 ${esc(e.insurance)}`:''}
-      </div>
+      <div class="sb-section-meta">警察 ${esc(e.police)} · 救護 ${esc(e.ambulance||'119')}${e.hospital?`<br>醫院 ${esc(e.hospital)}`:''}${e.insurance?`<br>保險 ${esc(e.insurance)}`:''}</div>
     </div>`:'';
 
   const days = DAYS_META.map(meta=>{
     const items=(state.items[meta.day]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
-    const budgets=items.filter(i=>!i.hidden&&i.budget).map(i=>i.budget);
     return `
       <div class="sb-day">
         <div class="sb-day-title">${meta.label} ${meta.area}<span class="sb-day-date">${meta.date.slice(5)}</span></div>
         ${items.length?items.map(item=>`
-          <div class="sb-item ${item.hidden?'is-hidden':''}" onclick="switchDay(${meta.day});closeSidebar();">
+          <div class="sb-item ${item.hidden?'is-hidden':''}" onclick="switchDay(${meta.day});closeSidebar()">
             <div class="sb-dot ${item.hidden?'dot-hidden':'dot-'+item.type}"></div>
             <div class="sb-info">
               <div class="sb-name">${esc(item.name)}</div>
               <div class="sb-meta">${esc(item.time)}${item.endTime?' – '+esc(item.endTime):''}${item.budget?' · 💰'+esc(item.budget):''}</div>
-              ${voteStr(item.votes)?`<div class="sb-votes">${voteStr(item.votes)}</div>`:''}
             </div>
           </div>`).join('')
-        :'<div style="font-size:11px;color:var(--muted);padding:4px 0 4px 15px;">（尚無地點）</div>'}
-        ${budgets.length?`<div style="font-size:10px;font-family:var(--mono);color:var(--green);margin-top:4px;padding-left:15px;">💰 ${budgets.join(' · ')}</div>`:''}
+        :'<div style="font-size:11px;color:var(--muted);padding:4px 0 4px 14px;">（尚無地點）</div>'}
       </div>`;
   }).join('');
 
@@ -1239,9 +1083,59 @@ function render() {
 }
 
 // ═══════════════════════════════════════════
+//  EXPAND / COLLAPSE
+// ═══════════════════════════════════════════
+function toggleExpand(id, event) {
+  if (event && event.target.closest('button,a,input,select,textarea,.vd,.resv-badge')) return;
+  const exp  = document.getElementById('exp_'+id);
+  const card = document.getElementById('card_'+id);
+  if (!exp) return;
+  if (expandedItems.has(id)) {
+    expandedItems.delete(id);
+    exp.classList.remove('open');
+    card?.classList.remove('is-expanded');
+  } else {
+    expandedItems.add(id);
+    exp.classList.add('open');
+    card?.classList.add('is-expanded');
+  }
+}
+
+// ═══════════════════════════════════════════
+//  INLINE TIME EDIT
+// ═══════════════════════════════════════════
+function startTimeEdit(id, day, event) {
+  event.stopPropagation();
+  const item = (state.items[day]||[]).find(i=>i.id===id);
+  if (!item) return;
+  if (isHardLock(item)) { showToast('🔒 已預約，需先取消預約才能改時間'); return; }
+
+  const wrap = event.currentTarget;
+  const orig = item.time;
+  wrap.innerHTML = `<input class="tl-time-input" type="time" value="${orig}"
+    onclick="event.stopPropagation()"
+    onblur="commitTimeEdit('${id}',${day},this.value,'${orig}')">
+    <span class="tl-hint">確認後點外</span>`;
+  wrap.querySelector('input').focus();
+}
+
+function commitTimeEdit(id, day, newTime, orig) {
+  const item = (state.items[day]||[]).find(i=>i.id===id);
+  if (!item) { render(); return; }
+  if (newTime && newTime !== orig) {
+    item.time = newTime;
+    item.manualTime = true;
+    const [h,m] = newTime.split(':').map(Number);
+    item.endTime = minsToTime(h*60+m + (STAY_MINS[item.type]||60));
+    saveState();
+    showToast('📌 時間已更新並固定');
+  }
+  render();
+}
+
+// ═══════════════════════════════════════════
 //  INTERACTIONS
 // ═══════════════════════════════════════════
-
 function switchDay(d) { currentDay=d; render(); window.scrollTo({top:0,behavior:'smooth'}); }
 function toggleShowHidden(d) { showHidden[d]=!showHidden[d]; renderDay(); }
 
@@ -1254,7 +1148,7 @@ function toggleHide(id, d) {
 function cycleResv(id, d) {
   const item=(state.items[d]||[]).find(i=>i.id===id); if(!item) return;
   item.resv=RESV_CYCLE[(RESV_CYCLE.indexOf(item.resv||'none')+1)%3];
-  saveState(); render(); showToast('預約：'+RESV_LABEL[item.resv]);
+  saveState(); render(); showToast('預約狀態：'+RESV_LABEL[item.resv]);
 }
 
 function cycleVote(id, d, name) {
@@ -1270,8 +1164,7 @@ function noteInput(d, val) {
 }
 
 function dismissWeather() {
-  weatherDismissed=true;
-  localStorage.setItem('seoul_weather_dismissed','1');
+  weatherDismissed=true; localStorage.setItem('seoul_weather_dismissed','1');
   document.getElementById('weatherBanner').style.display='none';
 }
 
@@ -1281,7 +1174,6 @@ function togglePanel(id) {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
   if(!was) el.classList.add('open');
 }
-
 function syncPanelUI() {
   const f=state.flight||{}, h=state.hotel||{}, e=state.emergency||{};
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
@@ -1293,15 +1185,14 @@ function syncPanelUI() {
   set('e_hotel_kr',e.hotel_kr);set('e_hospital',e.hospital);
   set('e_insurance',e.insurance);set('e_notes',e.notes);
 }
-
 function saveFlight() {
   const g=id=>document.getElementById(id).value.trim();
   state.flight={out_no:g('f_out_no'),out_dep:g('f_out_dep'),out_arr:g('f_out_arr'),
                 ret_no:g('f_ret_no'),ret_dep:g('f_ret_dep'),ret_arr:g('f_ret_arr')};
   saveState(); showToast('✈ 機票已儲存');
   document.getElementById('panelFlight').classList.remove('open');
+  render();
 }
-
 function saveHotel() {
   const g=id=>document.getElementById(id).value.trim();
   state.hotel={name:g('h_name'),address:g('h_address'),cin:g('h_cin'),
@@ -1309,7 +1200,6 @@ function saveHotel() {
   saveState(); showToast('🏨 住宿已儲存'); render();
   document.getElementById('panelHotel').classList.remove('open');
 }
-
 function saveEmergency() {
   const g=id=>document.getElementById(id).value.trim();
   state.emergency={police:g('e_police'),ambulance:g('e_ambulance'),hotel_kr:g('e_hotel_kr'),
@@ -1329,8 +1219,15 @@ function closeSidebar() {
 }
 
 // ═══════════════════════════════════════════
-//  MODAL
+//  MODAL (Add + Edit, shared)
 // ═══════════════════════════════════════════
+function autoFillEndTime() {
+  const t = document.getElementById('m_time').value;
+  const type = document.getElementById('m_type').value;
+  if (!t) return;
+  const [h,m] = t.split(':').map(Number);
+  document.getElementById('m_endtime').value = minsToTime(h*60+m+(STAY_MINS[type]||60));
+}
 
 function toggleMember(name) {
   const cb=document.getElementById('w_'+name), opt=document.getElementById('opt_'+name);
@@ -1339,21 +1236,26 @@ function toggleMember(name) {
   if(m) opt.classList.toggle(m.optCls,cb.checked);
 }
 
-function openModal(day) {
-  document.getElementById('m_day').value=String(day);
-  const {start,end}=suggestNextTime(day);
-  document.getElementById('m_time').value=start;
-  document.getElementById('m_endtime').value=end;
+function resetModal() {
   ['m_name','m_nameko','m_address','m_admission','m_budget','m_hours','m_transport','m_desc']
     .forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('m_type').value='other';
-  suggestedDay=null; document.getElementById('daySuggestBanner').classList.add('hidden');
   document.getElementById('m_manual_time').checked=false;
+  suggestedDay=null; document.getElementById('daySuggestBanner').classList.add('hidden');
   MEMBERS.forEach(m=>{
     document.getElementById('w_'+m.low).checked=false;
     document.getElementById('opt_'+m.low).classList.remove(m.optCls);
   });
-  // auto-check current user
+}
+
+function openModal(day) {
+  modalEditingId=null; modalEditingDay=null;
+  document.getElementById('modalTitle').textContent='＋ 新增地點';
+  resetModal();
+  document.getElementById('m_day').value=String(day);
+  const {start,end}=suggestNextTime(day);
+  document.getElementById('m_time').value=start;
+  document.getElementById('m_endtime').value=end;
   if (currentUser) {
     const m=MEMBERS.find(m=>m.id===currentUser);
     if(m) toggleMember(m.low);
@@ -1362,77 +1264,134 @@ function openModal(day) {
   setTimeout(()=>document.getElementById('m_name').focus(),200);
 }
 
-function handleOverlayClick(e) { if(e.target===e.currentTarget) closeModal(); }
-function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function openEditModal(id, day) {
+  const item=(state.items[day]||[]).find(i=>i.id===id); if(!item) return;
+  modalEditingId=id; modalEditingDay=day;
+  document.getElementById('modalTitle').textContent='✏️ 編輯地點';
+  resetModal();
+  document.getElementById('m_name').value=item.name||'';
+  document.getElementById('m_nameko').value=item.nameKo||'';
+  document.getElementById('m_type').value=item.type||'other';
+  document.getElementById('m_day').value=String(day);
+  document.getElementById('m_time').value=item.time||'';
+  document.getElementById('m_endtime').value=item.endTime||'';
+  document.getElementById('m_address').value=item.address||'';
+  document.getElementById('m_admission').value=item.admission||'';
+  document.getElementById('m_budget').value=item.budget||'';
+  document.getElementById('m_hours').value=item.hours||'';
+  document.getElementById('m_transport').value=item.transport||'';
+  document.getElementById('m_desc').value=item.desc||'';
+  document.getElementById('m_manual_time').checked=item.manualTime||false;
+  MEMBERS.forEach(m=>{
+    const cb=document.getElementById('w_'+m.low);
+    const opt=document.getElementById('opt_'+m.low);
+    const chk=(item.who||[]).includes(m.id);
+    cb.checked=chk;
+    if(chk) opt.classList.add(m.optCls); else opt.classList.remove(m.optCls);
+  });
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('m_name').focus(),200);
+}
 
-function submitAdd() {
+function handleOverlayClick(e) { if(e.target===e.currentTarget) closeModal(); }
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  modalEditingId=null; modalEditingDay=null;
+  document.getElementById('modalTitle').textContent='＋ 新增地點';
+}
+
+function submitModal() {
   const name=document.getElementById('m_name').value.trim();
   if(!name){document.getElementById('m_name').focus();return;}
   const g=id=>document.getElementById(id).value.trim();
-  const dayNum=parseInt(g('m_day'),10);
+  const newDay=parseInt(g('m_day'),10);
   const who=MEMBERS.filter(m=>document.getElementById('w_'+m.low).checked).map(m=>m.id);
-  const item={
-    id:uid(),type:g('m_type'),hidden:false,resv:'none',votes:EMPTY_VOTES(),
-    name,nameKo:g('m_nameko'),
-    time:g('m_time')||'12:00',endTime:g('m_endtime'),
-    hours:g('m_hours'),admission:g('m_admission'),
-    budget:g('m_budget'),transport:g('m_transport'),
-    desc:g('m_desc'),address:g('m_address'),
-    who,isDefault:false,addedBy:currentUser||'—',
-    manualTime:document.getElementById('m_manual_time').checked,
-  };
-  if(!state.items[dayNum]) state.items[dayNum]=[];
-  state.items[dayNum].push(item);
-  saveState(); currentDay=dayNum; closeModal(); render();
-  showToast('✅ 已加入 Day '+dayNum);
+  const manualTime=document.getElementById('m_manual_time').checked;
+
+  if(modalEditingId) {
+    // EDIT existing
+    const origDay = modalEditingDay;
+    const item=(state.items[origDay]||[]).find(i=>i.id===modalEditingId);
+    if(item) {
+      item.name=name; item.nameKo=g('m_nameko'); item.type=g('m_type');
+      item.time=g('m_time')||item.time; item.endTime=g('m_endtime');
+      item.hours=g('m_hours'); item.admission=g('m_admission');
+      item.budget=g('m_budget'); item.transport=g('m_transport');
+      item.desc=g('m_desc'); item.address=g('m_address');
+      item.who=who; item.manualTime=manualTime;
+      if(newDay!==origDay) {
+        const arr=state.items[origDay]||[];
+        const idx=arr.findIndex(i=>i.id===modalEditingId);
+        if(idx>=0) {
+          const [moved]=arr.splice(idx,1);
+          if(!state.items[newDay]) state.items[newDay]=[];
+          state.items[newDay].push(moved);
+        }
+      }
+    }
+    saveState(); currentDay=newDay; closeModal(); render();
+    showToast('✅ 已更新');
+  } else {
+    // ADD new
+    const item={
+      id:uid(),type:g('m_type'),hidden:false,resv:'none',votes:EMPTY_VOTES(),
+      name,nameKo:g('m_nameko'),
+      time:g('m_time')||'12:00',endTime:g('m_endtime'),
+      hours:g('m_hours'),admission:g('m_admission'),
+      budget:g('m_budget'),transport:g('m_transport'),
+      desc:g('m_desc'),address:g('m_address'),
+      who,isDefault:false,addedBy:currentUser||'—',manualTime,
+    };
+    if(!state.items[newDay]) state.items[newDay]=[];
+    state.items[newDay].push(item);
+    saveState(); currentDay=newDay; closeModal(); render();
+    showToast('✅ 已加入 Day '+newDay);
+  }
 }
 
 // ═══════════════════════════════════════════
 //  SMART DAY SUGGESTION
 // ═══════════════════════════════════════════
-
 const DAY_KEYWORDS = {
-  1: ['삼청','경복','북촌','인사동','안국','창덕','가회','소격','팔판','삼청동'],
-  2: ['광화문','세종대로','청계천','을지로','명동','시청','남대문','중구','덕수궁','일민','세종'],
-  3: ['동대문','ddp','동대문디자인','성수','왕십리','동묘','신당','을지로3가','을지로4가'],
-  4: ['용산','한남','이태원','압구정','강남','신사','청담','도산','한강진','리움','소서울','한남동'],
-  5: ['이촌','국립중앙박물관','서빙고','노량진','용산역'],
+  1:['삼청','경복','북촌','인사동','안국','창덕','가회','소격','팔판','삼청동'],
+  2:['광화문','세종대로','청계천','을지로','명동','시청','남대문','중구','덕수궁','일민','세종'],
+  3:['동대문','ddp','동대문디자인','성수','왕십리','동묘','신당','을지로3가','을지로4가'],
+  4:['용산','한남','이태원','압구정','강남','신사','청담','도산','한강진','리움','소서울','한남동'],
+  5:['이촌','국립중앙박물관','서빙고','노량진','용산역'],
 };
-
 let suggestedDay = null;
 
 function suggestBestDay(name, address) {
-  const txt = ((name||'') + ' ' + (address||'')).toLowerCase();
-  const scores = {};
-  for (let d = 1; d <= 5; d++) {
-    scores[d] = (DAY_KEYWORDS[d]||[]).reduce((s,kw) => txt.includes(kw) ? s+3 : s, 0);
-    const cnt = (state.items[d]||[]).filter(i=>!i.hidden).length;
-    if (cnt < 3) scores[d] += 1;
+  const txt=((name||'')+' '+(address||'')).toLowerCase();
+  const scores={};
+  for(let d=1;d<=5;d++){
+    scores[d]=(DAY_KEYWORDS[d]||[]).reduce((s,kw)=>txt.includes(kw)?s+3:s,0);
+    const cnt=(state.items[d]||[]).filter(i=>!i.hidden).length;
+    if(cnt<3) scores[d]+=1;
   }
-  const best = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
-  return parseInt(best[1]) >= 3 ? {day:parseInt(best[0]), score:parseInt(best[1])} : null;
+  const best=Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
+  return parseInt(best[1])>=3?{day:parseInt(best[0]),score:parseInt(best[1])}:null;
 }
 
 function updateDaySuggest() {
-  const name = document.getElementById('m_name').value;
-  const addr = document.getElementById('m_address').value;
-  const result = suggestBestDay(name, addr);
-  const banner = document.getElementById('daySuggestBanner');
-  const text   = document.getElementById('daySuggestText');
-  if (result) {
-    suggestedDay = result.day;
-    const meta = DAYS_META[result.day-1];
-    text.innerHTML = `📍 建議 <strong>Day ${result.day} — ${meta.area}</strong>（依地理位置）`;
+  const name=document.getElementById('m_name').value;
+  const addr=document.getElementById('m_address').value;
+  const result=suggestBestDay(name,addr);
+  const banner=document.getElementById('daySuggestBanner');
+  const text=document.getElementById('daySuggestText');
+  if(result){
+    suggestedDay=result.day;
+    const meta=DAYS_META[result.day-1];
+    text.innerHTML=`📍 建議 <strong>Day ${result.day} — ${meta.area}</strong>`;
     banner.classList.remove('hidden');
   } else {
-    suggestedDay = null;
-    banner.classList.add('hidden');
+    suggestedDay=null; banner.classList.add('hidden');
   }
 }
 
 function applySuggest() {
-  if (!suggestedDay) return;
-  document.getElementById('m_day').value = String(suggestedDay);
+  if(!suggestedDay) return;
+  document.getElementById('m_day').value=String(suggestedDay);
   document.getElementById('daySuggestBanner').classList.add('hidden');
   showToast(`✓ 已設為 Day ${suggestedDay}`);
 }
@@ -1440,80 +1399,117 @@ function applySuggest() {
 // ═══════════════════════════════════════════
 //  MOVE ITEM
 // ═══════════════════════════════════════════
-
-let moveItemId = null, moveFromDay = null;
+let moveItemId=null, moveFromDay=null;
 
 function openMoveModal(id, fromDay) {
-  const item = (state.items[fromDay]||[]).find(i=>i.id===id);
-  if (!item) return;
-  moveItemId = id; moveFromDay = fromDay;
-  document.getElementById('moveItemName').textContent = item.name;
-  const suggest = suggestBestDay(item.name, item.address||'');
-  const sugLabel = document.getElementById('moveSuggestLabel');
-  if (suggest && suggest.day !== fromDay) {
-    const meta = DAYS_META[suggest.day-1];
-    sugLabel.textContent = `📍 智能推薦：Day ${suggest.day} — ${meta.area}`;
+  const item=(state.items[fromDay]||[]).find(i=>i.id===id); if(!item) return;
+  moveItemId=id; moveFromDay=fromDay;
+  document.getElementById('moveItemName').textContent=item.name;
+  const suggest=suggestBestDay(item.name,item.address||'');
+  const sugLabel=document.getElementById('moveSuggestLabel');
+  if(suggest&&suggest.day!==fromDay){
+    const meta=DAYS_META[suggest.day-1];
+    sugLabel.textContent=`📍 智能推薦：Day ${suggest.day} — ${meta.area}`;
     sugLabel.classList.remove('hidden');
-  } else {
-    sugLabel.classList.add('hidden');
-  }
-  const grid = document.getElementById('moveDayGrid');
-  grid.innerHTML = DAYS_META.map(m => {
-    const isCurrent  = m.day === fromDay;
-    const isSuggested = suggest && suggest.day === m.day && m.day !== fromDay;
-    return `<button class="move-day-btn${isCurrent?' current':''}${isSuggested?' suggested':''}"
-      onclick="doMoveItem(${m.day})">
-      Day ${m.day}<span>${m.area}</span>
-    </button>`;
+  } else { sugLabel.classList.add('hidden'); }
+  document.getElementById('moveDayGrid').innerHTML=DAYS_META.map(m=>{
+    const isCur=m.day===fromDay;
+    const isSug=suggest&&suggest.day===m.day&&m.day!==fromDay;
+    return `<button class="move-day-btn${isCur?' current':''}${isSug?' suggested':''}" onclick="doMoveItem(${m.day})">Day ${m.day}<span>${m.area}</span></button>`;
   }).join('');
   document.getElementById('moveModal').classList.add('open');
 }
 
 function doMoveItem(toDay) {
-  if (!moveItemId || !moveFromDay || toDay === moveFromDay) { closeMoveModal(); return; }
-  const items = state.items[moveFromDay]||[];
-  const idx = items.findIndex(i=>i.id===moveItemId);
-  if (idx < 0) { closeMoveModal(); return; }
-  const [item] = items.splice(idx, 1);
-  if (!state.items[toDay]) state.items[toDay] = [];
+  if(!moveItemId||!moveFromDay||toDay===moveFromDay){closeMoveModal();return;}
+  const items=state.items[moveFromDay]||[];
+  const idx=items.findIndex(i=>i.id===moveItemId);
+  if(idx<0){closeMoveModal();return;}
+  const [item]=items.splice(idx,1);
+  if(!state.items[toDay]) state.items[toDay]=[];
   state.items[toDay].push(item);
   saveState(); closeMoveModal();
-  const meta = DAYS_META[toDay-1];
-  showToast(`✓ 已移到 Day ${toDay} — ${meta.area}`);
+  showToast(`✓ 已移到 Day ${toDay} — ${DAYS_META[toDay-1].area}`);
   render();
 }
 
 function closeMoveModal() {
   document.getElementById('moveModal').classList.remove('open');
-  moveItemId = null; moveFromDay = null;
+  moveItemId=null; moveFromDay=null;
+}
+function handleMoveOverlay(e){if(e.target===e.currentTarget)closeMoveModal();}
+
+// ═══════════════════════════════════════════
+//  USER / LOGIN
+// ═══════════════════════════════════════════
+function setCurrentUser(name) {
+  currentUser=name; localStorage.setItem('seoul_current_user',name);
+  const chip=document.getElementById('userChip');
+  const chipName=document.getElementById('userChipName');
+  if(chip&&chipName){
+    chipName.textContent=name||'—';
+    chip.className='user-chip'+(name?' chip-'+name.toLowerCase():'');
+  }
+  setSyncInfo(name?`Hi ${name}，已連線`:'已連線，即時同步中');
 }
 
-function handleMoveOverlay(e) { if (e.target===e.currentTarget) closeMoveModal(); }
+const GUIDE_BADGE_COLORS={Mo:'#8B6820',Kelly:'#8B3828',Mia:'#486840',Ruei:'#2C5070'};
+let pendingUser='';
+
+function showGuide(name) {
+  pendingUser=name;
+  const badge=document.getElementById('guideWho');
+  badge.textContent=name; badge.style.background=GUIDE_BADGE_COLORS[name]||'#666';
+  badge.style.color=name==='Mo'?'#2A1E00':'#fff';
+  document.getElementById('loginPage1').classList.add('hidden');
+  document.getElementById('loginPage2').classList.add('active');
+}
+
+function enterApp() {
+  setCurrentUser(pendingUser);
+  document.getElementById('loginOverlay').classList.add('hidden');
+  render();
+}
+
+function backToSelect() {
+  document.getElementById('loginPage2').classList.remove('active');
+  document.getElementById('loginPage1').classList.remove('hidden');
+}
+
+function showLoginOverlay() {
+  pendingUser='';
+  document.getElementById('loginPage2').classList.remove('active');
+  document.getElementById('loginPage1').classList.remove('hidden');
+  document.getElementById('loginOverlay').classList.remove('hidden');
+}
+
+if(currentUser){
+  setCurrentUser(currentUser);
+  document.getElementById('loginOverlay').classList.add('hidden');
+}
 
 // ═══════════════════════════════════════════
 //  EXPORT
 // ═══════════════════════════════════════════
-
 function exportBackup() {
-  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),trip:'Seoul 2025',members:ALL4,state},null,2)],{type:'application/json'});
+  const blob=new Blob([JSON.stringify({exported:new Date().toISOString(),trip:'Seoul 2025',state},null,2)],{type:'application/json'});
   const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:`seoul-dhub-${new Date().toISOString().slice(0,10)}.json`});
-  a.click();URL.revokeObjectURL(a.href);showToast('↓ 備份已下載');
+  a.click(); URL.revokeObjectURL(a.href); showToast('↓ 備份已下載');
 }
 
 // ═══════════════════════════════════════════
 //  KEYBOARD
 // ═══════════════════════════════════════════
-
 document.addEventListener('keydown',e=>{
   const tag=document.activeElement.tagName;
-  if(e.key==='Escape') closeModal();
+  if(e.key==='Escape'){closeModal();closeMoveModal();}
   if(['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
   if(e.key==='ArrowRight'&&currentDay<5) switchDay(currentDay+1);
   if(e.key==='ArrowLeft' &&currentDay>1) switchDay(currentDay-1);
 });
 
 // ═══════════════════════════════════════════
-//  INIT (show local cache first, Firebase will refresh)
+//  INIT
 // ═══════════════════════════════════════════
 render();
 </script>
