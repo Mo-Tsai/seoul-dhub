@@ -141,7 +141,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .who-mo{background:#E8D8A8;color:#5A3E10}
 .who-kelly{background:#F2D8D0;color:#7A3020}
 .who-mia{background:#D5E8CC;color:#3A5828}
-.who-rui{background:#C8DCEA;color:#2A4A60}
+.who-ruei{background:#C8DCEA;color:#2A4A60}
 .who-other{background:rgba(0,0,0,.06);color:var(--muted)}
 .card-btns{display:flex;gap:6px;flex-wrap:wrap}
 .cbtn{font-size:10px;padding:3px 9px;border-radius:4px;border:1px solid var(--border);cursor:pointer;background:transparent;color:var(--muted);font-family:var(--mono);text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:all .12s}
@@ -156,6 +156,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .bar-museum{background:var(--blue)}.bar-architecture{background:var(--green)}.bar-restaurant{background:var(--red)}.bar-other{background:var(--purple)}
 .badge-museum{background:var(--blue-bg);color:var(--blue)}.badge-architecture{background:var(--green-bg);color:var(--green)}.badge-restaurant{background:var(--red-bg);color:var(--red)}.badge-other{background:var(--purple-bg);color:var(--purple)}
 .dot-museum{background:var(--blue)}.dot-architecture{background:var(--green)}.dot-restaurant{background:var(--red)}.dot-other{background:var(--purple)}.dot-hidden{background:#ccc}
+/* flight */
+.bar-flight{background:#C8921E}.badge-flight{background:#FFF4DC;color:#7A5800}.dot-flight{background:#C8921E}
+.flight-card{background:linear-gradient(135deg,#FFFAF0,#FFF4DC);border-color:#E8D090}
+.flight-card .card-name{color:#6A4800}
 
 /* ── ADD ── */
 .add-row{padding-left:88px;margin:4px 0 26px}
@@ -206,11 +210,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .member-opt{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;cursor:pointer;transition:all .15s;font-size:13px;user-select:none}
 .member-opt input{display:none}
 .member-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.md-mo{background:#3a3630}.md-kelly{background:#8a2f5a}.md-mia{background:#5e45a0}.md-rui{background:#2d5f9b}
+.md-mo{background:#3a3630}.md-kelly{background:#8a2f5a}.md-mia{background:#5e45a0}.md-ruei{background:#2d5f9b}
 .checked-mo{border-color:#aaa298;background:#f0ede8}
 .checked-kelly{border-color:#d48aaa;background:#fde8f2}
 .checked-mia{border-color:#9985cc;background:#ede8f9}
-.checked-rui{border-color:#6a9fd4;background:#e5f0fb}
+.checked-ruei{border-color:#6a9fd4;background:#e5f0fb}
 .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
 .btn-cancel{padding:9px 18px;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;font-family:var(--serif);font-size:13px;color:var(--muted)}
 .btn-cancel:hover{background:var(--border)}
@@ -237,7 +241,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .lbtn-mo   {background:#8B6820;color:#FFF0C8}
 .lbtn-kelly{background:#8B3828;color:#FFE8E0}
 .lbtn-mia  {background:#486840;color:#E8F5E0}
-.lbtn-rui  {background:#2C5070;color:#DCF0FF}
+.lbtn-ruei  {background:#2C5070;color:#DCF0FF}
 
 /* ── GUIDE PAGE (step 2, same overlay) ── */
 .guide-page{display:none;flex-direction:column;align-items:center;gap:22px;width:min(92vw,360px)}
@@ -265,7 +269,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .chip-mo   {border-color:#8B6820!important;background:rgba(139,104,32,.2)!important;color:#D4A840!important}
 .chip-kelly{border-color:#8B3828!important;background:rgba(139,56,40,.2)!important;color:#D47060!important}
 .chip-mia  {border-color:#486840!important;background:rgba(72,104,64,.2)!important;color:#80A870!important}
-.chip-rui  {border-color:#2C5070!important;background:rgba(44,80,112,.2)!important;color:#6090B8!important}
+.chip-ruei  {border-color:#2C5070!important;background:rgba(44,80,112,.2)!important;color:#6090B8!important}
 .chip-switch{opacity:.35;font-size:9px;margin-left:2px}
 
 /* ── DAY SUGGEST (modal) ── */
@@ -375,8 +379,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
       <button class="login-btn lbtn-mia"   onclick="showGuide('Mia')">
         <span class="lb-emoji">✨</span>Mia<span class="lb-role">女兒</span>
       </button>
-      <button class="login-btn lbtn-rui"   onclick="showGuide('Rui')">
-        <span class="lb-emoji">⚡</span>Rui<span class="lb-role">兒子</span>
+      <button class="login-btn lbtn-ruei"   onclick="showGuide('Ruei')">
+        <span class="lb-emoji">⚡</span>Ruei<span class="lb-role">兒子</span>
       </button>
     </div>
   </div>
@@ -427,7 +431,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn mob-hide" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn mob-hide" onclick="window.print()">⎙ 列印</button>
-    <span class="ver">v1.8</span>
+    <span class="ver">v1.9</span>
   </div>
 </header>
 
@@ -547,7 +551,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
         <label class="member-opt" id="opt_mo"    onclick="toggleMember('mo')">   <input type="checkbox" id="w_mo">   <div class="member-dot md-mo"></div>   Mo</label>
         <label class="member-opt" id="opt_kelly" onclick="toggleMember('kelly')"><input type="checkbox" id="w_kelly"><div class="member-dot md-kelly"></div> Kelly</label>
         <label class="member-opt" id="opt_mia"   onclick="toggleMember('mia')">  <input type="checkbox" id="w_mia">  <div class="member-dot md-mia"></div>  Mia</label>
-        <label class="member-opt" id="opt_rui"   onclick="toggleMember('rui')">  <input type="checkbox" id="w_rui">  <div class="member-dot md-rui"></div>  Rui</label>
+        <label class="member-opt" id="opt_ruei"  onclick="toggleMember('ruei')"> <input type="checkbox" id="w_ruei"> <div class="member-dot md-ruei"></div> Ruei</label>
       </div>
     </div>
     <div class="modal-actions">
@@ -606,15 +610,15 @@ const MEMBERS = [
   {id:'Mo',    low:'mo',    optCls:'checked-mo'},
   {id:'Kelly', low:'kelly', optCls:'checked-kelly'},
   {id:'Mia',   low:'mia',  optCls:'checked-mia'},
-  {id:'Rui',   low:'rui',  optCls:'checked-rui'},
+  {id:'Ruei',  low:'ruei', optCls:'checked-ruei'},
 ];
-const ALL4 = ['Mo','Kelly','Mia','Rui'];
+const ALL4 = ['Mo','Kelly','Mia','Ruei'];
 const RESV_CYCLE = ['none','pending','booked'];
 const RESV_LABEL = {none:'待確認', pending:'待預約', booked:'已預約✓'};
 const VOTE_ICONS = ['○','👍','❤️','🤔'];
 const VOTE_CLS   = ['','vote-v1','vote-v2','vote-v3'];
 const TYPE_LABEL = {museum:'美術館',architecture:'建築',restaurant:'餐廳',other:'其他'};
-const EMPTY_VOTES = () => ({Mo:0,Kelly:0,Mia:0,Rui:0});
+const EMPTY_VOTES = () => ({Mo:0,Kelly:0,Mia:0,Ruei:0});
 
 const DEFAULT_ITEMS = {
   1:[
@@ -740,6 +744,11 @@ function migrateItem(i) {
   if (!i.votes)                              i.votes     = EMPTY_VOTES();
   if (i.budget    === undefined)             i.budget    = '';
   if (i.transport === undefined)             i.transport = '';
+  // rename Rui → Ruei in old data
+  if (i.votes && i.votes.Rui !== undefined && i.votes.Ruei === undefined) {
+    i.votes.Ruei = i.votes.Rui; delete i.votes.Rui;
+  }
+  if (Array.isArray(i.who)) i.who = i.who.map(w => w === 'Rui' ? 'Ruei' : w);
   return i;
 }
 
@@ -850,7 +859,7 @@ function setSyncInfo(msg) {
 // ═══════════════════════════════════════════
 
 function mapsUrl(a) { return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a); }
-function whoClass(n) { return ({Mo:'who-mo',Kelly:'who-kelly',Mia:'who-mia',Rui:'who-rui'})[n]||'who-other'; }
+function whoClass(n) { return ({Mo:'who-mo',Kelly:'who-kelly',Mia:'who-mia',Ruei:'who-ruei',Rui:'who-ruei'})[n]||'who-other'; }
 function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -894,7 +903,7 @@ function setCurrentUser(name) {
 }
 
 const GUIDE_BADGE_COLORS = {
-  Mo:'#8B6820', Kelly:'#8B3828', Mia:'#486840', Rui:'#2C5070'
+  Mo:'#8B6820', Kelly:'#8B3828', Mia:'#486840', Ruei:'#2C5070'
 };
 let pendingUser = '';
 
@@ -943,6 +952,40 @@ function renderTabs() {
       ${d.label} ${d.area}
       <span class="tab-date">${d.date.slice(5)} (${d.weekday})</span>
     </button>`).join('');
+}
+
+function flightCard(isOutbound) {
+  const f = state.flight || {};
+  const dep = isOutbound ? f.out_dep : f.ret_dep;
+  const arr = isOutbound ? f.out_arr : f.ret_arr;
+  const no  = isOutbound ? f.out_no  : f.ret_no;
+  if (!dep && !arr) return '';
+  const label = isOutbound ? '去程' : '回程';
+  const route = isOutbound ? 'TPE → ICN' : 'ICN → TPE';
+  const time  = (dep||arr||'').match(/\d{1,2}:\d{2}/)?.[0] || (isOutbound?'08:00':'17:00');
+  return `
+  <div class="tl-item">
+    <div class="tl-time">${time}</div>
+    <div class="tl-dot-wrap"><div class="tl-dot dot-flight"></div></div>
+    <div class="item-card flight-card">
+      <div class="card-inner">
+        <div class="card-bar bar-flight"></div>
+        <div class="card-content">
+          <div class="card-top">
+            <div>
+              <div class="card-name">✈ ${label}${no?' '+esc(no):''}</div>
+              <div class="card-nameko">${route}</div>
+            </div>
+            <span class="card-badge badge-flight">班機</span>
+          </div>
+          <div class="card-meta">
+            ${dep?`<div class="card-meta-row"><span>🛫</span><span>出發 ${esc(dep)}</span></div>`:''}
+            ${arr?`<div class="card-meta-row"><span>🛬</span><span>抵達 ${esc(arr)}</span></div>`:''}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 
 function renderDay() {
@@ -1007,6 +1050,9 @@ function renderDay() {
     </div>`;
   }).join('');
 
+  const flightTop    = currentDay === 1 ? flightCard(true)  : '';
+  const flightBottom = currentDay === 5 ? flightCard(false) : '';
+
   document.getElementById('mainContent').innerHTML = `
     <div class="day-header">
       <div>
@@ -1017,7 +1063,7 @@ function renderDay() {
         ${show?`👁 收起 (${hCount})`:`🙈 隱藏 (${hCount})`}
       </button>`:''}
     </div>
-    <div class="timeline">${items.length?itemsHtml:'<p style="padding:16px 0 16px 88px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>'}</div>
+    <div class="timeline">${flightTop}${items.length?itemsHtml:'<p style="padding:16px 0 16px 88px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>'}${flightBottom}</div>
     <div class="add-row"><button class="add-btn" onclick="openModal(${currentDay})">＋ 新增地點</button></div>
     <div class="notes-section">
       <div class="notes-label">📝 今日備註</div>
