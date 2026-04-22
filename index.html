@@ -297,6 +297,15 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .move-cancel{width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-family:var(--serif);font-size:13px;color:var(--muted)}
 .move-cancel:hover{background:var(--border)}
 
+/* ── LOCK & SCHEDULE (v2.0) ── */
+.tl-lock{font-size:9px;display:block;text-align:right;line-height:1;margin-top:3px;letter-spacing:0}
+.sched-btns{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}
+.reschedule-btn,.opt-sort-btn{font-size:10px;font-family:var(--mono);padding:5px 10px;border-radius:5px;cursor:pointer;white-space:nowrap;border:1px solid transparent;transition:all .12s}
+.reschedule-btn{border-color:var(--blue);background:var(--blue-bg);color:var(--blue)}
+.reschedule-btn:hover{background:var(--blue);color:#fff}
+.opt-sort-btn{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.opt-sort-btn:hover{background:var(--green);color:#fff}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:72px;right:24px;background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:6px;font-size:12px;font-family:var(--mono);opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:300}
 .toast.show{opacity:1;transform:translateY(0)}
@@ -431,7 +440,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn mob-hide" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn mob-hide" onclick="window.print()">⎙ 列印</button>
-    <span class="ver">v1.9</span>
+    <span class="ver">v2.0</span>
   </div>
 </header>
 
@@ -534,6 +543,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <div class="fg-row">
       <div class="fg"><label>開始時間</label><input id="m_time" type="time"></div>
       <div class="fg"><label>結束時間</label><input id="m_endtime" type="time"></div>
+    </div>
+    <div class="fg" style="margin-top:-4px">
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--muted)">
+        <input type="checkbox" id="m_manual_time" style="width:14px;height:14px;cursor:pointer"> 🔸 固定此時間（排程不自動調整）
+      </label>
     </div>
     <div class="fg"><label>地址／搜尋（Google Maps 用）</label><input id="m_address" type="text" placeholder="如：익선동 서울" oninput="updateDaySuggest()"></div>
     <div class="fg-row">
@@ -943,6 +957,107 @@ if (currentUser) {
 // else: overlay stays visible until user picks identity
 
 // ═══════════════════════════════════════════
+//  SMART SCHEDULER (v2.0)
+// ═══════════════════════════════════════════
+
+const ZONE_ORDER = ['삼청','광화문','동대문','한남','이촌','강남'];
+const STAY_MINS  = { museum:120, architecture:60, restaurant:90, other:60 };
+const ZONE_KEYWORDS = {
+  '삼청':   ['삼청','안국','북촌','경복','소격','인사동','가회','팔판','삼청동','kukje','국제갈러리','mmca'],
+  '광화문': ['광화문','세종','시청','덕수궁','일민','명동','남대문','중구','세종대로','seма','서울시립'],
+  '동대문': ['동대문','ddp','성수','을지로3','을지로4','왕십리','신당','동대문디자인'],
+  '한남':   ['한남','이태원','한강진','리움','소서울','한남동','leeum'],
+  '이촌':   ['이촌','서빙고','용산역','아모레','아모레퍼시픽','국립중앙박물관','국립중앙','amorepacific'],
+  '강남':   ['강남','압구정','신사','청담','도산','밍글스','mingles'],
+};
+
+function getItemZone(item) {
+  if (item.zone) return item.zone;
+  const txt = ((item.name||'')+' '+(item.nameKo||'')+' '+(item.address||'')).toLowerCase();
+  for (const [zone, kws] of Object.entries(ZONE_KEYWORDS)) {
+    if (kws.some(kw => txt.includes(kw))) return zone;
+  }
+  return null;
+}
+
+function transitMins(zA, zB) {
+  if (!zA || !zB || zA === zB) return 20;
+  const diff = Math.abs(ZONE_ORDER.indexOf(zA) - ZONE_ORDER.indexOf(zB));
+  return diff <= 1 ? 35 : 55;
+}
+
+function isHardLock(item) { return item.resv === 'booked'; }
+function isSoftLock(item) { return item.manualTime === true && !isHardLock(item); }
+
+function itemEndMins(item) {
+  if (item.endTime && item.endTime !== item.time) {
+    const [h,m] = item.endTime.split(':').map(Number); return h*60+m;
+  }
+  const [h,m] = item.time.split(':').map(Number);
+  return h*60+m + (STAY_MINS[item.type]||60);
+}
+
+function minsToTime(mins) {
+  const c = Math.max(0, Math.min(mins, 23*60+59));
+  return String(Math.floor(c/60)).padStart(2,'0')+':'+String(c%60).padStart(2,'0');
+}
+
+function rescheduleDay(day) {
+  const sorted = (state.items[day]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
+  if (!sorted.length) { showToast('這天沒有地點'); return; }
+
+  let cursor = null, lastZone = null;
+
+  // Day 1: 去程落地 +90min 為首個錨點
+  if (day === 1) {
+    const f = state.flight||{};
+    if (f.out_arr) {
+      const t = f.out_arr.match(/(\d{1,2}):(\d{2})/);
+      if (t) cursor = parseInt(t[1])*60 + parseInt(t[2]) + 90;
+    }
+  }
+
+  let moved = 0;
+  for (const item of sorted) {
+    if (isHardLock(item) || isSoftLock(item) || cursor === null) {
+      cursor = itemEndMins(item);
+      lastZone = getItemZone(item);
+      continue;
+    }
+    const zone = getItemZone(item);
+    const gap  = transitMins(lastZone, zone);
+    const newStart = cursor + gap;
+    const dur  = STAY_MINS[item.type]||60;
+    const si   = (state.items[day]||[]).find(i=>i.id===item.id);
+    if (si && (si.time !== minsToTime(newStart) || si.endTime !== minsToTime(newStart+dur))) {
+      si.time = minsToTime(newStart);
+      si.endTime = minsToTime(newStart+dur);
+      moved++;
+    }
+    cursor = newStart + dur;
+    lastZone = zone;
+  }
+
+  if (!moved) { showToast('⏱ 時間已是最佳排列'); return; }
+  saveState(); render();
+  showToast(`⏱ 已重新排程 ${moved} 個地點`);
+}
+
+function optSortDay(day) {
+  const items = state.items[day];
+  if (!items || items.length < 2) { showToast('地點太少，無需排序'); return; }
+  state.items[day] = items.slice().sort((a,b) => {
+    if (isHardLock(a) !== isHardLock(b)) return isHardLock(a) ? -1 : 1;
+    const zA = ZONE_ORDER.indexOf(getItemZone(a)||'');
+    const zB = ZONE_ORDER.indexOf(getItemZone(b)||'');
+    if (zA !== zB) return (zA<0?99:zA)-(zB<0?99:zB);
+    return a.time.localeCompare(b.time);
+  });
+  saveState(); render();
+  showToast('🗺 已依地理區域排序，可再按「重新排程」更新時間');
+}
+
+// ═══════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════
 
@@ -1000,7 +1115,7 @@ function renderDay() {
     const votes = item.votes || EMPTY_VOTES();
     return `
     <div class="tl-item">
-      <div class="tl-time">${esc(item.time)}${item.endTime?'<br><span style="opacity:.55">–'+esc(item.endTime)+'</span>':''}</div>
+      <div class="tl-time">${esc(item.time)}${item.endTime?'<br><span style="opacity:.55">–'+esc(item.endTime)+'</span>':''}${isHardLock(item)?'<span class="tl-lock">🔒</span>':isSoftLock(item)?'<span class="tl-lock">🔸</span>':''}</div>
       <div class="tl-dot-wrap"><div class="tl-dot ${isH?'dot-hidden':'dot-'+item.type}"></div></div>
       <div class="item-card ${isH?'hidden-item':''}">
         <div class="card-inner">
@@ -1059,9 +1174,13 @@ function renderDay() {
         <h2>${meta.label} — ${meta.area}</h2>
         <div class="day-meta">${meta.date}（${meta.weekday}）· 明洞 Stanford</div>
       </div>
-      ${hCount?`<button class="show-hidden-btn ${show?'active':''}" onclick="toggleShowHidden(${currentDay})">
-        ${show?`👁 收起 (${hCount})`:`🙈 隱藏 (${hCount})`}
-      </button>`:''}
+      <div class="sched-btns">
+        ${hCount?`<button class="show-hidden-btn ${show?'active':''}" onclick="toggleShowHidden(${currentDay})">
+          ${show?`👁 收起 (${hCount})`:`🙈 隱藏 (${hCount})`}
+        </button>`:''}
+        <button class="reschedule-btn" onclick="rescheduleDay(${currentDay})" title="從鎖定錨點往後，自動填入浮動地點時間">⏱ 重新排程</button>
+        <button class="opt-sort-btn" onclick="optSortDay(${currentDay})" title="依地理區域重新排列順序">🗺 優化排序</button>
+      </div>
     </div>
     <div class="timeline">${flightTop}${items.length?itemsHtml:'<p style="padding:16px 0 16px 88px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>'}${flightBottom}</div>
     <div class="add-row"><button class="add-btn" onclick="openModal(${currentDay})">＋ 新增地點</button></div>
@@ -1229,6 +1348,7 @@ function openModal(day) {
     .forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('m_type').value='other';
   suggestedDay=null; document.getElementById('daySuggestBanner').classList.add('hidden');
+  document.getElementById('m_manual_time').checked=false;
   MEMBERS.forEach(m=>{
     document.getElementById('w_'+m.low).checked=false;
     document.getElementById('opt_'+m.low).classList.remove(m.optCls);
@@ -1259,6 +1379,7 @@ function submitAdd() {
     budget:g('m_budget'),transport:g('m_transport'),
     desc:g('m_desc'),address:g('m_address'),
     who,isDefault:false,addedBy:currentUser||'—',
+    manualTime:document.getElementById('m_manual_time').checked,
   };
   if(!state.items[dayNum]) state.items[dayNum]=[];
   state.items[dayNum].push(item);
