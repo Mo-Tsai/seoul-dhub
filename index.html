@@ -123,6 +123,24 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .tl-transit-pill.no-link{cursor:default;color:var(--muted);background:#f5f3ef;border-color:var(--border)}
 .tl-transit-pill.no-link:hover{background:#f5f3ef;color:var(--muted);border-color:var(--border)}
 
+/* ── HOTEL ANCHOR ── */
+.bar-hotel{background:#78694A}.dot-hotel{background:#78694A}
+
+/* ── SUGGESTED SPOTS ── */
+.suggest-section{padding:6px 0 4px}
+.suggest-label{font-size:10px;font-family:var(--mono);color:var(--muted);margin-bottom:8px;letter-spacing:.04em}
+.suggest-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.suggest-row::-webkit-scrollbar{display:none}
+.suggest-card{flex-shrink:0;width:152px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;display:flex}
+.suggest-bar{width:3px;flex-shrink:0}
+.suggest-body{padding:9px 11px;flex:1;display:flex;flex-direction:column}
+.suggest-name{font-size:11px;font-weight:600;color:var(--ink);line-height:1.3;margin-bottom:1px}
+.suggest-kr{font-size:9px;font-family:var(--mono);color:var(--muted);margin-bottom:5px}
+.suggest-desc{font-size:10px;color:var(--muted);line-height:1.45;flex:1;margin-bottom:7px}
+.suggest-foot{display:flex;gap:5px;flex-wrap:wrap}
+.suggest-add{color:var(--green)!important;border-color:#b0d4ad!important}
+.suggest-add:hover{background:var(--green)!important;color:#fff!important;border-color:var(--green)!important}
+
 /* ── CARD ── */
 .item-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:box-shadow .15s;box-shadow:0 1px 5px rgba(14,12,38,.05)}
 .item-card:hover{box-shadow:0 3px 14px rgba(14,12,38,.1)}
@@ -398,7 +416,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn mob-hide" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn mob-hide" onclick="window.print()">⎙ 列印</button>
     <button class="hbtn" onclick="togglePanel('panelSettings')" id="settingsBtn">⚙️ 設定</button>
-    <span class="ver">v2.3</span>
+    <span class="ver">v2.4</span>
   </div>
 </header>
 
@@ -997,6 +1015,96 @@ function renderTransit(prev, next) {
     : `<span class="tl-transit-pill no-link">🚶${gapStr ? ' ' + gapStr : ''}</span>`;
   return `<div class="tl-transit"><div></div><div class="tl-transit-dot-col"></div><div>${pill}</div></div>`;
 }
+
+function fixedTransitCard(label, href) {
+  const pill = href
+    ? `<a class="tl-transit-pill" href="${href}" target="_blank" rel="noopener">🚇 ${label}</a>`
+    : `<span class="tl-transit-pill no-link">🚇 ${label}</span>`;
+  return `<div class="tl-transit"><div></div><div class="tl-transit-dot-col"></div><div>${pill}</div></div>`;
+}
+
+function hotelAnchorCard(mode) {
+  const h = state.hotel || {};
+  const name = h.name || '明洞 Stanford';
+  const addr = h.address || '';
+  const rawTime = mode === 'in' ? (h.cin || '') : (h.cout || '');
+  const timeStr = rawTime.match(/\d{1,2}:\d{2}/)?.[0] || (mode === 'in' ? '15:00' : '11:00');
+  const label = mode === 'in' ? '✅ 入住' : '🏁 退房';
+  const mapsBtn = addr ? `<a class="cbtn maps" href="${mapsUrl(addr)}" target="_blank" rel="noopener">🗺 地圖</a>` : '';
+  return `
+  <div class="tl-item">
+    <div class="tl-time-wrap"><div class="tl-time locked">${timeStr}</div></div>
+    <div class="tl-dot-wrap"><div class="tl-dot dot-hotel"></div></div>
+    <div class="item-card" style="cursor:default">
+      <div class="card-inner">
+        <div class="card-bar bar-hotel"></div>
+        <div class="card-content">
+          <div class="card-compact">
+            <div class="card-name-wrap">
+              <span class="card-type-icon">🏨</span>
+              <div>
+                <div class="card-name">${esc(name)}</div>
+                <div class="card-compact-meta">${label}${mapsBtn ? ' · ' : ''}${mapsBtn}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+const SUGGESTED_LAST_DAY = [
+  { name:'樂天免稅店 明洞', nameKr:'롯데면세점', address:'서울 중구 남대문로 81', type:'other', desc:'出發前最後血拼，免稅直接帶走', budget:'$$' },
+  { name:'南大門市場',      nameKr:'남대문시장', address:'서울 중구 남대문시장4길 21', type:'restaurant', desc:'首爾最大傳統市場，伴手禮 + 小吃', budget:'$' },
+  { name:'仁寺洞',          nameKr:'인사동',    address:'서울 종로구 인사동길 12',    type:'architecture', desc:'傳統工藝品、紀念品最佳選擇', budget:'$' },
+  { name:'廣藏市場',        nameKr:'광장시장',  address:'서울 종로구 창경궁로 88',    type:'restaurant', desc:'綠豆煎餅、麻藥紫菜卷，必吃一次', budget:'$' },
+];
+
+function suggestedSpotsRow() {
+  const cards = SUGGESTED_LAST_DAY.map(s => {
+    const already = (state.items[5]||[]).some(i => i.name === s.name);
+    const addBtn = already
+      ? `<span class="cbtn" style="color:var(--muted);cursor:default">✓ 已加</span>`
+      : `<button class="cbtn suggest-add" onclick="addSuggested(${JSON.stringify(JSON.stringify(s))})">＋ 加入</button>`;
+    return `
+    <div class="suggest-card">
+      <div class="suggest-bar bar-${s.type}"></div>
+      <div class="suggest-body">
+        <div class="suggest-name">${esc(s.name)}</div>
+        <div class="suggest-kr">${esc(s.nameKr)}</div>
+        <div class="suggest-desc">${esc(s.desc)}</div>
+        <div class="suggest-foot">
+          ${s.address ? `<a class="cbtn maps" href="${mapsUrl(s.address)}" target="_blank" rel="noopener">🗺</a>` : ''}
+          ${addBtn}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+  <div class="tl-item" style="margin-bottom:14px">
+    <div></div><div></div>
+    <div class="suggest-section">
+      <div class="suggest-label">💡 最後一天推薦地點</div>
+      <div class="suggest-row">${cards}</div>
+    </div>
+  </div>`;
+}
+
+function addSuggested(jsonStr) {
+  const s = JSON.parse(jsonStr);
+  if ((state.items[5]||[]).some(i => i.name === s.name)) { showToast('已在 Day 5 清單中'); return; }
+  if (!state.items[5]) state.items[5] = [];
+  state.items[5].push({
+    id: uid(), name: s.name, type: s.type,
+    address: s.address||'', time:'10:00', endTime:'',
+    budget: s.budget||'', desc: s.desc||'', notes:'',
+    resv:'none', votes: EMPTY_VOTES(), hidden: false
+  });
+  saveState(); render();
+  showToast('✅ 已加入 Day 5 — ' + s.name);
+}
+
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function uid() { return 'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
 
@@ -1141,8 +1249,25 @@ function renderDay() {
   const itemsHtml = items.map((item, i) =>
     renderItem(item) + (i < items.length-1 ? renderTransit(item, items[i+1]) : '')
   ).join('');
-  const flightTop    = currentDay === 1 ? flightCard(true)  : '';
-  const flightBottom = currentDay === 5 ? flightCard(false) : '';
+
+  // Day 1 fixed head: ✈ 抵達 → AREX → 🏨 入住
+  const hotelAddr = (state.hotel && state.hotel.address) ? state.hotel.address : DEFAULT_HOTEL.address;
+  const day1Head = currentDay === 1 ? (
+    flightCard(true) +
+    fixedTransitCard('AREX 直達 43 分 → 飯店', mapsDir('인천국제공항 제1여객터미널', hotelAddr)) +
+    hotelAnchorCard('in')
+  ) : '';
+
+  // Day 5 fixed tail: 🏨 退房 → 推薦地點 → AREX → ✈ 出發
+  const day5Tail = currentDay === 5 ? (
+    hotelAnchorCard('out') +
+    fixedTransitCard('步行 / 計程車 ~15 分', '') +
+    suggestedSpotsRow() +
+    fixedTransitCard('AREX 直達 43 分 → 機場', mapsDir('서울역', '인천국제공항 제1여객터미널')) +
+    flightCard(false)
+  ) : '';
+
+  const emptyMsg = !items.length ? '<p style="padding:16px 0 16px 76px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>' : '';
 
   document.getElementById('mainContent').innerHTML = `
     <div class="day-header">
@@ -1157,9 +1282,9 @@ function renderDay() {
       </div>
     </div>
     <div class="timeline">
-      ${flightTop}
-      ${items.length ? itemsHtml : '<p style="padding:16px 0 16px 76px;color:var(--muted);font-size:13px;">這天還沒有地點，點下方新增！</p>'}
-      ${flightBottom}
+      ${day1Head}
+      ${itemsHtml || emptyMsg}
+      ${day5Tail}
     </div>
     <div class="add-row"><button class="add-btn" onclick="openModal(${currentDay})">＋ 新增地點</button></div>
     <div class="notes-section">
