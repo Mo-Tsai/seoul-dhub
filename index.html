@@ -115,6 +115,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .tl-dot-wrap{display:flex;justify-content:center;padding-top:16px;position:relative;z-index:1}
 .tl-dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--bg);box-shadow:0 0 0 1.5px var(--border)}
 
+/* ── TRANSIT CARD ── */
+.tl-transit{display:grid;grid-template-columns:50px 16px 1fr;gap:0 10px;margin-bottom:4px;margin-top:-4px;align-items:center}
+.tl-transit-dot-col{display:flex;justify-content:center;align-items:center;position:relative;z-index:1}
+.tl-transit-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-family:var(--mono);color:var(--blue);background:var(--blue-bg);border:1px solid #c5dff0;cursor:pointer;text-decoration:none;transition:all .12s;white-space:nowrap;max-width:fit-content}
+.tl-transit-pill:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tl-transit-pill.no-link{cursor:default;color:var(--muted);background:#f5f3ef;border-color:var(--border)}
+.tl-transit-pill.no-link:hover{background:#f5f3ef;color:var(--muted);border-color:var(--border)}
+
 /* ── CARD ── */
 .item-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:box-shadow .15s;box-shadow:0 1px 5px rgba(14,12,38,.05)}
 .item-card:hover{box-shadow:0 3px 14px rgba(14,12,38,.1)}
@@ -321,6 +329,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
   .tab{padding:10px 10px;font-size:11px}
   .timeline::before{left:54px}
   .tl-item{grid-template-columns:40px 12px 1fr;gap:0 8px}
+  .tl-transit{grid-template-columns:40px 12px 1fr;gap:0 8px}
   .tl-time{font-size:10px}
   .card-content{padding:10px 11px}
   .card-name{font-size:12px}
@@ -389,7 +398,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn mob-hide" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn mob-hide" onclick="window.print()">⎙ 列印</button>
     <button class="hbtn" onclick="togglePanel('panelSettings')" id="settingsBtn">⚙️ 設定</button>
-    <span class="ver">v2.2</span>
+    <span class="ver">v2.3</span>
   </div>
 </header>
 
@@ -974,6 +983,20 @@ function getTravelMins(from, to) {
 //  UTILS
 // ═══════════════════════════════════════════
 function mapsUrl(a) { return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(a); }
+function mapsDir(from, to) { return 'https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(from)+'&destination='+encodeURIComponent(to)+'&travelmode=transit'; }
+function renderTransit(prev, next) {
+  const [ph, pm] = prev.endTime ? prev.endTime.split(':').map(Number) : [0,0];
+  const [nh, nm] = next.time.split(':').map(Number);
+  const prevMins = prev.endTime ? ph*60+pm : itemEndMins(prev);
+  const nextMins = nh*60+nm;
+  const gap = nextMins - prevMins;
+  const gapStr = (gap > 0 && gap < 180) ? `${gap} 分` : '';
+  const hasAddrs = prev.address && next.address;
+  const pill = hasAddrs
+    ? `<a class="tl-transit-pill" href="${mapsDir(prev.address, next.address)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🚇${gapStr ? ' ' + gapStr : ' 查路線'}</a>`
+    : `<span class="tl-transit-pill no-link">🚶${gapStr ? ' ' + gapStr : ''}</span>`;
+  return `<div class="tl-transit"><div></div><div class="tl-transit-dot-col"></div><div>${pill}</div></div>`;
+}
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function uid() { return 'u_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
 
@@ -1115,7 +1138,9 @@ function renderDay() {
   const items = show ? all : all.filter(i=>!i.hidden);
   const hCount = all.filter(i=>i.hidden).length;
 
-  const itemsHtml = items.map(renderItem).join('');
+  const itemsHtml = items.map((item, i) =>
+    renderItem(item) + (i < items.length-1 ? renderTransit(item, items[i+1]) : '')
+  ).join('');
   const flightTop    = currentDay === 1 ? flightCard(true)  : '';
   const flightBottom = currentDay === 5 ? flightCard(false) : '';
 
