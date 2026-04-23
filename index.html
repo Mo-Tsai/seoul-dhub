@@ -388,7 +388,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn mob-hide" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn mob-hide" onclick="window.print()">⎙ 列印</button>
-    <span class="ver">v2.1</span>
+    <button class="hbtn" onclick="togglePanel('panelSettings')" id="settingsBtn">⚙️ 設定</button>
+    <span class="ver">v2.2</span>
   </div>
 </header>
 
@@ -430,6 +431,26 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <div class="fld"><label>旅遊保險單號</label><input id="e_insurance" type="text" placeholder="保單號碼"></div>
     <div class="fld"><label>其他聯絡</label><textarea id="e_notes" placeholder="台灣緊急聯絡人…"></textarea></div>
     <button class="psave" onclick="saveEmergency()">儲存</button>
+  </div>
+</div>
+
+<div id="panelSettings" class="panel" style="background:#F5F2EC">
+  <div class="panel-inner" style="flex-direction:column;align-items:flex-start;gap:10px">
+    <div style="font-size:10px;font-family:var(--mono);color:var(--muted)">
+      🗺 Google Maps API Key — 只存在這台手機，不會上傳
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+      <div class="fld" style="flex:1;min-width:220px">
+        <label>API Key</label>
+        <input id="s_gmaps_key" type="password" placeholder="AIzaSy…" autocomplete="off">
+      </div>
+      <div id="gmaps_status" style="font-size:10px;font-family:var(--mono);color:var(--muted);padding-bottom:9px"></div>
+      <button class="psave" onclick="saveSettings()">儲存</button>
+    </div>
+    <div style="font-size:10px;font-family:var(--mono);color:var(--muted);line-height:1.8">
+      存入後，「重新排程」會自動用 Google Maps 抓真實車程（大眾運輸）<br>
+      沒有 Key 也可用，改用區域估算
+    </div>
   </div>
 </div>
 
@@ -838,36 +859,115 @@ function minsToTime(mins) {
   return String(Math.floor(c/60)).padStart(2,'0')+':'+String(c%60).padStart(2,'0');
 }
 
-function rescheduleDay(day, silent) {
+async function rescheduleDay(day, silent) {
   const sorted = (state.items[day]||[]).slice().sort((a,b)=>a.time.localeCompare(b.time));
   if (!sorted.length) { if(!silent) showToast('這天沒有地點'); render(); return; }
 
-  let cursor = null, lastZone = null;
+  const hotelAddr = (state.hotel && state.hotel.address) ? state.hotel.address : DEFAULT_HOTEL.address;
+  let cursor = null, lastZone = null, lastAddr = hotelAddr;
+
   if (day === 1) {
     const f = state.flight||{};
     if (f.out_arr) {
       const t = f.out_arr.match(/(\d{1,2}):(\d{2})/);
-      if (t) cursor = parseInt(t[1])*60 + parseInt(t[2]) + 90;
+      if (t) cursor = parseInt(t[1])*60 + parseInt(t[2]) + 120; // 落地+2hr(海關+ICN交通到飯店)
     }
   }
+  if (cursor === null) cursor = 9 * 60; // 預設早上9點從飯店出發
+
+  if (gmapsLoaded && !silent) showToast('🗺 計算車程中…');
 
   let moved = 0;
   for (const item of sorted) {
-    if (isHardLock(item) || isSoftLock(item) || cursor === null) {
-      cursor = itemEndMins(item); lastZone = getItemZone(item); continue;
+    if (isHardLock(item) || isSoftLock(item)) {
+      cursor = itemEndMins(item); lastZone = getItemZone(item);
+      if (item.address) lastAddr = item.address;
+      continue;
     }
-    const zone = getItemZone(item);
-    const gap  = transitGap(lastZone, zone);
-    const ns   = cursor + gap;
-    const dur  = STAY_MINS[item.type]||60;
-    const si   = (state.items[day]||[]).find(i=>i.id===item.id);
+    // 計算到下一個地點的交通時間
+    let gap;
+    if (gmapsLoaded && item.address) {
+      gap = await getTravelMins(lastAddr, item.address);
+      if (gap === null) gap = transitGap(lastZone, getItemZone(item));
+    } else {
+      gap = transitGap(lastZone, getItemZone(item));
+    }
+
+    const ns  = cursor + gap;
+    const dur = STAY_MINS[item.type] || 60;
+    const si  = (state.items[day]||[]).find(i=>i.id===item.id);
     if (si) { si.time = minsToTime(ns); si.endTime = minsToTime(ns+dur); moved++; }
-    cursor = ns + dur; lastZone = zone;
+    cursor = ns + dur; lastZone = getItemZone(item);
+    if (item.address) lastAddr = item.address;
   }
+
   saveState(); render();
-  if (!silent && moved>0) showToast(`⏱ 已重新排程 ${moved} 個地點`);
+  if (!silent && moved>0) showToast(gmapsLoaded ? `🗺 已用真實車程排程 ${moved} 個地點` : `⏱ 已重新排程 ${moved} 個地點`);
   else if (!silent) showToast('⏱ 時間已是最佳排列');
   else if (moved>0) showToast('✈ 已依班機時間自動排程 Day 1');
+}
+
+// ═══════════════════════════════════════════
+//  SETTINGS + GOOGLE MAPS
+// ═══════════════════════════════════════════
+const LOCAL_GMAPS_KEY = 'seoul_gmaps_key';
+let gmapsLoaded = false;
+let gmapsService = null;
+
+function loadSettings() {
+  const key = localStorage.getItem(LOCAL_GMAPS_KEY) || '';
+  const el = document.getElementById('s_gmaps_key');
+  if (el) el.placeholder = key ? '（已儲存）' : 'AIzaSy…';
+  if (key) initGMaps(key);
+}
+
+function saveSettings() {
+  const inp = document.getElementById('s_gmaps_key');
+  const val = inp.value.trim();
+  if (val) {
+    localStorage.setItem(LOCAL_GMAPS_KEY, val);
+    inp.value = '';
+    inp.placeholder = '（已儲存）';
+    if (!gmapsLoaded) initGMaps(val);
+  }
+  document.getElementById('panelSettings').classList.remove('open');
+  showToast('⚙️ 設定已儲存');
+}
+
+function initGMaps(key) {
+  if (gmapsLoaded || !key) return;
+  const s = document.createElement('script');
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&language=zh-TW&callback=onGMapsReady`;
+  s.onerror = () => setGMapsStatus('❌ API Key 無效或無車程權限');
+  document.head.appendChild(s);
+}
+
+window.onGMapsReady = function() {
+  gmapsLoaded = true;
+  gmapsService = new google.maps.DistanceMatrixService();
+  setGMapsStatus('✅ 已連線，排程時自動抓車程');
+};
+
+function setGMapsStatus(msg) {
+  const el = document.getElementById('gmaps_status');
+  if (el) el.textContent = msg;
+}
+
+function getTravelMins(from, to) {
+  if (!gmapsLoaded || !gmapsService || !from || !to) return Promise.resolve(null);
+  return new Promise(resolve => {
+    gmapsService.getDistanceMatrix({
+      origins: [from],
+      destinations: [to],
+      travelMode: google.maps.TravelMode.TRANSIT,
+    }, (res, status) => {
+      if (status === 'OK' && res.rows[0]?.elements[0]?.status === 'OK') {
+        resolve(Math.ceil(res.rows[0].elements[0].duration.value / 60));
+      } else {
+        resolve(null);
+      }
+    });
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -1511,6 +1611,7 @@ document.addEventListener('keydown',e=>{
 // ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
+loadSettings();
 render();
 </script>
 </body>
