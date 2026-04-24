@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Seoul D-Hub — 首爾行程 2025</title>
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇰🇷</text></svg>">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇰🇷</text></svg>">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -208,6 +208,27 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .flight-card{background:linear-gradient(135deg,#FFFAF0,#FFF4DC);border-color:#E8D090}
 .flight-card .card-name{color:#6A4800}
 .flight-card .card-type-icon{opacity:.85}
+
+/* ── QUICK INPUT OVERLAY ── */
+.quick-overlay{position:fixed;inset:0;z-index:500;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);transition:opacity .2s}
+.quick-overlay.hidden{display:none}
+.quick-sheet{width:100%;max-width:600px;background:var(--card);border-radius:18px 18px 0 0;padding:22px 20px 36px;box-shadow:0 -8px 40px rgba(0,0,0,.18);display:flex;flex-direction:column;gap:14px;max-height:90vh}
+.quick-hdr{display:flex;align-items:center;justify-content:space-between}
+.quick-title{font-size:16px;font-weight:700;color:var(--ink);font-family:var(--serif)}
+.quick-subtitle{font-size:11px;font-family:var(--mono);color:var(--muted);margin-top:2px}
+.quick-close{background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;line-height:1;padding:0 2px}
+.quick-ta{width:100%;min-height:160px;max-height:45vh;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-family:var(--serif);font-size:13px;color:var(--ink);background:#FDFAF5;resize:vertical;outline:none;line-height:1.7}
+.quick-ta:focus{border-color:var(--accent)}
+.quick-ta::placeholder{color:#bbb;font-size:12px}
+.quick-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.quick-day-wrap{display:flex;align-items:center;gap:7px;font-size:12px;font-family:var(--mono);color:var(--muted)}
+.quick-day-wrap select{border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-family:var(--mono);background:white;color:var(--ink);cursor:pointer}
+.quick-submit{margin-left:auto;padding:10px 22px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-family:var(--serif);font-weight:700;cursor:pointer;transition:opacity .15s}
+.quick-submit:hover{opacity:.88}
+.quick-preview{font-size:11px;font-family:var(--mono);color:var(--muted);background:#f5f3ef;border-radius:8px;padding:8px 12px;line-height:1.6;max-height:100px;overflow-y:auto}
+.quick-preview b{color:var(--ink)}
+.hbtn.hbtn-quick{background:rgba(184,90,56,.25);border-color:rgba(184,90,56,.5);color:#F0C8A0}
+.hbtn.hbtn-quick:hover{background:rgba(184,90,56,.45)}
 
 /* ADD ROW */
 .add-row{padding-left:76px;margin:4px 0 24px}
@@ -415,8 +436,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn" onclick="toggleSidebar()">≡ 總覽</button>
     <button class="hbtn mob-hide" onclick="exportBackup()">↓ 備份</button>
     <button class="hbtn mob-hide" onclick="window.print()">⎙ 列印</button>
+    <button class="hbtn hbtn-quick" onclick="openQuick()">⚡ 丟入</button>
     <button class="hbtn" onclick="togglePanel('panelSettings')" id="settingsBtn">⚙️ 設定</button>
-    <span class="ver">v2.4</span>
+    <span class="ver">v2.5</span>
   </div>
 </header>
 
@@ -1759,10 +1781,153 @@ document.addEventListener('keydown',e=>{
 });
 
 // ═══════════════════════════════════════════
+//  QUICK INPUT
+// ═══════════════════════════════════════════
+function openQuick() {
+  document.getElementById('quickOverlay').classList.remove('hidden');
+  document.getElementById('quickTa').focus();
+}
+function closeQuick() {
+  document.getElementById('quickOverlay').classList.add('hidden');
+  document.getElementById('quickTa').value = '';
+  document.getElementById('quickPreview').style.display = 'none';
+}
+function quickOverlayClick(e) {
+  if (e.target === document.getElementById('quickOverlay')) closeQuick();
+}
+
+function parseMapsUrl(url) {
+  // google.com/maps/place/NAME/@...
+  let m = url.match(/google\.com\/maps\/place\/([^/@?#]+)/);
+  if (m) return decodeURIComponent(m[1].replace(/\+/g,' ')).replace(/_/g,' ');
+  // google.com/maps/search/QUERY
+  m = url.match(/google\.com\/maps\/search\/([^/@?#]+)/);
+  if (m) return decodeURIComponent(m[1].replace(/\+/g,' ')).replace(/_/g,' ');
+  return null; // shortened URL, can't parse
+}
+
+function autoType(name) {
+  const n = (name||'').toLowerCase();
+  if (/식당|레스토랑|restaurant|cafe|카페|커피|market|시장|마켓|bbq|갈비|음식|food|餐|食|市場|咖啡/.test(n)) return 'restaurant';
+  if (/museum|미술관|박물관|gallery|갤러리|美術|博物/.test(n)) return 'museum';
+  if (/궁|palace|temple|사원|성당|church|cathedral|建築|寺|宮|성|castle/.test(n)) return 'architecture';
+  return 'other';
+}
+
+function parseQuickLines(raw) {
+  return raw.split('\n')
+    .map(l => l.trim())
+    .filter(l => l && !l.startsWith('#'))
+    .map(l => {
+      const isUrl = /^https?:\/\//.test(l);
+      if (isUrl) {
+        const name = parseMapsUrl(l);
+        return { name: name || '未命名地點', address: '', rawUrl: l, fromUrl: true, parsed: !!name };
+      }
+      return { name: l, address: '', fromUrl: false };
+    })
+    .filter(p => p.name.length > 0);
+}
+
+function updateQuickPreview() {
+  const raw = document.getElementById('quickTa').value;
+  const places = parseQuickLines(raw);
+  const preview = document.getElementById('quickPreview');
+  if (!places.length) { preview.style.display = 'none'; return; }
+  preview.style.display = 'block';
+  preview.innerHTML = places.map(p =>
+    `<b>${p.name}</b>${p.fromUrl && !p.parsed ? ' <span style="color:var(--accent)">（短網址，請改貼完整連結）</span>' : ''}`
+  ).join('<br>');
+}
+
+function submitQuick() {
+  const raw = document.getElementById('quickTa').value;
+  const places = parseQuickLines(raw);
+  if (!places.length) { showToast('請至少輸入一個地點'); return; }
+
+  const dayVal = document.getElementById('quickDay').value;
+
+  // Auto-distribute across Day 2, 3, 4 round-robin
+  const autoDays = [2, 3, 4];
+  let autoIdx = 0;
+
+  // Count how many already in each auto day to balance
+  const counts = {2: (state.items[2]||[]).length, 3: (state.items[3]||[]).length, 4: (state.items[4]||[]).length};
+
+  places.forEach(p => {
+    let day;
+    if (dayVal === 'auto') {
+      // Pick the emptiest day
+      day = autoDays.reduce((a, b) => counts[a] <= counts[b] ? a : b);
+      counts[day]++;
+    } else {
+      day = parseInt(dayVal);
+    }
+    if (!state.items[day]) state.items[day] = [];
+    state.items[day].push({
+      id: uid(),
+      name: p.name,
+      type: autoType(p.name),
+      address: p.address || '',
+      time: '10:00',
+      endTime: '',
+      budget: '', desc: '', notes: '',
+      resv: 'none',
+      votes: EMPTY_VOTES(),
+      hidden: false
+    });
+  });
+
+  saveState();
+  closeQuick();
+  // Switch to first affected day
+  const firstDay = dayVal === 'auto' ? 2 : parseInt(dayVal);
+  currentDay = firstDay;
+  render();
+  showToast(`✅ 已加入 ${places.length} 個地點`);
+}
+
+// ═══════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════
 loadSettings();
 render();
 </script>
+
+<!-- QUICK INPUT OVERLAY -->
+<div class="quick-overlay hidden" id="quickOverlay" onclick="quickOverlayClick(event)">
+  <div class="quick-sheet" id="quickSheet">
+    <div class="quick-hdr">
+      <div>
+        <div class="quick-title">⚡ 快速丟入地點</div>
+        <div class="quick-subtitle">每行一個地點 · 支援 Google Maps 連結 · 直接貼也行</div>
+      </div>
+      <button class="quick-close" onclick="closeQuick()">×</button>
+    </div>
+    <textarea class="quick-ta" id="quickTa"
+      placeholder="광장시장
+경복궁
+南大門市場
+https://www.google.com/maps/place/...
+漢南洞逛街
+仁寺洞工藝品"
+      oninput="updateQuickPreview()"></textarea>
+    <div class="quick-preview" id="quickPreview" style="display:none"></div>
+    <div class="quick-footer">
+      <div class="quick-day-wrap">
+        <label>加入</label>
+        <select id="quickDay">
+          <option value="auto">自動分配（Day 2–4）</option>
+          <option value="1">Day 1</option>
+          <option value="2">Day 2</option>
+          <option value="3">Day 3</option>
+          <option value="4">Day 4</option>
+          <option value="5">Day 5</option>
+        </select>
+      </div>
+      <button class="quick-submit" onclick="submitQuick()">加入行程 →</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
