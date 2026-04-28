@@ -69,6 +69,45 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
 .weather-dismiss:hover{opacity:1}
 .sync-bar{background:rgba(0,0,0,.04);border-bottom:1px solid rgba(0,0,0,.06);padding:4px 20px;font-size:10px;font-family:var(--mono);color:var(--muted);display:flex;align-items:center;gap:6px}
 
+/* ── MODE BAR ── */
+.mode-bar{background:#1E1810;border-bottom:2px solid rgba(184,90,56,.35);display:flex;align-items:stretch;padding:0 16px;gap:4px}
+.mode-btn{padding:9px 16px;cursor:pointer;font-size:12px;font-weight:600;color:rgba(240,232,216,.38);border:none;background:none;font-family:var(--serif);transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.mode-btn:hover{color:rgba(240,232,216,.7)}
+.mode-btn.active{color:#F0C8A0;border-bottom-color:#B85A38}
+.mode-btn .mode-count{font-size:10px;font-family:var(--mono);opacity:.6;margin-left:4px}
+
+/* ── WISHLIST ── */
+.wl-page{padding:16px 20px 40px}
+.wl-input-row{display:flex;gap:8px;margin-bottom:20px}
+.wl-input{flex:1;border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;font-family:var(--serif);font-size:14px;color:var(--ink);background:#FDFAF5;outline:none;transition:border-color .15s}
+.wl-input:focus{border-color:var(--accent)}
+.wl-input::placeholder{color:#bbb}
+.wl-add-btn{padding:11px 18px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:13px;font-family:var(--serif);font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.wl-add-btn:hover{opacity:.88}
+.wl-section-label{font-size:10px;font-family:var(--mono);color:var(--muted);letter-spacing:.06em;margin-bottom:10px}
+.wl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:28px}
+.wl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 13px 11px;display:flex;flex-direction:column;gap:8px;position:relative;transition:box-shadow .15s}
+.wl-card:hover{box-shadow:0 3px 14px rgba(14,12,38,.1)}
+.wl-card-del{position:absolute;top:8px;right:9px;background:none;border:none;cursor:pointer;font-size:14px;color:#ccc;line-height:1;padding:2px}
+.wl-card-del:hover{color:var(--accent)}
+.wl-card-name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.35;padding-right:16px}
+.wl-card-meta{display:flex;align-items:center;gap:7px}
+.wl-card-type{font-size:10px;font-family:var(--mono);color:var(--muted)}
+.wl-maps-btn{font-size:11px;color:var(--blue);text-decoration:none;opacity:.7}
+.wl-maps-btn:hover{opacity:1}
+.wl-votes{display:flex;gap:5px;flex-wrap:wrap}
+.wl-vote-btn{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-size:11px;font-family:var(--mono);color:var(--muted);transition:all .12s}
+.wl-vote-btn.liked{border-color:#e06060;background:#fff0f0;color:#c04040}
+.wl-vote-btn.is-me{font-weight:700}
+.wl-card-by{font-size:9px;font-family:var(--mono);color:var(--muted);opacity:.6;margin-top:2px}
+.wl-scheduled{opacity:.45}
+.wl-scheduled .wl-card-name::after{content:' ✓';font-size:10px;color:var(--green)}
+.wl-empty{text-align:center;padding:48px 20px;color:var(--muted);font-size:14px;line-height:2}
+.wl-empty-icon{font-size:40px;display:block;margin-bottom:8px;opacity:.4}
+.wl-consolidate-bar{background:var(--green-bg);border:1px solid #b0d4ad;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.wl-consolidate-txt{font-size:12px;color:var(--green);font-family:var(--mono)}
+.wl-consolidate-btn{padding:8px 16px;background:var(--green);color:#fff;border:none;border-radius:7px;font-size:12px;font-family:var(--serif);font-weight:700;cursor:pointer}
+
 /* ── DAY TABS ── */
 .day-tabs{background:#2A2018;border-bottom:1px solid rgba(184,90,56,.2);display:flex;overflow-x:auto;padding:0 14px;scrollbar-width:none}
 .day-tabs::-webkit-scrollbar{display:none}
@@ -438,7 +477,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
     <button class="hbtn mob-hide" onclick="window.print()">⎙ 列印</button>
     <button class="hbtn hbtn-quick" onclick="openQuick()">⚡ 丟入</button>
     <button class="hbtn" onclick="togglePanel('panelSettings')" id="settingsBtn">⚙️ 設定</button>
-    <span class="ver">v2.5</span>
+    <span class="ver">v2.6</span>
   </div>
 </header>
 
@@ -508,7 +547,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--serif);min-height:1
   <button class="weather-dismiss" onclick="dismissWeather()">✕</button>
 </div>
 
-<nav class="day-tabs" id="dayTabs"></nav>
+<div class="mode-bar" id="modeBar"></div>
+<nav class="day-tabs" id="dayTabs" style="display:none"></nav>
 
 <div class="layout">
   <main class="content" id="mainContent"></main>
@@ -760,6 +800,7 @@ function freshState() {
     emergency: {...DEFAULT_EMERGENCY},
     items:     JSON.parse(JSON.stringify(DEFAULT_ITEMS)),
     notes:     {1:'',2:'',3:'',4:'',5:''},
+    wishlist:  [],
   };
 }
 
@@ -781,11 +822,13 @@ function migrateState(s) {
   if (!s.hotel)     s.hotel     = {...DEFAULT_HOTEL};
   if (!s.emergency) s.emergency = {...DEFAULT_EMERGENCY};
   if (!s.notes)     s.notes     = {1:'',2:'',3:'',4:'',5:''};
+  if (!s.wishlist)  s.wishlist  = [];
   for (let d=1;d<=5;d++) {
     if (!s.items[d])  s.items[d]  = [];
     if (s.notes[d] === undefined) s.notes[d] = '';
     s.items[d].forEach(migrateItem);
   }
+  s.wishlist.forEach(w => { if (!w.likes) w.likes = {Mo:false,Kelly:false,Mia:false,Ruei:false}; });
   return s;
 }
 
@@ -797,6 +840,7 @@ function saveLocal() { localStorage.setItem(LOCAL_KEY, JSON.stringify(state)); }
 
 let weatherDismissed = localStorage.getItem('seoul_weather_dismissed') === '1';
 let currentUser      = localStorage.getItem('seoul_current_user') || '';
+let appMode          = localStorage.getItem('seoul_app_mode') || 'wishlist';
 let state       = loadLocal() || freshState();
 let currentDay  = 1;
 let showHidden  = {1:false,2:false,3:false,4:false,5:false};
@@ -1147,13 +1191,173 @@ function suggestNextTime(d) {
 }
 
 // ═══════════════════════════════════════════
+//  WISHLIST
+// ═══════════════════════════════════════════
+function setMode(m) {
+  appMode = m;
+  localStorage.setItem('seoul_app_mode', m);
+  render();
+}
+
+function wlInputParse(raw) {
+  const s = raw.trim();
+  if (!s) return null;
+  if (/^https?:\/\//.test(s)) {
+    let m = s.match(/google\.com\/maps\/place\/([^/@?#]+)/);
+    if (!m) m = s.match(/google\.com\/maps\/search\/([^/@?#]+)/);
+    const name = m ? decodeURIComponent(m[1].replace(/\+/g,' ')).replace(/_/g,' ') : '未命名地點';
+    return { name, address: '', url: s };
+  }
+  return { name: s, address: '', url: '' };
+}
+
+function addWishlistItem() {
+  const inp = document.getElementById('wlInput');
+  const parsed = wlInputParse(inp.value);
+  if (!parsed) { showToast('請輸入地點名稱'); return; }
+  if ((state.wishlist||[]).some(w => w.name === parsed.name)) { showToast('已在收納包'); return; }
+  if (!state.wishlist) state.wishlist = [];
+  state.wishlist.push({
+    id: uid(), name: parsed.name, address: parsed.address, url: parsed.url,
+    likes: {Mo:false,Kelly:false,Mia:false,Ruei:false},
+    addedBy: currentUser || '?', ts: Date.now(), scheduled: false
+  });
+  inp.value = '';
+  saveState(); renderWishlist();
+  showToast('✅ 已加入收納包');
+}
+
+function toggleWishlistLike(id) {
+  const w = (state.wishlist||[]).find(w=>w.id===id);
+  if (!w || !currentUser) return;
+  if (!w.likes) w.likes = {Mo:false,Kelly:false,Mia:false,Ruei:false};
+  w.likes[currentUser] = !w.likes[currentUser];
+  saveState(); renderWishlist();
+}
+
+function removeWishlistItem(id) {
+  state.wishlist = (state.wishlist||[]).filter(w=>w.id!==id);
+  saveState(); renderWishlist();
+}
+
+function consolidateWishlist() {
+  const items = (state.wishlist||[]).filter(w=>!w.scheduled);
+  if (!items.length) { showToast('收納包是空的'); return; }
+
+  // Sort by like count desc
+  const sorted = [...items].sort((a,b) => {
+    const la = Object.values(a.likes||{}).filter(Boolean).length;
+    const lb = Object.values(b.likes||{}).filter(Boolean).length;
+    return lb - la;
+  });
+
+  // Distribute round-robin: days 2,3,4 first, then 1,5
+  const dayOrder = [2,3,4,1,5];
+  const counts = {};
+  dayOrder.forEach(d => counts[d] = (state.items[d]||[]).filter(i=>!i.isDefault).length);
+
+  sorted.forEach(w => {
+    const day = dayOrder.reduce((a,b) => counts[a] <= counts[b] ? a : b);
+    counts[day]++;
+    if (!state.items[day]) state.items[day] = [];
+    state.items[day].push({
+      id: uid(), name: w.name, type: autoType(w.name),
+      address: w.address||'', time:'10:00', endTime:'',
+      budget:'', desc:'', notes:'', resv:'none',
+      votes: EMPTY_VOTES(), hidden:false
+    });
+    w.scheduled = true;
+  });
+
+  saveState();
+  setMode('schedule');
+  showToast(`🎉 已整合 ${sorted.length} 個地點到行程`);
+}
+
+function renderWishlist() {
+  const list = state.wishlist || [];
+  const unscheduled = list.filter(w=>!w.scheduled);
+  const scheduled   = list.filter(w=> w.scheduled);
+  const likeCount = w => Object.values(w.likes||{}).filter(Boolean).length;
+
+  const wlCard = w => {
+    const myLiked = currentUser && w.likes?.[currentUser];
+    const votes = ALL4.map(n => {
+      const liked = w.likes?.[n];
+      const isMe  = n === currentUser;
+      return `<button class="wl-vote-btn ${liked?'liked':''} ${isMe?'is-me':''}"
+        onclick="toggleWishlistLike('${w.id}')" title="${n}">
+        ${liked?'❤️':'·'} <span>${n}</span></button>`;
+    }).join('');
+    const mapsBtn = (w.address||w.url) ? `<a class="wl-maps-btn" href="${w.url||mapsUrl(w.address)}" target="_blank" rel="noopener">🗺</a>` : '';
+    return `
+    <div class="wl-card ${w.scheduled?'wl-scheduled':''}">
+      <button class="wl-card-del" onclick="removeWishlistItem('${w.id}')" title="移除">×</button>
+      <div class="wl-card-name">${esc(w.name)}</div>
+      <div class="wl-card-meta">${mapsBtn}</div>
+      <div class="wl-votes">${votes}</div>
+      <div class="wl-card-by">by ${esc(w.addedBy)}</div>
+    </div>`;
+  };
+
+  const consolidateBar = unscheduled.length ? `
+    <div class="wl-consolidate-bar">
+      <div class="wl-consolidate-txt">📦 ${unscheduled.length} 個地點等待整合</div>
+      <button class="wl-consolidate-btn" onclick="consolidateWishlist()">整合成行程 →</button>
+    </div>` : '';
+
+  const emptyState = !list.length ? `
+    <div class="wl-empty">
+      <span class="wl-empty-icon">📦</span>
+      收納包是空的<br>
+      <span style="font-size:12px;opacity:.6">把想去的地方丟進來，大家一起 ❤️</span>
+    </div>` : '';
+
+  const unschHtml = unscheduled.length ? `
+    <div class="wl-section-label">想去的地方 · ${unscheduled.length} 個</div>
+    <div class="wl-grid">${unscheduled.map(wlCard).join('')}</div>` : '';
+
+  const schHtml = scheduled.length ? `
+    <div class="wl-section-label" style="margin-top:8px">已加入行程 · ${scheduled.length} 個</div>
+    <div class="wl-grid">${scheduled.map(wlCard).join('')}</div>` : '';
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="wl-page">
+      <div class="wl-input-row">
+        <input class="wl-input" id="wlInput" type="text"
+          placeholder="打地點名稱，或貼 Google Maps 連結"
+          onkeydown="if(event.key==='Enter')addWishlistItem()">
+        <button class="wl-add-btn" onclick="addWishlistItem()">加入</button>
+      </div>
+      ${consolidateBar}
+      ${emptyState}
+      ${unschHtml}
+      ${schHtml}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════
 function renderTabs() {
-  document.getElementById('dayTabs').innerHTML = DAYS_META.map(d=>`
-    <button class="tab ${d.day===currentDay?'active':''}" onclick="switchDay(${d.day})">
-      ${d.label} ${d.area}<span class="tab-date">${d.date.slice(5)} (${d.weekday})</span>
-    </button>`).join('');
+  const wlCount = (state.wishlist||[]).filter(w=>!w.scheduled).length;
+  document.getElementById('modeBar').innerHTML = `
+    <button class="mode-btn ${appMode==='wishlist'?'active':''}" onclick="setMode('wishlist')">
+      📦 收納包<span class="mode-count">${wlCount||''}</span>
+    </button>
+    <button class="mode-btn ${appMode==='schedule'?'active':''}" onclick="setMode('schedule')">
+      📅 行程
+    </button>`;
+  const dayTabsEl = document.getElementById('dayTabs');
+  if (appMode === 'schedule') {
+    dayTabsEl.style.display = 'flex';
+    dayTabsEl.innerHTML = DAYS_META.map(d=>`
+      <button class="tab ${d.day===currentDay?'active':''}" onclick="switchDay(${d.day})">
+        ${d.label} ${d.area}<span class="tab-date">${d.date.slice(5)} (${d.weekday})</span>
+      </button>`).join('');
+  } else {
+    dayTabsEl.style.display = 'none';
+  }
 }
 
 function flightCard(isOut) {
@@ -1350,7 +1554,10 @@ function renderSidebar() {
 }
 
 function render() {
-  renderTabs(); renderDay(); renderSidebar(); syncPanelUI();
+  renderTabs();
+  if (appMode === 'wishlist') renderWishlist();
+  else renderDay();
+  renderSidebar(); syncPanelUI();
   document.getElementById('weatherBanner').style.display = weatherDismissed?'none':'flex';
 }
 
