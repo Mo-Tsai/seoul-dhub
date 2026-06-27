@@ -97,7 +97,7 @@
 <header>
   <div class="t">🇰🇷 首爾家庭行</div>
   <div class="s">7/1（二） – 7/5（六） · 5 天 4 夜</div>
-  <div class="ver">v3.1 · 每日行程版</div>
+  <div class="ver">v3.2 · 每日行程版</div>
 </header>
 
 <div class="wrap">
@@ -143,7 +143,7 @@
     每張卡片點下去都會開 Google Maps；地圖上的點也可以點。<br>
     時間是建議參考，家庭步調可彈性調整。
   </div>
-  <footer>SEOUL · JULY · v3.1</footer>
+  <footer>SEOUL · JULY · v3.2</footer>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -182,6 +182,14 @@ const P = {
   amore:{name:"Amorepacific 總部", kr:"아모레퍼시픽 본사 · 용산", cat:"design", lat:37.5293,lng:126.9648, q:"아모레퍼시픽 본사 서울 용산구", note:"David Chipperfield，一樓開放"},
   anthracite:{name:"Anthracite 漢南", kr:"앤트러사이트 한남", cat:"design", lat:37.5345,lng:127.0000, q:"앤트러사이트 한남 서울", note:"老廠房改的烘豆 × 咖啡空間"},
   boconcept:{name:"BoConcept 清潭", kr:"보컨셉 청담", cat:"design", lat:37.5240,lng:127.0470, q:"보컨셉 청담 서울 강남구", note:"純丹麥量產線 showroom"},
+  // 時尚品牌（南青山風 · 島山/漢南/清潭）
+  beaker:{name:"Beaker 漢南旗艦", kr:"비이커 한남", cat:"shop", lat:37.5345,lng:127.0008, q:"비이커 한남 서울 용산구 이태원로 241", note:"韓系策展型選品旗艦，空間有質感"},
+  system:{name:"System / System Homme", kr:"시스템 · 한남", cat:"shop", lat:37.5340,lng:127.0015, q:"시스템 옴므 한남 서울", note:"質感基本款，日系無印放大版"},
+  paf:{name:"Post Archive Faction (PAF)", kr:"포스트아카이브팩션", cat:"shop", nopin:true, q:"포스트아카이브팩션 paf 서울", note:"前衛設計品牌；無大型旗艦，多於 Boon the Shop／Beaker 等選品店上架"},
+  hausdosan:{name:"Haus Dosan · Gentle Monster", kr:"하우스도산 · 신사", cat:"shop", lat:37.5237,lng:127.0388, q:"하우스도산 젠틀몬스터 서울 강남구 압구정로46길 50", note:"眼鏡旗艦＋Tamburins 香氛＋Nudake 甜點，museum-grade 店裝，小孩也愛"},
+  wooyoungmi:{name:"Wooyoungmi 우영미", kr:"우영미 · 도산", cat:"shop", lat:37.5240,lng:127.0375, q:"우영미 wooyoungmi 청담 서울", note:"巴黎發跡的韓國奢華男裝旗艦"},
+  boontheshop:{name:"Boon the Shop 분더샵", kr:"분더샵 · 청담", cat:"shop", lat:37.5258,lng:127.0405, q:"분더샵 부띠끄 청담 서울 강남구", note:"韓國頂級 multi-brand 精品，空間極簡，最對南青山調性"},
+  corsocomo:{name:"10 Corso Como Seoul", kr:"10 꼬르소 꼬모 · 청담", cat:"shop", lat:37.5266,lng:127.0400, q:"10 corso como seoul 청담 서울", note:"米蘭概念店首爾分店（出發前先確認營業）"},
   // 景點
   gyeongbok:{name:"景福宮", kr:"경복궁", cat:"spot", lat:37.5796,lng:126.9770, q:"경복궁 서울", note:"守門將交接約 10:00／14:00"},
   bukchon:{name:"北村韓屋村", kr:"북촌한옥마을", cat:"spot", lat:37.5826,lng:126.9850, q:"북촌한옥마을 서울", note:"傳統韓屋街，好拍"},
@@ -222,13 +230,22 @@ const DAYS = [
      {time:"18:00", id:"namyeongdon"},
      {time:"20:00", id:"ddp"},
    ]},
-  {day:"Day 4", date:"7/4（五）", theme:"延南洞 · 弘大", base:"麻浦 · 西側",
+  {day:"Day 4", date:"7/4（五）", theme:"島山·漢南·清潭 — 時尚＋設計", base:"江南 · 設計師區",
    stops:[
-     {time:"10:30", id:"gleamingday"},
-     {time:"12:00", id:"grazingpig"},
-     {time:"14:00", id:"jodawson"},
-     {time:"15:00", id:"yeonnam"},
-     {time:"18:00", name:"晚餐（延南／弘大自選）", spot:true, note:"區內餐廳多，可現場挑"},
+     {transit:"明洞 → 漢南（計程車約 20 分）"},
+     {time:"10:00", id:"leeum"},
+     {time:"11:30", id:"anthracite"},
+     {time:"12:30", spot:true, name:"午餐（漢南／梨泰院）", note:"區內餐廳多，可現場挑"},
+     {time:"14:00", id:"beaker"},
+     {time:"14:40", id:"system"},
+     {time:"15:00", id:"paf"},
+     {transit:"→ 新沙 島山公園（約 10 分）"},
+     {time:"15:40", id:"hausdosan"},
+     {time:"16:45", id:"wooyoungmi"},
+     {transit:"→ 清潭（約 8 分）"},
+     {time:"17:30", id:"boontheshop"},
+     {time:"18:15", id:"corsocomo"},
+     {time:"19:30", id:"yeongdong"},
    ]},
   {day:"Day 5", date:"7/5（六）", theme:"退房 · 回程", base:"明洞 → 仁川",
    stops:[
@@ -240,10 +257,13 @@ const DAYS = [
 ];
 
 // ── 候補 ──
-const BACKUP = ["leeum","amore","anthracite","monoha","yeongdong","aquafield","bangrae","boconcept","anjumaeul"];
+const BACKUP = ["gleamingday","grazingpig","jodawson","amore","monoha","boconcept","aquafield","bangrae","anjumaeul"];
 const BACKUP_NOTE = {
-  leeum:"想專心看建築，可把漢南·龍山設計線排成一天",
-  aquafield:"放鬆半日，小孩喜歡，也可排 Day 4 下午",
+  gleamingday:"延南西側半日：Jellycat ＋ The Grazing Pig ＋ JO & DAWSON，可整組跟 Day 4 對調",
+  amore:"龍山，Day 4 上午順路可加",
+  monoha:"漢南，Day 4 順路可加",
+  boconcept:"清潭，Day 4 下午順路可加",
+  aquafield:"放鬆半日，小孩喜歡",
 };
 
 // ─────────────────────────────────────────────
