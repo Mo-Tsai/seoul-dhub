@@ -97,7 +97,7 @@
 <header>
   <div class="t">🇰🇷 首爾家庭行</div>
   <div class="s">7/1（二） – 7/5（六） · 5 天 4 夜</div>
-  <div class="ver">v3.2 · 每日行程版</div>
+  <div class="ver">v3.3 · 每日行程版</div>
 </header>
 
 <div class="wrap">
@@ -143,7 +143,7 @@
     每張卡片點下去都會開 Google Maps；地圖上的點也可以點。<br>
     時間是建議參考，家庭步調可彈性調整。
   </div>
-  <footer>SEOUL · JULY · v3.2</footer>
+  <footer>SEOUL · JULY · v3.3</footer>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -190,6 +190,20 @@ const P = {
   wooyoungmi:{name:"Wooyoungmi 우영미", kr:"우영미 · 도산", cat:"shop", lat:37.5240,lng:127.0375, q:"우영미 wooyoungmi 청담 서울", note:"巴黎發跡的韓國奢華男裝旗艦"},
   boontheshop:{name:"Boon the Shop 분더샵", kr:"분더샵 · 청담", cat:"shop", lat:37.5258,lng:127.0405, q:"분더샵 부띠끄 청담 서울 강남구", note:"韓國頂級 multi-brand 精品，空間極簡，最對南青山調性"},
   corsocomo:{name:"10 Corso Como Seoul", kr:"10 꼬르소 꼬모 · 청담", cat:"shop", lat:37.5266,lng:127.0400, q:"10 corso como seoul 청담 서울", note:"米蘭概念店首爾分店（出發前先確認營業）"},
+  // 聖水選品（新增）
+  monami:{name:"Monami 모나미 聖水", kr:"모나미스토어 성수", cat:"shop", lat:37.5462,lng:127.0562, q:"모나미스토어 성수 서울 성동구 아차산로 104", note:"老牌文具店，筆可現場刻字"},
+  artbox:{name:"Artbox 아트박스 聖水", kr:"아트박스 · 성수", cat:"shop", lat:37.5450,lng:127.0560, q:"아트박스 성수 서울 성동구 연무장길 57", note:"文具雜貨，好逛好買"},
+  pointofview:{name:"Point of View 포인트오브뷰", kr:"포인트오브뷰 · 성수", cat:"shop", lat:37.5445,lng:127.0548, q:"포인트오브뷰 성수 서울 성동구 연무장길 18", note:"文具／物件選品，極簡質感"},
+  eguhome:{name:"29cm home 이구홈", kr:"이구홈 · 성수", cat:"shop", lat:37.5433,lng:127.0568, q:"이구홈 29cm home 서울 성동구 연무장9길 57", note:"家飾選品 × 生活小物，對設計胃口"},
+  miffy:{name:"Miffy Store 미피스토어 聖水", kr:"미피스토어 성수", cat:"shop", lat:37.5440,lng:127.0575, q:"미피스토어 성수 서울 성동구 연무장13길 5", note:"米菲兔主題店，小孩會喜歡"},
+  // 漢南選品（新增 · 685/683 一帶步行可達）
+  anoetic:{name:"Anoetic 아노에틱 3號店", kr:"아노에틱 · 한남", cat:"shop", lat:37.5348,lng:127.0018, q:"아노에틱 anoetic 한남 서울 용산구 한남동 685-1", note:"漢南概念選品"},
+  hanna543:{name:"HANNA543", kr:"한나543 · 한남", cat:"shop", lat:37.5347,lng:127.0021, q:"HANNA543 한남 서울 용산구 한남동 685-13", note:"漢南選品"},
+  ateliernain:{name:"Atelier Nain 아틀리에나인", kr:"아틀리에나인 · 한남", cat:"shop", lat:37.5344,lng:127.0008, q:"아틀리에나인 한남 서울 용산구 한남동 684-12", note:"漢南選品"},
+  leterie:{name:"Leterie 레터리", kr:"레터리 · 한남", cat:"shop", lat:37.5342,lng:127.0012, q:"레터리 leterie 한남 서울 용산구 한남동 683-68", note:"漢南選品小店"},
+  fruand:{name:"fru& 프루앤", kr:"fru& · 한남", cat:"shop", lat:37.5340,lng:127.0010, q:"fru& 프루앤 한남 서울 용산구 한남동 683-72", note:"漢南選品"},
+  // 益善洞（新增）
+  silladang:{name:"Silladang 신라당 益善", kr:"신라당 · 익선동", cat:"food", lat:37.5736,lng:126.9895, q:"신라당 익선 서울 종로구 익선동 166-16", note:"糯米甜甜圈(주악)、慶州麵包、五味子茶，鐘路三街站4號出口"},
   // 景點
   gyeongbok:{name:"景福宮", kr:"경복궁", cat:"spot", lat:37.5796,lng:126.9770, q:"경복궁 서울", note:"守門將交接約 10:00／14:00"},
   bukchon:{name:"北村韓屋村", kr:"북촌한옥마을", cat:"spot", lat:37.5826,lng:126.9850, q:"북촌한옥마을 서울", note:"傳統韓屋街，好拍"},
@@ -208,39 +222,50 @@ const DAYS = [
      {time:"16:30", id:"lotte"},
      {time:"19:00", id:"lijeongwon", tag:"book", tagtext:"已訂 19:00"},
    ]},
-  {day:"Day 2", date:"7/2（三）", theme:"三清洞 · 北村 · 光化門", base:"市中心北側",
+  {day:"Day 2", date:"7/2（三）", theme:"三清洞 · 北村 · 益善洞 · 光化門", base:"市中心北側",
    stops:[
      {time:"09:30", id:"gyeongbok"},
      {time:"11:00", id:"bukchon"},
+     {time:"12:00", id:"silladang"},
      {time:"13:30", id:"mmca"},
      {time:"15:30", id:"onionanguk"},
      {time:"16:30", id:"gwanghwamun"},
      {time:"18:30", id:"surakanjang"},
      {alt:true, id:"dutum", label:"備選晚餐"},
    ]},
-  {day:"Day 3", date:"7/3（四）", theme:"聖水洞 · 東大門", base:"城東 · 東大門",
+  {day:"Day 3", date:"7/3（四）", theme:"聖水洞 一日（文具 · 選品 · 美食）", base:"城東 · 聖水", busy:true,
    stops:[
-     {time:"10:00", id:"dongdaemun"},
-     {transit:"地鐵 → 聖水（約 20 分）"},
-     {time:"12:00", id:"anmok"},
-     {time:"13:30", id:"onionseongsu"},
-     {time:"14:30", id:"adererror"},
+     {transit:"明洞 → 聖水（地鐵約 25 分）"},
+     {time:"10:00", id:"monami"},
+     {time:"10:40", id:"artbox"},
+     {time:"11:10", id:"pointofview"},
+     {time:"11:40", id:"eguhome"},
+     {time:"12:30", id:"anmok"},
+     {time:"14:00", id:"onionseongsu"},
+     {time:"14:45", id:"adererror"},
      {time:"15:30", id:"samuelsmalls", note2:"需預約"},
-     {time:"16:30", id:"maman"},
+     {time:"16:15", id:"miffy"},
+     {time:"16:45", id:"maman"},
      {time:"18:00", id:"namyeongdon"},
      {time:"20:00", id:"ddp"},
    ]},
-  {day:"Day 4", date:"7/4（五）", theme:"島山·漢南·清潭 — 時尚＋設計", base:"江南 · 設計師區",
+  {day:"Day 4", date:"7/4（五）", theme:"漢南 · 島山 · 清潭（時尚＋設計）", base:"江南 · 設計師區", busy:true,
    stops:[
      {transit:"明洞 → 漢南（計程車約 20 分）"},
      {time:"10:00", id:"leeum"},
-     {time:"11:30", id:"anthracite"},
-     {time:"12:30", spot:true, name:"午餐（漢南／梨泰院）", note:"區內餐廳多，可現場挑"},
-     {time:"14:00", id:"beaker"},
-     {time:"14:40", id:"system"},
-     {time:"15:00", id:"paf"},
+     {time:"11:15", id:"anthracite"},
+     {time:"12:00", spot:true, name:"午餐（漢南）", note:"區內餐廳多，可現場挑"},
+     {time:"13:30", spot:true, name:"漢南選品街（685／683 一帶）", note:"以下幾家在步行範圍內，可隨興進出"},
+     {time:"13:30", id:"beaker"},
+     {time:"13:50", id:"anoetic"},
+     {time:"14:05", id:"hanna543"},
+     {time:"14:20", id:"ateliernain"},
+     {time:"14:35", id:"leterie"},
+     {time:"14:50", id:"fruand"},
+     {time:"15:05", id:"system"},
+     {time:"15:15", id:"paf"},
      {transit:"→ 新沙 島山公園（約 10 分）"},
-     {time:"15:40", id:"hausdosan"},
+     {time:"15:45", id:"hausdosan"},
      {time:"16:45", id:"wooyoungmi"},
      {transit:"→ 清潭（約 8 分）"},
      {time:"17:30", id:"boontheshop"},
@@ -257,9 +282,11 @@ const DAYS = [
 ];
 
 // ── 候補 ──
-const BACKUP = ["gleamingday","grazingpig","jodawson","amore","monoha","boconcept","aquafield","bangrae","anjumaeul"];
+const BACKUP = ["gleamingday","grazingpig","jodawson","dongdaemun","hatchingroom","amore","monoha","boconcept","aquafield","bangrae","anjumaeul"];
 const BACKUP_NOTE = {
   gleamingday:"延南西側半日：Jellycat ＋ The Grazing Pig ＋ JO & DAWSON，可整組跟 Day 4 對調",
+  dongdaemun:"文具玩具批發，可排 Day 2 或 Day 3 早上",
+  hatchingroom:"聖水設計旗艦，Day 3 順路可加",
   amore:"龍山，Day 4 上午順路可加",
   monoha:"漢南，Day 4 順路可加",
   boconcept:"清潭，Day 4 下午順路可加",
@@ -326,7 +353,7 @@ function stopHTML(s){
 document.getElementById('days').innerHTML = DAYS.map((d,i)=>`
   <section class="day" id="day${i+1}">
     <div class="day-head"><span class="d">${d.day}</span><span class="th">${d.theme}</span></div>
-    <div class="day-sub">${d.date} · <span class="base">📍 ${d.base}</span></div>
+    <div class="day-sub">${d.date} · <span class="base">📍 ${d.base}</span>${d.busy?' · <span style="color:#B06A2E;font-weight:600">點多，依興趣取捨</span>':''}</div>
     <div class="tl">${d.stops.map(stopHTML).join("")}</div>
   </section>`).join("");
 
