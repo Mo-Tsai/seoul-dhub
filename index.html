@@ -79,6 +79,11 @@
   .kr{font-size:11.5px;color:var(--sub);font-weight:500}
   .nt{font-size:13px;color:#5A534B;margin-top:3px}
   .go{font-size:12px;color:#2563C9;margin-top:5px;font-weight:600}
+  .links{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .links .lk{font-size:12px;font-weight:700;text-decoration:none;padding:4px 10px;border-radius:8px;white-space:nowrap}
+  .links .nav{background:#E7F6EC;color:#137A3B}
+  .links .g{background:#EEF1F6;color:#3F5573}
+  .maptip{text-align:center;font-size:12px;color:#B06A2E;margin:2px 0 16px;line-height:1.6}
   .tag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;letter-spacing:.3px}
   .tag.book{background:#FDECEA;color:#C0392B}
   .tag.alt{background:#F1EEE7;color:#8A7E6C}
@@ -97,7 +102,7 @@
 <header>
   <div class="t">🇰🇷 首爾家庭行</div>
   <div class="s">7/1（二） – 7/5（六） · 5 天 4 夜</div>
-  <div class="ver">v3.4 · 每日行程版</div>
+  <div class="ver">v3.5 · 每日行程版</div>
 </header>
 
 <div class="wrap">
@@ -114,8 +119,8 @@
       <div class="h">🏨 住宿</div>
       <div class="ln"><b>明洞斯坦福飯店</b></div>
       <div class="ln"><span class="seg">入住 7/1 15:00</span><span class="seg">退房 7/5 11:00</span></div>
-      <a class="mini" target="_blank" rel="noopener"
-        href="https://www.google.com/maps/search/?api=1&query=%EC%8A%A4%ED%83%A0%ED%8F%AC%EB%93%9C%ED%98%B8%ED%85%94%20%EB%AA%85%EB%8F%99%20%EC%84%9C%EC%9A%B8%20%EC%A4%91%EA%B5%AC%20%EB%82%A8%EB%8C%80%EB%AC%B8%EB%A1%9C9%EA%B8%B8%2024">🧭 飯店位置</a>
+      <a class="mini" style="color:#137A3B" target="_blank" rel="noopener"
+        href="https://map.naver.com/p/search/%EC%8A%A4%ED%83%A0%ED%8F%AC%EB%93%9C%ED%98%B8%ED%85%94%20%EB%AA%85%EB%8F%99">🟢 Naver 飯店位置</a>
     </div>
   </div>
 
@@ -129,6 +134,7 @@
     <span><i style="background:var(--design)"></i>設計</span>
     <span><i style="background:var(--spot)"></i>景點</span>
   </div>
+  <div class="maptip">🟢 韓國 Google Maps <b>不能導航</b> → 現場請點各地點的「Naver 導航」（Google 連結只用來看位置）</div>
 
   <!-- 分日 tab -->
   <div class="tabs" id="tabs"></div>
@@ -141,10 +147,10 @@
   <div id="backup"></div>
 
   <div class="note">
-    每張卡片點下去都會開 Google Maps；地圖上的點也可以點。<br>
+    每個地點都有「🟢 Naver 導航」與「Google 看位置」兩個連結；地圖上的點也可以點。<br>
     時間是建議參考，家庭步調可彈性調整。
   </div>
-  <footer>SEOUL · JULY · v3.4</footer>
+  <footer>SEOUL · JULY · v3.5</footer>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -302,6 +308,7 @@ const BACKUP_NOTE = {
 // ─────────────────────────────────────────────
 const COLORS={home:"#3A3530",food:"#D9694B",shop:"#7C6AF7",exp:"#2E9E8F",design:"#C8921E",spot:"#8C8378",flight:"#C8921E"};
 function mapsUrl(q){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);}
+function naverUrl(q){return "https://map.naver.com/p/search/"+encodeURIComponent(q);}
 
 // 地圖
 const map=L.map('map',{scrollWheelZoom:false}).setView([37.554,126.985],11);
@@ -318,7 +325,8 @@ Object.values(P).forEach(p=>{
      <div style="font-weight:700;font-size:14px">${p.name}</div>
      ${p.kr?`<div style="font-size:11px;color:#888">${p.kr}</div>`:''}
      ${p.note?`<div style="font-size:12px;color:#555;margin:4px 0">${p.note}</div>`:''}
-     <a href="${mapsUrl(p.q)}" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;color:#2563C9;text-decoration:none">🧭 Google Maps 導航 →</a>
+     <a href="${naverUrl(p.q)}" target="_blank" rel="noopener" style="font-size:12px;font-weight:700;color:#137A3B;text-decoration:none">🟢 Naver 導航 →</a><br>
+     <a href="${mapsUrl(p.q)}" target="_blank" rel="noopener" style="font-size:11px;color:#3F5573;text-decoration:none">Google 看位置</a>
    </div>`);
   bounds.push([p.lat,p.lng]);
 });
@@ -346,14 +354,16 @@ function stopHTML(s){
   if(p&&p.cat==="design") tags+=`<span class="tag cat-design">設計順路</span>`;
   const time = s.time?`<div class="time">${s.time}</div>`:"";
   const clickable = q && !s.flight;
+  const links = clickable?`<div class="links">
+      <a class="lk nav" href="${naverUrl(q)}" target="_blank" rel="noopener">🟢 Naver 導航</a>
+      <a class="lk g" href="${mapsUrl(q)}" target="_blank" rel="noopener">Google 看位置</a>
+    </div>`:"";
   const inner = `
     <div class="nm">${s.alt?(p?p.name:name):name}${tags}</div>
     ${kr?`<div class="kr">${kr}</div>`:""}
     ${note?`<div class="nt">${note}</div>`:""}
-    ${clickable?`<div class="go">🧭 在 Google Maps 開啟 →</div>`:""}`;
-  const card = clickable
-    ? `<a class="stopcard${s.flight?' plain':''}" href="${mapsUrl(q)}" target="_blank" rel="noopener">${inner}</a>`
-    : `<div class="stopcard plain">${inner}</div>`;
+    ${links}`;
+  const card = `<div class="stopcard${(s.flight||!clickable)?' plain':''}">${inner}</div>`;
   return `<div class="stop ${cat}">${time}${card}</div>`;
 }
 document.getElementById('days').innerHTML = DAYS.map((d,i)=>`
@@ -366,13 +376,16 @@ document.getElementById('days').innerHTML = DAYS.map((d,i)=>`
 // 候補
 document.getElementById('backup').innerHTML = BACKUP.map(id=>{
   const p=P[id]; const extra=BACKUP_NOTE[id];
-  return `<a class="stopcard" style="margin-bottom:9px" href="${mapsUrl(p.q)}" target="_blank" rel="noopener">
+  return `<div class="stopcard" style="margin-bottom:9px">
     <div class="nm">${p.name}${p.cat==="design"?'<span class="tag cat-design">設計</span>':''}</div>
     ${p.kr?`<div class="kr">${p.kr}</div>`:""}
     ${p.note?`<div class="nt">${p.note}</div>`:""}
     ${extra?`<div class="nt" style="color:#B06A2E">↳ ${extra}</div>`:""}
-    <div class="go">🧭 在 Google Maps 開啟 →</div>
-  </a>`;
+    <div class="links">
+      <a class="lk nav" href="${naverUrl(p.q)}" target="_blank" rel="noopener">🟢 Naver 導航</a>
+      <a class="lk g" href="${mapsUrl(p.q)}" target="_blank" rel="noopener">Google 看位置</a>
+    </div>
+  </div>`;
 }).join("");
 </script>
 </body>
