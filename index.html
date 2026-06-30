@@ -88,7 +88,19 @@
   /* 花費 */
   #grandBar{text-align:center;font-weight:800;font-size:15px;margin:8px 0 0;color:var(--ink)}
   #grandBar #grandTotal{color:var(--food)}
-  #grandBar .tip{display:block;font-size:11px;color:#B6ADA2;font-weight:500;margin-top:2px}
+  #grandBar .ntd{color:var(--sub);font-size:13px;font-weight:700}
+  #grandBar .tip{display:block;font-size:11px;color:#B6ADA2;font-weight:500;margin-top:4px}
+  #rateRow{font-size:12px;color:var(--sub);font-weight:600;margin-top:6px}
+  #rateInput{width:64px;border:1px solid var(--line);border-radius:7px;padding:4px 7px;font-size:13px;
+    font-family:inherit;text-align:center;background:#fff}
+  #catBreak{display:flex;flex-wrap:wrap;gap:6px 8px;justify-content:center;margin-top:8px}
+  .cat-chip{font-size:12px;font-weight:600;color:#5A534B;background:#fff;border:1px solid var(--line);
+    border-left:3px solid var(--c);border-radius:8px;padding:3px 8px}
+  .cat-chip b{color:var(--ink)}
+  .bud-cat{border:1px solid var(--line);border-radius:8px;padding:8px 4px;font-size:13px;
+    font-family:inherit;background:#fff;flex:0 0 auto}
+  .cat-dot{flex:0 0 auto;width:20px;height:20px;border-radius:6px;display:inline-flex;
+    align-items:center;justify-content:center;font-size:11px}
   .budget{margin:12px 0 4px;background:#FCFAF6;border:1px solid var(--line);border-radius:12px;padding:11px 13px}
   .bud-head{font-size:13px;font-weight:800;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
   .bud-head .bud-sub{color:var(--food);font-weight:800;font-size:15px}
@@ -122,7 +134,7 @@
 <header>
   <div class="t">🇰🇷 首爾家庭行</div>
   <div class="s">7/1（二） – 7/5（六） · 5 天 4 夜</div>
-  <div class="ver">v3.6 · 每日行程版</div>
+  <div class="ver">v3.7 · 每日行程版</div>
 </header>
 
 <div class="wrap">
@@ -160,7 +172,9 @@
   <div class="tabs" id="tabs"></div>
 
   <!-- 全程花費 -->
-  <div id="grandBar">💰 全程花費 <span id="grandTotal">₩0</span>
+  <div id="grandBar">💰 全程花費 <span id="grandTotal">₩0</span> <span id="grandNtd" class="ntd">≈ NT$0</span>
+    <div id="rateRow">匯率 1 NT$ = <input id="rateInput" type="number" inputmode="decimal" step="0.1"> ₩</div>
+    <div id="catBreak"></div>
     <span class="tip">每天可在下方記錄花費 · 資料存在本機瀏覽器</span></div>
 
   <!-- 每日行程 -->
@@ -174,7 +188,7 @@
     每個地點都有「🟢 Naver 導航」與「Google 看位置」兩個連結；地圖上的點也可以點。<br>
     時間是建議參考，家庭步調可彈性調整。
   </div>
-  <footer>SEOUL · JULY · v3.6</footer>
+  <footer>SEOUL · JULY · v3.7</footer>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -335,32 +349,51 @@ function mapsUrl(q){return "https://www.google.com/maps/search/?api=1&query="+en
 function naverUrl(q){return "https://map.naver.com/p/search/"+encodeURIComponent(q);}
 
 // ── 花費（存在本機 localStorage）──
-const BKEY='seoul_budget_v1';
+const BKEY='seoul_budget_v1', RKEY='seoul_rate_v1';
+const catMeta={'吃':{ic:'🍽',col:'#D9694B'},'買':{ic:'🛍',col:'#7C6AF7'},'交通':{ic:'🚕',col:'#2E9E8F'},'門票':{ic:'🎫',col:'#C8921E'},'其他':{ic:'📌',col:'#8C8378'}};
 function loadBudget(){try{return JSON.parse(localStorage.getItem(BKEY))||{};}catch(e){return {};}}
 function saveBudget(){localStorage.setItem(BKEY, JSON.stringify(BUDGET));}
 let BUDGET = loadBudget();
+let RATE = parseFloat(localStorage.getItem(RKEY))||43;
 function escapeHtml(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function won(n){return '₩'+(n||0).toLocaleString('en-US');}
+function ntd(n){return (RATE>0)?'≈ NT$'+Math.round(n/RATE).toLocaleString('en-US'):'';}
 function dayTotal(day){return (BUDGET[day]||[]).reduce((s,e)=>s+(e.a||0),0);}
 function grandTotal(){return DAYS.reduce((s,d,i)=>s+dayTotal(i+1),0);}
+function catTotal(cat){return DAYS.reduce((s,d,i)=>s+(BUDGET[i+1]||[]).filter(e=>(e.c||'其他')===cat).reduce((x,e)=>x+(e.a||0),0),0);}
 function renderDayBudget(day){
   const list=document.getElementById('budlist'+day); if(!list) return;
   const items=BUDGET[day]||[];
-  list.innerHTML = items.length ? items.map((e,idx)=>`<div class="bud-row">
+  list.innerHTML = items.length ? items.map((e,idx)=>{const m=catMeta[e.c]||catMeta['其他'];
+   return `<div class="bud-row">
+     <span class="cat-dot" style="background:${m.col}" title="${e.c||'其他'}">${m.ic}</span>
      <span class="bud-d">${escapeHtml(e.t)}</span>
      <span class="bud-a">${won(e.a)}</span>
      <button class="bud-del" onclick="delExpense(${day},${idx})" aria-label="刪除">✕</button>
-   </div>`).join("") : `<div class="bud-empty">尚未記錄</div>`;
+   </div>`;}).join("") : `<div class="bud-empty">尚未記錄</div>`;
   document.getElementById('budsum'+day).textContent = won(dayTotal(day));
-  const g=document.getElementById('grandTotal'); if(g) g.textContent=won(grandTotal());
+  renderGrand();
 }
-function renderAllBudget(){DAYS.forEach((d,i)=>renderDayBudget(i+1));}
+function renderGrand(){
+  const gt=grandTotal();
+  const g=document.getElementById('grandTotal'); if(g) g.textContent=won(gt);
+  const gn=document.getElementById('grandNtd'); if(gn) gn.textContent=ntd(gt);
+  const cb=document.getElementById('catBreak');
+  if(cb) cb.innerHTML = Object.keys(catMeta).map(k=>
+    `<span class="cat-chip" style="--c:${catMeta[k].col}">${catMeta[k].ic} ${k} <b>${won(catTotal(k))}</b></span>`).join("");
+}
+function initRate(){
+  const r=document.getElementById('rateInput'); if(!r) return;
+  r.value=RATE;
+  r.addEventListener('input',()=>{const v=parseFloat(r.value); RATE=(v>0?v:0); localStorage.setItem(RKEY, r.value); renderGrand();});
+}
+function renderAllBudget(){DAYS.forEach((d,i)=>renderDayBudget(i+1)); initRate(); renderGrand();}
 function addExpense(day){
-  const ti=document.getElementById('buditem'+day), ai=document.getElementById('budamt'+day);
-  const t=(ti.value||'').trim(); const a=parseInt(ai.value,10);
+  const ti=document.getElementById('buditem'+day), ai=document.getElementById('budamt'+day), ci=document.getElementById('budcat'+day);
+  const t=(ti.value||'').trim(); const a=parseInt(ai.value,10); const c=ci?ci.value:'其他';
   if(!t && isNaN(a)) return;
   if(!BUDGET[day]) BUDGET[day]=[];
-  BUDGET[day].push({t:t||'(未命名)', a:isNaN(a)?0:a});
+  BUDGET[day].push({t:t||'(未命名)', a:isNaN(a)?0:a, c:c});
   saveBudget(); ti.value=''; ai.value=''; renderDayBudget(day); ti.focus();
 }
 function delExpense(day,idx){ (BUDGET[day]||[]).splice(idx,1); saveBudget(); renderDayBudget(day); }
@@ -430,7 +463,14 @@ document.getElementById('days').innerHTML = DAYS.map((d,i)=>`
       <div class="bud-head">💰 Day ${i+1} 花費 <span class="bud-sub" id="budsum${i+1}">₩0</span></div>
       <div class="bud-list" id="budlist${i+1}"></div>
       <div class="bud-add">
-        <input class="bud-item" id="buditem${i+1}" placeholder="品項（例：晚餐、計程車）">
+        <select class="bud-cat" id="budcat${i+1}">
+          <option value="吃">🍽 吃</option>
+          <option value="買">🛍 買</option>
+          <option value="交通">🚕 交通</option>
+          <option value="門票">🎫 門票</option>
+          <option value="其他">📌 其他</option>
+        </select>
+        <input class="bud-item" id="buditem${i+1}" placeholder="品項（例：晚餐）">
         <input class="bud-amt" id="budamt${i+1}" type="number" inputmode="numeric" placeholder="金額 ₩"
           onkeydown="if(event.key==='Enter')addExpense(${i+1})">
         <button class="bud-btn" onclick="addExpense(${i+1})">＋</button>
