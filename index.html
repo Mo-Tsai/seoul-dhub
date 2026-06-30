@@ -97,7 +97,7 @@
 <header>
   <div class="t">🇰🇷 首爾家庭行</div>
   <div class="s">7/1（二） – 7/5（六） · 5 天 4 夜</div>
-  <div class="ver">v3.3 · 每日行程版</div>
+  <div class="ver">v3.4 · 每日行程版</div>
 </header>
 
 <div class="wrap">
@@ -106,8 +106,9 @@
   <div class="summary">
     <div class="sm">
       <div class="h">✈️ 機票</div>
-      <div class="ln"><span class="seg">去 7/1 · 7C6102</span><b>TPE 11:55 → ICN 13:35</b></div>
+      <div class="ln"><span class="seg">去 7/1 · 7C6102</span><b>TPE 11:55 → ICN 15:35</b></div>
       <div class="ln"><span class="seg">回 7/5 · CI161</span><b>ICN 12:45 → TPE 14:20</b></div>
+      <div class="ln"><span class="seg" style="font-size:11px">去程第1航廈 · 回程第2航廈</span></div>
     </div>
     <div class="sm">
       <div class="h">🏨 住宿</div>
@@ -143,7 +144,7 @@
     每張卡片點下去都會開 Google Maps；地圖上的點也可以點。<br>
     時間是建議參考，家庭步調可彈性調整。
   </div>
-  <footer>SEOUL · JULY · v3.3</footer>
+  <footer>SEOUL · JULY · v3.4</footer>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -204,6 +205,9 @@ const P = {
   fruand:{name:"fru& 프루앤", kr:"fru& · 한남", cat:"shop", lat:37.5340,lng:127.0010, q:"fru& 프루앤 한남 서울 용산구 한남동 683-72", note:"漢南選品"},
   // 益善洞（新增）
   silladang:{name:"Silladang 신라당 益善", kr:"신라당 · 익선동", cat:"food", lat:37.5736,lng:126.9895, q:"신라당 익선 서울 종로구 익선동 166-16", note:"糯米甜甜圈(주악)、慶州麵包、五味子茶，鐘路三街站4號出口"},
+  // 新增
+  hongdae:{name:"弘大商圈", kr:"홍대 · 서교동", cat:"shop", lat:37.5556,lng:126.9229, q:"홍대입구 홍대거리 서울 마포구 서교동 348-47", note:"弘益大學周邊，首爾最有活力的潮流集散地，與延南相鄰"},
+  yuehua:{name:"YUEHUA 樂華娛樂", kr:"위에화 · 강남 역삼", cat:"spot", lat:37.5085,lng:127.0312, q:"위에화엔터테인먼트 yuehua entertainment 서울 강남구 논현로 403", note:"K-pop 經紀公司大樓，追星打卡"},
   // 景點
   gyeongbok:{name:"景福宮", kr:"경복궁", cat:"spot", lat:37.5796,lng:126.9770, q:"경복궁 서울", note:"守門將交接約 10:00／14:00"},
   bukchon:{name:"北村韓屋村", kr:"북촌한옥마을", cat:"spot", lat:37.5826,lng:126.9850, q:"북촌한옥마을 서울", note:"傳統韓屋街，好拍"},
@@ -216,11 +220,11 @@ const DAYS = [
   {day:"Day 1", date:"7/1（二）", theme:"抵達 · 明洞", base:"明洞 Stanford",
    stops:[
      {time:"11:55", flight:true, name:"✈ 去程 7C6102", note:"TPE 起飛 11:55"},
-     {time:"13:35", flight:true, name:"✈ 抵達仁川 ICN", note:"入境、領行李"},
+     {time:"15:35", flight:true, name:"✈ 抵達仁川 ICN", note:"第1航廈，入境、領行李"},
      {transit:"AREX 直達 → 首爾站 → 飯店（約 60 分）"},
-     {time:"15:30", home:true, id:"hotel", label:"🏨 入住 明洞斯坦福飯店"},
-     {time:"16:30", id:"lotte"},
+     {time:"17:15", home:true, id:"hotel", label:"🏨 入住 明洞斯坦福飯店"},
      {time:"19:00", id:"lijeongwon", tag:"book", tagtext:"已訂 19:00"},
+     {time:"20:30", spot:true, name:"明洞夜逛（順路）", note:"晚餐後散步，樂天免稅店就在附近"},
    ]},
   {day:"Day 2", date:"7/2（三）", theme:"三清洞 · 北村 · 益善洞 · 光化門", base:"市中心北側",
    stops:[
@@ -264,27 +268,29 @@ const DAYS = [
      {time:"14:50", id:"fruand"},
      {time:"15:05", id:"system"},
      {time:"15:15", id:"paf"},
-     {transit:"→ 新沙 島山公園（約 10 分）"},
+     {transit:"→ 江南（島山／清潭一帶）"},
      {time:"15:45", id:"hausdosan"},
      {time:"16:45", id:"wooyoungmi"},
-     {transit:"→ 清潭（約 8 分）"},
-     {time:"17:30", id:"boontheshop"},
-     {time:"18:15", id:"corsocomo"},
+     {time:"17:15", id:"yuehua", note2:"快速打卡"},
+     {time:"17:45", id:"boontheshop"},
+     {time:"18:20", id:"corsocomo"},
      {time:"19:30", id:"yeongdong"},
    ]},
   {day:"Day 5", date:"7/5（六）", theme:"退房 · 回程", base:"明洞 → 仁川",
    stops:[
      {time:"08:00", spot:true, name:"早餐 / 明洞最後採買", note:"回程班機早，建議提前打包"},
      {time:"09:00", home:true, id:"hotel", label:"🏨 退房（建議提早）"},
-     {transit:"AREX → 仁川機場（國際線提早 2.5 小時）"},
-     {time:"12:45", flight:true, name:"✈ 回程 CI161", note:"ICN 起飛 12:45 → TPE 14:20"},
+     {transit:"AREX → 仁川機場 第2航廈（華航在 T2，國際線提早 2.5 小時）"},
+     {time:"12:45", flight:true, name:"✈ 回程 CI161", note:"ICN 第2航廈 起飛 12:45 → TPE 14:20"},
    ]},
 ];
 
 // ── 候補 ──
-const BACKUP = ["gleamingday","grazingpig","jodawson","dongdaemun","hatchingroom","amore","monoha","boconcept","aquafield","bangrae","anjumaeul"];
+const BACKUP = ["gleamingday","hongdae","grazingpig","jodawson","lotte","dongdaemun","hatchingroom","amore","monoha","boconcept","aquafield","bangrae","anjumaeul"];
 const BACKUP_NOTE = {
-  gleamingday:"延南西側半日：Jellycat ＋ The Grazing Pig ＋ JO & DAWSON，可整組跟 Day 4 對調",
+  gleamingday:"延南／弘大西側半日：弘大商圈 ＋ Jellycat ＋ The Grazing Pig ＋ JO & DAWSON，可整組跟 Day 4 對調",
+  hongdae:"弘大商圈，與延南相鄰，西側半日一起逛",
+  lotte:"明洞近飯店，任一晚順路補貨／免稅",
   dongdaemun:"文具玩具批發，可排 Day 2 或 Day 3 早上",
   hatchingroom:"聖水設計旗艦，Day 3 順路可加",
   amore:"龍山，Day 4 上午順路可加",
