@@ -84,6 +84,26 @@
   .links .nav{background:#E7F6EC;color:#137A3B}
   .links .g{background:#EEF1F6;color:#3F5573}
   .maptip{text-align:center;font-size:12px;color:#B06A2E;margin:2px 0 16px;line-height:1.6}
+
+  /* 花費 */
+  #grandBar{text-align:center;font-weight:800;font-size:15px;margin:8px 0 0;color:var(--ink)}
+  #grandBar #grandTotal{color:var(--food)}
+  #grandBar .tip{display:block;font-size:11px;color:#B6ADA2;font-weight:500;margin-top:2px}
+  .budget{margin:12px 0 4px;background:#FCFAF6;border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+  .bud-head{font-size:13px;font-weight:800;color:var(--sub);display:flex;justify-content:space-between;align-items:center}
+  .bud-head .bud-sub{color:var(--food);font-weight:800;font-size:15px}
+  .bud-list{margin:7px 0 2px}
+  .bud-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .bud-row:last-child{border-bottom:none}
+  .bud-d{flex:1;min-width:0;word-break:break-all}
+  .bud-a{font-weight:700;white-space:nowrap}
+  .bud-del{border:none;background:none;color:#C0392B;font-size:14px;cursor:pointer;padding:2px 4px;line-height:1}
+  .bud-empty{font-size:12px;color:#B6ADA2;padding:3px 0}
+  .bud-add{display:flex;gap:6px;margin-top:8px}
+  .bud-add input{border:1px solid var(--line);border-radius:8px;padding:8px 9px;font-size:14px;font-family:inherit;background:#fff}
+  .bud-item{flex:1;min-width:0}
+  .bud-amt{width:108px}
+  .bud-btn{border:none;background:var(--food);color:#fff;font-weight:800;font-size:18px;border-radius:8px;padding:0 15px;cursor:pointer}
   .tag{font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;letter-spacing:.3px}
   .tag.book{background:#FDECEA;color:#C0392B}
   .tag.alt{background:#F1EEE7;color:#8A7E6C}
@@ -102,7 +122,7 @@
 <header>
   <div class="t">🇰🇷 首爾家庭行</div>
   <div class="s">7/1（二） – 7/5（六） · 5 天 4 夜</div>
-  <div class="ver">v3.5 · 每日行程版</div>
+  <div class="ver">v3.6 · 每日行程版</div>
 </header>
 
 <div class="wrap">
@@ -139,6 +159,10 @@
   <!-- 分日 tab -->
   <div class="tabs" id="tabs"></div>
 
+  <!-- 全程花費 -->
+  <div id="grandBar">💰 全程花費 <span id="grandTotal">₩0</span>
+    <span class="tip">每天可在下方記錄花費 · 資料存在本機瀏覽器</span></div>
+
   <!-- 每日行程 -->
   <div id="days"></div>
 
@@ -150,7 +174,7 @@
     每個地點都有「🟢 Naver 導航」與「Google 看位置」兩個連結；地圖上的點也可以點。<br>
     時間是建議參考，家庭步調可彈性調整。
   </div>
-  <footer>SEOUL · JULY · v3.5</footer>
+  <footer>SEOUL · JULY · v3.6</footer>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -310,6 +334,37 @@ const COLORS={home:"#3A3530",food:"#D9694B",shop:"#7C6AF7",exp:"#2E9E8F",design:
 function mapsUrl(q){return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);}
 function naverUrl(q){return "https://map.naver.com/p/search/"+encodeURIComponent(q);}
 
+// ── 花費（存在本機 localStorage）──
+const BKEY='seoul_budget_v1';
+function loadBudget(){try{return JSON.parse(localStorage.getItem(BKEY))||{};}catch(e){return {};}}
+function saveBudget(){localStorage.setItem(BKEY, JSON.stringify(BUDGET));}
+let BUDGET = loadBudget();
+function escapeHtml(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function won(n){return '₩'+(n||0).toLocaleString('en-US');}
+function dayTotal(day){return (BUDGET[day]||[]).reduce((s,e)=>s+(e.a||0),0);}
+function grandTotal(){return DAYS.reduce((s,d,i)=>s+dayTotal(i+1),0);}
+function renderDayBudget(day){
+  const list=document.getElementById('budlist'+day); if(!list) return;
+  const items=BUDGET[day]||[];
+  list.innerHTML = items.length ? items.map((e,idx)=>`<div class="bud-row">
+     <span class="bud-d">${escapeHtml(e.t)}</span>
+     <span class="bud-a">${won(e.a)}</span>
+     <button class="bud-del" onclick="delExpense(${day},${idx})" aria-label="刪除">✕</button>
+   </div>`).join("") : `<div class="bud-empty">尚未記錄</div>`;
+  document.getElementById('budsum'+day).textContent = won(dayTotal(day));
+  const g=document.getElementById('grandTotal'); if(g) g.textContent=won(grandTotal());
+}
+function renderAllBudget(){DAYS.forEach((d,i)=>renderDayBudget(i+1));}
+function addExpense(day){
+  const ti=document.getElementById('buditem'+day), ai=document.getElementById('budamt'+day);
+  const t=(ti.value||'').trim(); const a=parseInt(ai.value,10);
+  if(!t && isNaN(a)) return;
+  if(!BUDGET[day]) BUDGET[day]=[];
+  BUDGET[day].push({t:t||'(未命名)', a:isNaN(a)?0:a});
+  saveBudget(); ti.value=''; ai.value=''; renderDayBudget(day); ti.focus();
+}
+function delExpense(day,idx){ (BUDGET[day]||[]).splice(idx,1); saveBudget(); renderDayBudget(day); }
+
 // 地圖
 const map=L.map('map',{scrollWheelZoom:false}).setView([37.554,126.985],11);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -371,7 +426,18 @@ document.getElementById('days').innerHTML = DAYS.map((d,i)=>`
     <div class="day-head"><span class="d">${d.day}</span><span class="th">${d.theme}</span></div>
     <div class="day-sub">${d.date} · <span class="base">📍 ${d.base}</span>${d.busy?' · <span style="color:#B06A2E;font-weight:600">點多，依興趣取捨</span>':''}</div>
     <div class="tl">${d.stops.map(stopHTML).join("")}</div>
+    <div class="budget">
+      <div class="bud-head">💰 Day ${i+1} 花費 <span class="bud-sub" id="budsum${i+1}">₩0</span></div>
+      <div class="bud-list" id="budlist${i+1}"></div>
+      <div class="bud-add">
+        <input class="bud-item" id="buditem${i+1}" placeholder="品項（例：晚餐、計程車）">
+        <input class="bud-amt" id="budamt${i+1}" type="number" inputmode="numeric" placeholder="金額 ₩"
+          onkeydown="if(event.key==='Enter')addExpense(${i+1})">
+        <button class="bud-btn" onclick="addExpense(${i+1})">＋</button>
+      </div>
+    </div>
   </section>`).join("");
+renderAllBudget();
 
 // 候補
 document.getElementById('backup').innerHTML = BACKUP.map(id=>{
